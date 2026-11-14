@@ -18,6 +18,7 @@ export class LocalMediaManager {
   private selectedMicInfo: MediaDeviceInfo | Record<string, never> = {};
   private selectedSpeakerInfo: MediaDeviceInfo | Record<string, never> = {};
   private preferredMicId: string | null = null;
+  private micRequest = 0;
 
   /** Called with the new track whenever the microphone track is replaced. */
   onLocalTrackReplaced: ((track: MediaStreamTrack) => Promise<void> | void) | null = null;
@@ -76,7 +77,9 @@ export class LocalMediaManager {
   }
 
   private async publishDevices(): Promise<void> {
+    const stream = this.stream;
     const devices = await navigator.mediaDevices.enumerateDevices();
+    if (!stream || stream !== this.stream) return;
     this.callbacks.onAvailableMicsUpdated?.(devices.filter((d) => d.kind === "audioinput"));
     this.callbacks.onAvailableSpeakersUpdated?.(devices.filter((d) => d.kind === "audiooutput"));
     const track = this.stream?.getAudioTracks()[0];
@@ -96,14 +99,7 @@ export class LocalMediaManager {
       this.initialized = true;
       return;
     }
-    this.stream = await this.openMic(this.preferredMicId);
-    const track = this.stream.getAudioTracks()[0];
-    if (track) {
-      track.enabled = this.micOn;
-      this.callbacks.onTrackStarted?.(track, { id: "local", local: true, name: "local" });
-    }
-    await this.publishDevices();
-    this.initialized = true;
+    this.initialized = await this.replaceMic();
   }
 
   async connect(): Promise<void> {
@@ -111,6 +107,7 @@ export class LocalMediaManager {
   }
 
   async disconnect(): Promise<void> {
+    this.micRequest += 1;
     this.stream?.getTracks().forEach((t) => {
       t.stop();
       this.callbacks.onTrackStopped?.(t, { id: "local", local: true, name: "local" });
@@ -139,16 +136,35 @@ export class LocalMediaManager {
   async updateMic(micId: string): Promise<void> {
     this.preferredMicId = micId;
     if (!this.initialized) return;
-    const next = await this.openMic(micId);
+    await this.replaceMic();
+  }
+
+  /** Only the latest microphone request may install a track. */
+  private async replaceMic(): Promise<boolean> {
+    const request = ++this.micRequest;
+    const next = await this.openMic(this.preferredMicId);
     const track = next.getAudioTracks()[0];
-    if (!track) return;
-    track.enabled = this.micOn;
-    const old = this.stream;
+    if (request !== this.micRequest || !track) {
+      next.getTracks().forEach((track) => track.stop());
+      return false;
+    }
+
+    const previous = this.stream;
     this.stream = next;
-    await this.onLocalTrackReplaced?.(track);
-    old?.getTracks().forEach((t) => t.stop());
-    this.callbacks.onTrackStarted?.(track, { id: "local", local: true, name: "local" });
-    await this.publishDevices();
+    track.enabled = this.micOn;
+    try {
+      await this.onLocalTrackReplaced?.(track);
+      if (request !== this.micRequest) return false;
+      this.callbacks.onTrackStarted?.(track, { id: "local", local: true, name: "local" });
+      await this.publishDevices();
+      return request === this.micRequest;
+    } catch (error) {
+      next.getTracks().forEach((track) => track.stop());
+      if (this.stream === next) this.stream = null;
+      throw error;
+    } finally {
+      previous?.getTracks().forEach((track) => track.stop());
+    }
   }
 
   updateCam(): void {
@@ -176,18 +192,10 @@ export class LocalMediaManager {
     this.micOn = enable;
     if (enable && !this.stream && this.initialized) {
       // Started without a microphone: acquire one now and attach it.
-      void this.openMic(this.preferredMicId)
-        .then(async (s) => {
-          this.stream = s;
-          const track = s.getAudioTracks()[0];
-          if (!track) return;
-          await this.onLocalTrackReplaced?.(track);
-          this.callbacks.onTrackStarted?.(track, { id: "local", local: true, name: "local" });
-          await this.publishDevices();
-        })
-        .catch(() => {
-          this.micOn = false;
-        });
+      void this.replaceMic().catch(() => {
+        // openMic reports device errors through onDeviceError.
+        if (!this.stream) this.micOn = false;
+      });
       return;
     }
     this.stream?.getAudioTracks().forEach((t) => {

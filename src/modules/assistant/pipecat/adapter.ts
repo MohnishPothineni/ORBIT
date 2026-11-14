@@ -53,6 +53,7 @@ export class PipecatVoiceSession implements VoiceSession {
   private readonly opts: VoiceSessionOptions;
 
   private created: CreatedClient | null = null;
+  private stopped = false;
   private connection: ConnectionState = "idle";
   private mic = true;
   private settings: VoiceSettings | null;
@@ -76,7 +77,6 @@ export class PipecatVoiceSession implements VoiceSession {
   private rttTimer: number | undefined;
 
   // tools
-  private callSeq = 0;
   private calls = new Map<string, TrackedCall>();
   private pendingByName = new Map<string, string[]>();
   private toolCallIds = new Map<string, string>();
@@ -99,16 +99,18 @@ export class PipecatVoiceSession implements VoiceSession {
   /* ---------------------------------------------------------------- */
 
   async connect(): Promise<void> {
-    if (this.created) return;
+    if (this.created || this.stopped) return;
     this.tracker.update({ error: false });
     this.setConnection("connecting");
     try {
       await this.start(true);
     } catch (e) {
+      if (this.stopped) return;
       if (e instanceof DeviceError) {
         // Microphone unavailable: keep text mode usable with a mic-less session.
         this.em.emit("micPermission", e.type === "permissions" ? "denied" : "unavailable");
         await this.teardown();
+        if (this.stopped) return;
         this.setConnection("connecting");
         this.mic = false;
         this.em.emit("micEnabled", false);
@@ -116,6 +118,7 @@ export class PipecatVoiceSession implements VoiceSession {
           await this.start(false);
           return;
         } catch (e2) {
+          if (this.stopped) return;
           this.fail(e2);
           throw e2;
         }
@@ -136,6 +139,12 @@ export class PipecatVoiceSession implements VoiceSession {
     this.botAudio.autoplay = true;
     this.botAudio.volume = this.settings?.volume ?? 1;
     await created.client.connect();
+    if (this.created !== created) {
+      // The user ended the session while connection setup was still pending.
+      await created.media.disconnect();
+      await created.client.disconnect();
+      return;
+    }
     this.mic = withMic && created.client.isMicEnabled;
     this.em.emit("micEnabled", this.mic);
     this.tracker.update({ micEnabled: this.mic });
@@ -144,6 +153,7 @@ export class PipecatVoiceSession implements VoiceSession {
   }
 
   async disconnect(): Promise<void> {
+    this.stopped = true;
     await this.teardown();
     this.setConnection("disconnected");
     this.tracker.reset();
@@ -159,6 +169,8 @@ export class PipecatVoiceSession implements VoiceSession {
     const created = this.created;
     this.created = null;
     if (created) {
+      // Invalidate pending getUserMedia requests before waiting for the transport.
+      await created.media.disconnect();
       created.client.unregisterAllFunctionCallHandlers();
       try {
         await created.client.disconnect();
@@ -272,7 +284,7 @@ export class PipecatVoiceSession implements VoiceSession {
   }
 
   async setInputDevice(deviceId: string): Promise<void> {
-    this.created?.client.updateMic(deviceId);
+    await this.created?.client.updateMic(deviceId);
   }
 
   getLocalAudioTrack(): MediaStreamTrack | null {
@@ -337,7 +349,7 @@ export class PipecatVoiceSession implements VoiceSession {
   private async runClientTool(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
     // Runs synchronously up to the first await, before client-js emits
     // llmFunctionCallInProgress, so the queued id can be matched to tool_call_id.
-    const id = `call-${++this.callSeq}`;
+    const id = crypto.randomUUID();
     const queue = this.pendingByName.get(name) ?? [];
     queue.push(id);
     this.pendingByName.set(name, queue);
