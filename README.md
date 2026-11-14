@@ -18,6 +18,7 @@ The backend (Python, FastAPI, Uvicorn, Pipecat) serves the built frontend and `/
 | `npm run build` | Typecheck, then production build to `dist/`. |
 | `npm run typecheck` | `tsc -b --noEmit` |
 | `npm run lint` | ESLint |
+| `npm test` | Regression tests for microphone races, session cleanup, tool history, and input validation. |
 
 ## Layout
 
