@@ -13,7 +13,7 @@ import { cn } from "./cn";
 import { getFocusable, isTopLayer, popLayer, pushLayer } from "./focus";
 
 export interface PopoverTriggerProps {
-  ref: RefObject<HTMLButtonElement | null>;
+  ref: RefObject<HTMLButtonElement>;
   onClick: () => void;
   "aria-expanded": boolean;
   "aria-controls": string | undefined;
@@ -53,7 +53,7 @@ export function Popover({
   onOpenChange,
 }: PopoverProps) {
   const id = useId();
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const open = controlledOpen ?? uncontrolledOpen;

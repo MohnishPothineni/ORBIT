@@ -101,7 +101,7 @@ export function Sidebar({ mode, drawerOpen, onDrawerClose }: SidebarProps) {
   const rail = mode === "rail" || collapsed;
   return (
     <nav aria-label="Modules" className={cn("bg-panel border-r border-line flex flex-col min-h-0 overflow-y-auto", rail ? "w-16" : "w-60")}>
-      <p className={cn(TYPE.overline, rail ? "px-0 pt-4 pb-2 text-center" : "px-5 pt-4 pb-2")}>{rail ? "Nav" : "Modules"}</p>
+      <p className={cn(TYPE.overline, rail ? "px-0 pt-4 pb-2 text-center" : "px-5 pt-4 pb-2")}>Modules</p>
       <NavItems rail={rail} />
       <div className={cn("mt-auto border-t border-line flex flex-col gap-2", rail ? "items-center p-2 py-4" : "p-4")}>
         {rail ? (
