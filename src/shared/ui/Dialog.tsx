@@ -12,8 +12,8 @@ export interface DialogProps {
   description?: ReactNode;
   children?: ReactNode;
   footer?: ReactNode;
-  /** `center` = modal dialog; `right` = right-side sheet (drawer) with dialog semantics. */
-  placement?: "center" | "right";
+  /** `center` = modal dialog; `right` / `left` = side sheet (drawer) with dialog semantics. */
+  placement?: "center" | "right" | "left";
   initialFocusRef?: RefObject<HTMLElement | null>;
   /** Close when the backdrop is clicked (default true). */
   dismissible?: boolean;
@@ -75,9 +75,16 @@ export function Dialog({
 
   if (!open) return null;
 
-  const right = placement === "right";
+  const sheet = placement !== "center";
   return createPortal(
-    <div className={cn("fixed inset-0 z-50 flex", right ? "justify-end" : "items-center justify-center p-4")}>
+    <div
+      className={cn(
+        "fixed inset-0 z-50 flex",
+        placement === "right" && "justify-end",
+        placement === "left" && "justify-start",
+        !sheet && "items-center justify-center p-4",
+      )}
+    >
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-sunken/80"
@@ -92,7 +99,9 @@ export function Dialog({
         tabIndex={-1}
         className={cn(
           "relative flex flex-col bg-overlay border border-line-strong shadow-overlay focus-visible:outline-none",
-          right ? "h-full w-full max-w-[480px] rounded-l-xl border-r-0" : "w-full max-w-[560px] max-h-[calc(100dvh-32px)] rounded-xl",
+          placement === "right" && "h-full w-full max-w-[480px] rounded-l-xl border-r-0",
+          placement === "left" && "h-full w-full max-w-[280px] rounded-r-xl border-l-0",
+          !sheet && "w-full max-w-[560px] max-h-[calc(100dvh-32px)] rounded-xl",
           className,
         )}
       >
