@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+@theme {
+  /* Fonts */
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Surfaces (darkest → lightest) */
+  --color-sunken:  #060A10;  /* status bar, wells, code blocks, chart plot area */
+  --color-canvas:  #0A0F17;  /* app background */
+  --color-panel:   #101722;  /* cards, sidebar */
+  --color-raised:  #151E2B;  /* card headers, hovered rows, selected nav, inputs */
+  --color-overlay: #1B2636;  /* popovers, dialogs, menus, tooltips */
+
+  /* Lines */
+  --color-line:        #223044;  /* 1px hairline: card borders, dividers */
+  --color-line-strong: #2E3F57;  /* emphasized dividers, table header rule */
+  --color-control:     #56688A;  /* input/select/checkbox borders (≥3:1) */
+
+  /* Text */
+  --color-ink:          #E6EDF5;  /* primary text, values */
+  --color-ink-2:        #9AA8BA;  /* secondary text, labels */
+  --color-ink-3:        #7A889C;  /* tertiary/meta — only on canvas, panel, raised, sunken */
+  --color-ink-disabled: #4A5668;  /* disabled text only */
+
+  /* Accent (interactive, selection, focus) */
+  --color-accent:       #4C8DF0;
+  --color-accent-hover: #6AA2F5;
+  --color-accent-press: #3A78D8;
+  --color-accent-tint:  #12233D;
+  --color-on-accent:    #06101F;
+  --color-focus:        #8AB8FF;
+
+  /* Medical status — reserved for status meaning only */
+  --color-nominal:       #34C38F;
+  --color-nominal-tint:  #0E2A22;
+  --color-nominal-line:  #1E5A45;
+  --color-caution:       #F2B33D;
+  --color-caution-tint:  #2E230C;
+  --color-caution-line:  #6B4E14;
+  --color-critical:      #FF5C5C;
+  --color-critical-tint: #351416;
+  --color-critical-line: #7A2A2D;
+  --color-critical-solid:       #C83232;  /* destructive button fill, white text */
+  --color-critical-solid-hover: #D63C3C;
+  --color-standby:       #9AA8BA;
+  --color-standby-tint:  #182231;
+  --color-standby-line:  #2E3F57;
+
+  /* Data series — charts only, never for status */
+  --color-series-1: #4C8DF0;
+  --color-series-2: #5CD6E0;
+  --color-series-3: #B48CF2;
+  --color-series-4: #E58AC0;
+  --color-series-5: #9AD36A;
+
+  /* Type scale */
+  --text-2xs: 11px;  --text-2xs--line-height: 16px;
+  --text-xs:  12px;  --text-xs--line-height: 16px;
+  --text-sm:  13px;  --text-sm--line-height: 20px;
+  --text-base: 14px; --text-base--line-height: 20px;
+  --text-md:  16px;  --text-md--line-height: 24px;
+  --text-lg:  20px;  --text-lg--line-height: 28px;
+  --text-xl:  24px;  --text-xl--line-height: 32px;
+  --text-2xl: 32px;  --text-2xl--line-height: 40px;
+
+  /* Radii */
+  --radius-sm: 4px;   /* badges, chips, small inputs, checkboxes */
+  --radius-md: 6px;   /* buttons, inputs, selects, tabs */
+  --radius-lg: 8px;   /* cards, tiles, table containers */
+  --radius-xl: 12px;  /* dialogs, popovers, large panels */
+
+  /* Spacing base (Tailwind multiplies this) */
+  --spacing: 4px;
+
+  /* Elevation — overlays only; cards use borders, not shadows */
+  --shadow-overlay: 0 12px 32px rgb(0 0 0 / 0.55), 0 0 0 1px #2E3F57;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+html { color-scheme: dark; }
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 20px;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; border-radius: 4px; }
+::selection { background: #1F3B66; color: var(--color-ink); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Single 1.2s opacity pulse for a newly raised critical badge (section F). */
+@keyframes orbit-critical-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+@utility animate-critical-pulse {
+  animation: orbit-critical-pulse 1.2s var(--ease-standard) 1;
+}
