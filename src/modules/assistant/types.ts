@@ -87,10 +87,12 @@ export interface ToolOutcome {
 }
 
 /**
- * Client-side tool dispatcher. It receives the call and an `update` function to
- * report intermediate status (e.g. awaiting_confirmation → running).
+ * Client-side tool dispatcher. It receives the call, an `update` function to
+ * report intermediate status (e.g. awaiting_confirmation → running), and a
+ * signal that aborts when the pipeline cancels the call or the session ends.
  */
 export type ToolHandler = (
   call: ToolCallEvent,
   update: (patch: Partial<Pick<ToolCallEvent, "status" | "resultSummary" | "error">>) => void,
+  signal: AbortSignal,
 ) => Promise<ToolOutcome>;
