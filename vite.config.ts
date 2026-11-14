@@ -1,0 +1,30 @@
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+
+// FastAPI serves the SPA and /api/* over local HTTPS on the same origin.
+// In development, Vite proxies /api (including WebSocket / WebRTC signaling) to it.
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      // Never used (ORBIT supplies a local media manager); keeps Daily's CDN loader out of the bundle.
+      "@daily-co/daily-js": fileURLToPath(new URL("./src/vendor/daily-js-stub.ts", import.meta.url)),
+    },
+  },
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://localhost:8443",
+        secure: false,
+        changeOrigin: true,
+        ws: true,
+      },
+    },
+  },
+  build: {
+    sourcemap: true,
+    chunkSizeWarningLimit: 900,
+  },
+});
