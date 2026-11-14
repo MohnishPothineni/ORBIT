@@ -26,7 +26,7 @@ export function AppShell() {
         <Sidebar mode="drawer" drawerOpen={drawerOpen} onDrawerClose={() => setDrawerOpen(false)} />
       ) : null}
       {mode !== "drawer" && <Sidebar mode={mode} drawerOpen={false} onDrawerClose={() => {}} />}
-      <main id="main" tabIndex={-1} className={mode === "drawer" ? "col-span-2 overflow-y-auto min-h-0 focus-visible:outline-none" : "overflow-y-auto min-h-0 min-w-0 focus-visible:outline-none"}>
+      <main id="main" tabIndex={-1} className={mode === "drawer" ? "relative col-span-2 overflow-y-auto min-h-0 focus-visible:outline-none" : "relative overflow-y-auto min-h-0 min-w-0 focus-visible:outline-none"}>
         <Outlet />
       </main>
     </div>
