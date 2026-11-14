@@ -25,6 +25,28 @@ export function ModulePlaceholder({ module }: { module: ModuleKey }) {
   );
 }
 
+/** Suspense fallback while a lazily loaded module downloads. */
+export function ModuleSkeleton() {
+  return (
+    <div role="status" aria-label="Loading module" aria-busy="true" className="mx-auto max-w-[1600px] px-6 py-5">
+      <div className="flex items-end justify-between gap-4 pb-5 mb-5 border-b border-line">
+        <div className="flex flex-col gap-2">
+          <div className="h-8 w-56 rounded-md bg-raised animate-pulse" />
+          <div className="h-5 w-80 rounded-md bg-raised animate-pulse" />
+        </div>
+        <div className="h-11 w-36 rounded-md bg-raised animate-pulse" />
+      </div>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_380px]">
+        <div className="flex flex-col gap-4">
+          <div className="h-[220px] rounded-lg bg-raised animate-pulse" />
+          <div className="h-[420px] rounded-lg bg-raised animate-pulse" />
+        </div>
+        <div className="h-[420px] rounded-lg bg-raised animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
 export function NotFound() {
   useEffect(() => {
     document.title = "Not found · ORBIT";
