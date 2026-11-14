@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { cn } from "./cn";
 
 /** Placeholder block matching the final layout. Never use spinners for whole sections. */
@@ -6,7 +7,7 @@ export function Skeleton({ className }: { className?: string }) {
 }
 
 /** A labelled loading region made of skeleton blocks. */
-export function SkeletonGroup({ label = "Loading", className, children }: { label?: string; className?: string; children: React.ReactNode }) {
+export function SkeletonGroup({ label = "Loading", className, children }: { label?: string; className?: string; children: ReactNode }) {
   return (
     <div role="status" aria-label={label} aria-busy="true" className={className}>
       {children}
