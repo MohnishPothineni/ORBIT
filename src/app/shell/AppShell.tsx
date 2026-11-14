@@ -4,7 +4,7 @@ import { MOCK_MODE } from "../../shared/api/mockMode";
 import { SyntheticDataBanner } from "../../shared/ui/SyntheticDataBanner";
 import { Sidebar } from "./Sidebar";
 import { StatusBar } from "./StatusBar";
-import { TABLET, useMediaQuery, WIDE } from "./useMediaQuery";
+import { TABLET, useMediaQuery, WIDE } from "../../shared/hooks/useMediaQuery";
 
 export function AppShell() {
   const wide = useMediaQuery(WIDE);
