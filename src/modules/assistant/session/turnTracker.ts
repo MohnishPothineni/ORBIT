@@ -42,7 +42,11 @@ export class TurnTracker {
   /** Forced state from the mock dev panel; null = derived. */
   private forced: TurnState | null = null;
 
-  constructor(private readonly onChange: (s: TurnState) => void) {}
+  private readonly onChange: (s: TurnState) => void;
+
+  constructor(onChange: (s: TurnState) => void) {
+    this.onChange = onChange;
+  }
 
   update(patch: Partial<TurnInputs>): void {
     this.inputs = { ...this.inputs, ...patch };
