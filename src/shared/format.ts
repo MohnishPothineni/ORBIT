@@ -24,3 +24,6 @@ export function formatUtcDateTime(iso: string | Date): string {
 export function formatCount(n: number): string {
   return n.toLocaleString("en-US");
 }
+
+/** U+2009 thin space between a value and its unit: `72 bpm`. */
+export const THIN_SPACE = String.fromCharCode(0x2009);

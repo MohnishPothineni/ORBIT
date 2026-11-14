@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { THIN_SPACE } from "../../../shared/format";
 import type { StatusLevel } from "../../../shared/types";
 import { Card, CardBody, CardHeader } from "../../../shared/ui/Card";
 import { Skeleton, SkeletonGroup } from "../../../shared/ui/Skeleton";
@@ -83,7 +84,7 @@ export function SessionPipelineCard({ connectionState, metrics, history, config,
             <Row label="Round trip">
               <span>
                 <span className="font-mono text-xs text-ink tabular-nums">{metrics?.rttMs ?? "—"}</span>
-                {metrics?.rttMs != null && <span className="font-mono text-xs text-ink-3">{" "}ms</span>}
+                {metrics?.rttMs != null && <span className="font-mono text-xs text-ink-3">{THIN_SPACE}ms</span>}
               </span>
             </Row>
             <Row label="STT">

@@ -1,4 +1,5 @@
 import type { StatusLevel } from "../types";
+import { THIN_SPACE } from "../format";
 import { cn, TYPE } from "./cn";
 import { StatusBadge } from "./StatusBadge";
 
@@ -40,7 +41,7 @@ export function TelemetryValue({ label, value, unit, timestamp, source, level, s
         <span className={cn(size === "lg" ? TYPE.valueLg : TYPE.valueInline, isNull && "text-ink-3")}>
           {isNull ? "—" : value}
         </span>
-        {unit && !isNull && <span className={TYPE.unit}>{` ${unit}`}</span>}
+        {unit && !isNull && <span className={TYPE.unit}>{`${THIN_SPACE}${unit}`}</span>}
       </span>
       {meta && <span className={TYPE.meta}>{meta}</span>}
     </div>

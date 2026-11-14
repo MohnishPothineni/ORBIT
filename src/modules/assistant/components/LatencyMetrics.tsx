@@ -1,4 +1,5 @@
 import type { PipelineMetrics } from "../types";
+import { THIN_SPACE } from "../../../shared/format";
 
 const ROWS: Array<{ key: keyof Omit<PipelineMetrics, "turnId" | "rttMs">; label: string; bar: string }> = [
   { key: "sttMs", label: "STT", bar: "bg-series-2" },
@@ -55,7 +56,7 @@ export function LatencyMetrics({ metrics, history }: LatencyMetricsProps) {
               <dt className="text-xs text-ink-2">{r.label}</dt>
               <dd className="text-right">
                 <span className="font-mono text-base font-medium tabular-nums text-ink">{v ?? "—"}</span>
-                {v !== null && <span className="font-mono text-xs text-ink-3">{" "}ms</span>}
+                {v !== null && <span className="font-mono text-xs text-ink-3">{THIN_SPACE}ms</span>}
               </dd>
               <div aria-hidden="true" className="col-span-2 h-1 overflow-hidden rounded-sm bg-raised">
                 <div className={`h-full ${r.bar}`} style={{ width: `${v === null ? 0 : Math.min(100, (v / scale) * 100)}%` }} />
