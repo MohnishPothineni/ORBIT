@@ -95,3 +95,13 @@ export function shareRecordWithAssistant(payload: SharePayload, signal?: AbortSi
     signal,
   );
 }
+
+/** Removes any shared record context from the local assistant (crew changed or session ended). */
+export function clearAssistantContext(signal?: AbortSignal): Promise<void> {
+  return withMock(
+    () => apiSend<void>("DELETE", "/api/assistant/context", undefined, { signal }),
+    () => undefined,
+    100,
+    signal,
+  );
+}
