@@ -90,6 +90,12 @@ export class LocalMediaManager {
 
   async initialize(): Promise<void> {
     if (this.initialized) return;
+    if (!this.micOn) {
+      // Text-only session (e.g. microphone permission was denied). The audio
+      // transceiver still exists; a track is attached if the mic is enabled later.
+      this.initialized = true;
+      return;
+    }
     this.stream = await this.openMic(this.preferredMicId);
     const track = this.stream.getAudioTracks()[0];
     if (track) {
@@ -168,6 +174,22 @@ export class LocalMediaManager {
 
   enableMic(enable: boolean): void {
     this.micOn = enable;
+    if (enable && !this.stream && this.initialized) {
+      // Started without a microphone: acquire one now and attach it.
+      void this.openMic(this.preferredMicId)
+        .then(async (s) => {
+          this.stream = s;
+          const track = s.getAudioTracks()[0];
+          if (!track) return;
+          await this.onLocalTrackReplaced?.(track);
+          this.callbacks.onTrackStarted?.(track, { id: "local", local: true, name: "local" });
+          await this.publishDevices();
+        })
+        .catch(() => {
+          this.micOn = false;
+        });
+      return;
+    }
     this.stream?.getAudioTracks().forEach((t) => {
       t.enabled = enable;
     });
