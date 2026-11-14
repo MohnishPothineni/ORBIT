@@ -219,6 +219,27 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
     await sessionRef.current?.setInputDevice(id);
   }, []);
 
+  /** Ask for the microphone again; restarts an active session so it picks the mic up. */
+  const retryMic = useCallback(async (): Promise<boolean> => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMicPermission("unavailable");
+      return false;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((t) => t.stop());
+      setMicPermission("granted");
+      if (sessionRef.current) {
+        await end();
+        await connect();
+      }
+      return true;
+    } catch (e) {
+      setMicPermission(e instanceof DOMException && e.name === "NotFoundError" ? "unavailable" : "denied");
+      return false;
+    }
+  }, [connect, end]);
+
   const toolCalls = useMemo(() => Object.values(state.calls), [state.calls]);
   const metrics = metricsHistory[metricsHistory.length - 1] ?? null;
 
@@ -268,6 +289,7 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
     interrupt,
     setMic,
     setInputDevice,
+    retryMic,
     mockControls,
   };
 }
