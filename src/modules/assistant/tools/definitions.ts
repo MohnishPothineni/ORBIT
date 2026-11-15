@@ -36,6 +36,14 @@ export function isToolName(name: string): name is ToolName {
   return TOOL_DEFINITIONS.some((t) => t.name === name);
 }
 
+/**
+ * How long a write/share confirmation waits for a person. Kept shorter than the
+ * server's CONFIRM_TIMEOUT_SECS (300 s, server/orbit_server/tools.py) so the
+ * browser always gives up first and reports "declined" to the model, instead of
+ * leaving a Save button that still works after the model was told it timed out.
+ */
+export const CONFIRM_TIMEOUT_MS = 285_000;
+
 /** The exact phrase a person must speak to approve a share by voice. */
 export const VOICE_SHARE_PHRASE = "confirm share";
 

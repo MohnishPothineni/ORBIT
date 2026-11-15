@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useCrew } from "../../../shared/context/CrewContext";
 import { useToast } from "../../../shared/ui/Toast";
 import { formatUtcTime } from "../../../shared/format";
+import { EMBEDDED, notifyWebsite, WEBSITE_PAGES, websiteTab } from "../../../shared/embed";
 import type { CrewMember } from "../../../shared/types";
 import {
   clearAssistantContext,
@@ -12,7 +13,7 @@ import {
   shareRecordWithAssistant,
   VITAL_META,
 } from "../services/toolServices";
-import { isVoiceShareApproval, isToolName, TOOL_DEFINITIONS } from "../tools/definitions";
+import { CONFIRM_TIMEOUT_MS, isVoiceShareApproval, isToolName, TOOL_DEFINITIONS } from "../tools/definitions";
 import type { Citation, ToolHandler, ToolOutcome } from "../types";
 
 import {
@@ -27,10 +28,11 @@ export type Confirmation = VitalConfirmation | ShareConfirmation;
 export type DecisionVia = "button" | "voice";
 interface Decision {
   approve: boolean;
-  via: DecisionVia | "cancelled";
+  via: DecisionVia | "cancelled" | "timeout";
 }
 
 export interface SharedContextEntry {
+  sessionId: string;
   crewId: string;
   callsign: string;
   sections: ShareSection[];
@@ -53,6 +55,12 @@ function writeDisabled(disabled: Set<string>) {
   } catch {
     /* storage unavailable */
   }
+}
+
+function notApproved(via: Decision["via"], byPerson: string, verb: "saved" | "shared"): string {
+  if (via === "timeout") return `No one confirmed within ${Math.round(CONFIRM_TIMEOUT_MS / 60_000)} minutes. Nothing was ${verb}.`;
+  if (via === "cancelled") return `Cancelled before anyone confirmed. Nothing was ${verb}.`;
+  return `${byPerson}. Nothing was ${verb}.`;
 }
 
 const ALLOWED_ROUTES = ["crew", "anatomy", "assistant", "evidence"];
@@ -97,7 +105,11 @@ export function useToolRegistry() {
     setConfirmations((list) => [...list.filter((c) => c.callId !== req.callId), req]);
     return new Promise<Decision>((resolve) => {
       const cancel = () => done({ approve: false, via: "cancelled" });
+      // Give up before the server's own timeout, so the model is told "declined"
+      // and no Save button is left that would still store data afterwards.
+      const timer = window.setTimeout(() => done({ approve: false, via: "timeout" }), CONFIRM_TIMEOUT_MS);
       const done = (d: Decision) => {
+        window.clearTimeout(timer);
         signal.removeEventListener("abort", cancel);
         waiters.current.delete(req.callId);
         setConfirmations((list) => list.filter((c) => c.callId !== req.callId));
@@ -115,7 +127,7 @@ export function useToolRegistry() {
   }, []);
 
   const handleTool: ToolHandler = useCallback(
-    async (call, update, signal) => {
+    async (call, update, signal, context) => {
       const name = call.name;
       const { activeCrew: viewer, location: currentLocation, disabled: disabledTools } = live.current;
       if (!isToolName(name)) return fail(`Unknown tool: ${call.name}`);
@@ -158,10 +170,12 @@ export function useToolRegistry() {
             signal,
           );
           if (!decision.approve) {
-            return declined(decision.via === "cancelled" ? "Cancelled before anyone confirmed. Nothing was saved." : "Discarded by a person. Nothing was saved.");
+            return declined(notApproved(decision.via, "Discarded by a person", "saved"));
           }
           update({ status: "running" });
           const saved = await logVital(draft, signal);
+          // Inside the website, also add it to the website's Health log (kept in that page's browser storage).
+          notifyWebsite({ type: "orbit:vital-saved", id: saved.id, crewId: subject.id, kind, value, recordedAt: saved.recordedAt });
           return ok(`Saved ${meta.label} ${value} ${meta.unit} for ${subject.callsign} at ${formatUtcTime(saved.recordedAt)}`, {
             id: saved.id,
             recordedAt: saved.recordedAt,
@@ -172,10 +186,15 @@ export function useToolRegistry() {
           const path = readString(args.path) ?? readString(args.route);
           if (!path || !path.startsWith("/") || path.startsWith("//")) return fail("Navigation needs a path inside this console.");
           const first = path.slice(1).split(/[/?#]/)[0];
-          if (!ALLOWED_ROUTES.includes(first)) return fail(`No screen at ${path}.`);
+          const websitePage = EMBEDDED && Object.hasOwn(WEBSITE_PAGES, first);
+          if (!ALLOWED_ROUTES.includes(first) && !websitePage) {
+            return fail(Object.hasOwn(WEBSITE_PAGES, first) ? `${WEBSITE_PAGES[first]} is only on the website.` : `No screen at ${path}.`);
+          }
           update({ status: "running" });
           setPendingNavigation(path);
-          return ok(`Opening ${path}`, { path });
+          // Name the screen that actually opens, so the reply cannot claim a different one.
+          const label = EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path;
+          return ok(`Opening ${label}`, { path, screen: label });
         }
 
         case "control_anatomy": {
@@ -209,6 +228,9 @@ export function useToolRegistry() {
         }
 
         case "share_record_with_assistant": {
+          // Shared records belong to one voice session; without one there is nothing to share with.
+          const sessionId = context.sessionId;
+          if (!sessionId) return fail("Sharing needs an active voice session.");
           const subject = resolveCrew(args) ?? viewer;
           const summary = await getCrewSummary(subject.id, signal);
           const { sections, content, rows, withheld } = buildSharePreview(args.sections, subject, viewer, summary);
@@ -219,11 +241,11 @@ export function useToolRegistry() {
             signal,
           );
           if (!decision.approve) {
-            return declined(decision.via === "cancelled" ? "Cancelled before anyone confirmed. Nothing was shared." : "Declined by a person. Nothing was shared.");
+            return declined(notApproved(decision.via, "Declined by a person", "shared"));
           }
           update({ status: "running" });
-          const res = await shareRecordWithAssistant({ crewId: subject.id, sections, content }, signal);
-          setSharedContext((list) => [...list, { crewId: subject.id, callsign: subject.callsign, sections, sharedAt: res.sharedAt }]);
+          const res = await shareRecordWithAssistant({ sessionId, crewId: subject.id, sections, content }, signal);
+          setSharedContext((list) => [...list, { sessionId, crewId: subject.id, callsign: subject.callsign, sections, sharedAt: res.sharedAt }]);
           const how = decision.via === "voice" ? "approved by voice" : "approved on screen";
           return ok(`Shared ${sections.map((x) => SHARE_SECTIONS[x].toLowerCase()).join(" and ")} for ${subject.callsign} · ${how}`, {
             shared: content,
@@ -253,9 +275,13 @@ export function useToolRegistry() {
     for (const done of Array.from(waiters.current.values())) done({ approve: false, via: "cancelled" });
   }, []);
 
+  const sharedRef = useRef(sharedContext);
+  sharedRef.current = sharedContext;
+
   const clearShared = useCallback(async () => {
+    const sessions = Array.from(new Set(sharedRef.current.map((e) => e.sessionId)));
     try {
-      await clearAssistantContext();
+      await Promise.all(sessions.map((id) => clearAssistantContext(id)));
       setSharedContext([]);
     } catch {
       toast({

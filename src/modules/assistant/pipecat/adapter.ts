@@ -67,6 +67,13 @@ export class PipecatVoiceSession implements VoiceSession {
   private sawBotOutput = false;
   private botKind: "sentence" | "token" | null = null;
   private botEmitted = false;
+  /** Text shown in the open reply bubble so far. */
+  private botText = "";
+  /** The open bubble was started by the LLM's word stream before spoken sentences arrived. */
+  private botFromTokens = false;
+  /** A reply ends when the LLM has finished and the voice has stopped, whichever is later. */
+  private llmActive = false;
+  private botVoiceActive = false;
   private seenSegments = new Set<number>();
 
   // metrics
@@ -264,6 +271,7 @@ export class PipecatVoiceSession implements VoiceSession {
       if (this.botAudio) this.botAudio.muted = false;
     }, 1500);
     this.closeBotTurn();
+    this.botVoiceActive = false;
     this.tracker.update({ botSpeaking: false });
     this.em.emit("botSpeaking", false);
   }
@@ -309,14 +317,33 @@ export class PipecatVoiceSession implements VoiceSession {
     if (this.botEmitted) this.em.emit("botTranscript", { text: "", final: true, at: nowIso() });
     this.botKind = null;
     this.botEmitted = false;
+    this.botText = "";
+    this.botFromTokens = false;
     this.seenSegments.clear();
   }
 
   private appendBot(text: string, kind: "sentence" | "token"): void {
     if (!text) return;
     if (this.botKind === null) this.botKind = kind;
-    if (kind !== this.botKind) return;
-    const chunk = kind === "sentence" && this.botEmitted ? ` ${text.trim()}` : kind === "sentence" ? text.trim() : text;
+    let chunk: string;
+    if (kind === "sentence" && (this.botKind === "token" || this.botFromTokens)) {
+      // The first spoken sentence of a session arrives after the LLM's word stream has
+      // started this bubble, and the word stream stops then. Switch to sentences and, for
+      // the rest of this bubble, add only what the words have not already shown.
+      this.botKind = "sentence";
+      this.botFromTokens = true;
+      const sentence = text.trim();
+      if (this.botText.includes(sentence)) return;
+      let overlap = Math.min(sentence.length, this.botText.length);
+      while (overlap > 0 && !this.botText.endsWith(sentence.slice(0, overlap))) overlap -= 1;
+      chunk = overlap > 0 ? sentence.slice(overlap) : ` ${sentence}`;
+    } else if (kind !== this.botKind) {
+      return;
+    } else {
+      chunk = kind === "sentence" && this.botEmitted ? ` ${text.trim()}` : kind === "sentence" ? text.trim() : text;
+    }
+    if (!chunk || (this.botKind === "sentence" && !chunk.trim())) return;
+    this.botText += chunk;
     this.botEmitted = true;
     this.em.emit("botTranscript", { text: chunk, final: false, at: nowIso() });
   }
@@ -358,7 +385,9 @@ export class PipecatVoiceSession implements VoiceSession {
     this.calls.set(id, { call, ctrl });
     this.emitCall(id);
     try {
-      const outcome = await this.opts.handleTool(call, (patch) => this.patchCall(id, patch), ctrl.signal);
+      const outcome = await this.opts.handleTool(call, (patch) => this.patchCall(id, patch), ctrl.signal, {
+        sessionId: this.created?.sessionId() ?? null,
+      });
       this.patchCall(id, { status: outcome.status, resultSummary: outcome.resultSummary, error: outcome.error });
       if (outcome.citations?.length) this.em.emit("citations", outcome.citations);
       return { status: outcome.status, ...(outcome.error ? { error: outcome.error } : {}), ...outcome.result };
@@ -443,12 +472,15 @@ export class PipecatVoiceSession implements VoiceSession {
           this.metrics = { ...this.metrics, voiceToVoiceMs: Math.round(performance.now() - this.turnStartedAt) };
           this.em.emit("metrics", this.metrics);
         }
+        this.botVoiceActive = true;
         this.tracker.update({ botSpeaking: true, awaitingReply: false });
         this.em.emit("botSpeaking", true);
       },
       onBotStoppedSpeaking: () => {
         window.clearTimeout(this.interruptTimer);
         if (this.botAudio) this.botAudio.muted = false;
+        this.botVoiceActive = false;
+        if (!this.llmActive) this.closeBotTurn();
         this.tracker.update({ botSpeaking: false });
         this.em.emit("botSpeaking", false);
       },
@@ -462,12 +494,18 @@ export class PipecatVoiceSession implements VoiceSession {
         if (this.sawUserInput) return;
         this.onUserText(d.text, d.final, d.timestamp);
       },
+      // Close any open bot turn first. The greeting is spoken without the LLM, so no
+      // onBotLlmStopped ends it, and the first reply would otherwise be appended to it.
       onBotLlmStarted: () => {
-        this.botKind = null;
-        this.botEmitted = false;
-        this.seenSegments.clear();
+        this.closeBotTurn();
+        this.llmActive = true;
       },
-      onBotLlmStopped: () => this.closeBotTurn(),
+      // The spoken text (bot-output) arrives sentence by sentence as the audio plays, after
+      // the LLM has finished. Closing here would split the reply into two bubbles.
+      onBotLlmStopped: () => {
+        this.llmActive = false;
+        if (!this.botVoiceActive) this.closeBotTurn();
+      },
       onBotOutput: (d: BotOutputData) => {
         this.sawBotOutput = true;
         if (d.spoken_status && d.spoken_status !== "new") return;

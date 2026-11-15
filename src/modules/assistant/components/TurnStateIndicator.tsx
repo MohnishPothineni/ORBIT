@@ -42,11 +42,13 @@ export interface TurnStateIndicatorProps {
   toolName: string | null;
   errorMessage: string | null;
   className?: string;
+  /** Center the label on the icon. Used in the narrow side panel. */
+  centered?: boolean;
 }
 
 const ANNOUNCE_DEBOUNCE_MS = 500;
 
-export function TurnStateIndicator({ state, toolName, errorMessage, className }: TurnStateIndicatorProps) {
+export function TurnStateIndicator({ state, toolName, errorMessage, className, centered = false }: TurnStateIndicatorProps) {
   const meta = turnStateMeta(state, toolName, errorMessage);
   const Icon = meta.icon;
   const [announced, setAnnounced] = useState(meta.label);
@@ -58,16 +60,16 @@ export function TurnStateIndicator({ state, toolName, errorMessage, className }:
   }, [meta.label]);
 
   return (
-    <div className={cn("flex flex-col gap-2 min-w-0", className)}>
+    <div className={cn("flex min-w-0 flex-col gap-2", centered && "items-center text-center", className)}>
       <span className="font-mono text-2xs font-medium uppercase tracking-[0.08em] text-ink-3">Turn state</span>
-      <div className={cn("flex items-start gap-2.5", STATUS_TEXT[meta.level])}>
+      <div className={cn("flex gap-2.5", centered ? "flex-col items-center" : "items-center", STATUS_TEXT[meta.level])}>
         <Icon
           size={24}
           strokeWidth={ICON_STROKE}
           aria-hidden="true"
-          className={cn("mt-0.5 shrink-0", meta.spin && "animate-spin")}
+          className={cn("shrink-0", meta.spin && "animate-spin")}
         />
-        <span className="text-lg font-semibold leading-7 break-words line-clamp-3">{meta.label}</span>
+        <span className={cn("font-semibold break-words", centered ? "text-base leading-6" : "text-lg leading-7 line-clamp-3")}>{meta.label}</span>
       </div>
       <span className="sr-only" aria-live="polite" aria-atomic="true">
         {`Assistant: ${announced}`}

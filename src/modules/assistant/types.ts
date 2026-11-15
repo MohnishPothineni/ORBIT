@@ -55,7 +55,11 @@ export interface VoiceSettings {
 export interface VoiceConfig {
   voices: VoiceOption[];
   defaults: VoiceSettings;
-  capabilities: { supportsBlend: boolean; speedRange: [number, number]; sttModel: string; llmModel: string; ttsModel: string };
+  capabilities: {
+    supportsBlend: boolean; speedRange: [number, number]; sttModel: string; llmModel: string; ttsModel: string;
+    /** Module-local addition: how end of turn is detected, e.g. "Smart Turn v3" or "Silence timer · 1 s". */
+    turnDetection?: string;
+  };
   pipelineHealth: Record<"stt" | "llm" | "tts" | "vad" | "turn", "ready" | "loading" | "unavailable">;
 }
 
@@ -95,4 +99,10 @@ export type ToolHandler = (
   call: ToolCallEvent,
   update: (patch: Partial<Pick<ToolCallEvent, "status" | "resultSummary" | "error">>) => void,
   signal: AbortSignal,
+  context: ToolContext,
 ) => Promise<ToolOutcome>;
+
+/** Which live voice session a tool call belongs to (shared records are scoped to it). */
+export interface ToolContext {
+  sessionId: string | null;
+}

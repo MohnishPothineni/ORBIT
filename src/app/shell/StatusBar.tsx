@@ -1,11 +1,10 @@
 import { Cpu, Database, Lock, Menu, ServerCrash, ShieldAlert, WifiOff, type LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useSystemStatus } from "../../shared/context/SystemStatusContext";
-import { formatCount, formatUtcDate, formatUtcDateTime, formatUtcTime } from "../../shared/format";
+import { formatCount, formatUtcDate, formatUtcDateTime } from "../../shared/format";
 import type { NetworkMode, StatusLevel, SystemStatus } from "../../shared/types";
-import { IconButton } from "../../shared/ui/Button";
 import { CrewSelector } from "./CrewSelector";
+import { SECTION_LABEL, currentSection } from "./section";
 import { StatusChip } from "./StatusChip";
 
 const NETWORK: Record<NetworkMode, { level: StatusLevel; icon: LucideIcon; text: string }> = {
@@ -14,19 +13,6 @@ const NETWORK: Record<NetworkMode, { level: StatusLevel; icon: LucideIcon; text:
   cert_untrusted: { level: "caution", icon: ShieldAlert, text: "Certificate not trusted" },
   unreachable: { level: "critical", icon: ServerCrash, text: "Local server unreachable" },
 };
-
-function UtcClock() {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return (
-    <span aria-hidden="true" className="font-mono text-xs text-ink-2 tabular-nums whitespace-nowrap">
-      {formatUtcTime(now, true)}
-    </span>
-  );
-}
 
 function NetworkChip({ network }: { network: SystemStatus["network"] }) {
   const n = NETWORK[network.mode];
@@ -114,39 +100,23 @@ function IndexChip({ faiss }: { faiss: SystemStatus["faiss"] }) {
   );
 }
 
-export interface StatusBarProps {
-  /** Shown below 768px to open the navigation drawer. */
-  onOpenNav?: () => void;
-  showNavButton: boolean;
-}
-
-export function StatusBar({ onOpenNav, showNavButton }: StatusBarProps) {
+export function StatusBar({ navigationOpen, onToggleNav }: { navigationOpen: boolean; onToggleNav: () => void }) {
   const { status } = useSystemStatus();
+  const label = SECTION_LABEL[currentSection(useLocation().pathname)];
+  const ready = status?.ollama.state === "ready" && status.network.mode !== "unreachable";
   return (
-    <header className="col-span-2 h-12 flex items-center gap-2 px-3 bg-sunken border-b border-line min-w-0">
-      {showNavButton && <IconButton icon={Menu} label="Open navigation" size="sm" onClick={onOpenNav} />}
-      <Link to="/crew" className="flex items-center rounded-sm whitespace-nowrap" aria-label="ORBIT Crew Health — go to Crew status">
-        <span className="font-sans text-base font-semibold text-ink">ORBIT</span>
-        <span aria-hidden="true" className="h-4 w-px bg-line-strong mx-2" />
-        <span className="text-sm text-ink-2">Crew Health</span>
-      </Link>
-      <div className="flex-1" />
-      {status ? (
-        <>
-          <NetworkChip network={status.network} />
-          <ModelChip ollama={status.ollama} />
-          <IndexChip faiss={status.faiss} />
-        </>
-      ) : (
-        <div role="status" aria-label="Loading system status" className="flex gap-2">
-          <span className="h-8 w-28 rounded-md bg-raised animate-pulse" />
-          <span className="h-8 w-24 rounded-md bg-raised animate-pulse" />
-          <span className="h-8 w-32 rounded-md bg-raised animate-pulse" />
-        </div>
-      )}
-      <UtcClock />
-      <span aria-hidden="true" className="h-6 w-px bg-line mx-1" />
-      <CrewSelector />
+    <header className="orbit-topbar">
+      <button className="orbit-menu-button" type="button" aria-label="Toggle navigation" aria-expanded={navigationOpen} aria-controls="orbit-navigation" onClick={onToggleNav}><Menu size={20} /></button>
+      <div className="orbit-location"><span>Mission control</span><b aria-hidden="true">/</b> {label}</div>
+      <div className="orbit-topbar-actions">
+        <details className="orbit-system-status">
+          <summary><span aria-hidden="true" className={ready ? "text-nominal" : "text-ink-2"}>&#9679;</span>{ready ? "Ready" : "System status"}</summary>
+          <div aria-label="Local system status">
+            {status ? <><NetworkChip network={status.network} /><ModelChip ollama={status.ollama} /><IndexChip faiss={status.faiss} /></> : <p className="text-sm text-ink-2">Checking local services…</p>}
+          </div>
+        </details>
+        <CrewSelector />
+      </div>
     </header>
   );
 }
