@@ -97,7 +97,7 @@ export class DoctorSoftwareRenderer {
               alpha*=(texels[o0+3]*w0+texels[o1+3]*w1+texels[o2+3]*w2+texels[o3+3]*w3)/255;
             }
             if(alpha<Math.max(.01,mat.alphaTest||0))continue;
-            const mask=g.attributes.orbitClothing;if(mat.userData.orbitPink&&mask){const a=wa*mask.getX(ia)+wb*mask.getX(ib)+wc*mask.getX(ic),shade=Math.min(1.0,Math.max(.65,Math.hypot(r,gc,bl)/255*2.0));r=r*(1-a)+194*shade*a;gc=gc*(1-a)+121*shade*a;bl=bl*(1-a)+145*shade*a;}
+            const mask=g.attributes.orbitClothing;if(mat.userData.orbitPink&&mask){const warm=Math.min(1,Math.max(0,(r/Math.max(bl,1)-1.1)/.3)),a=(wa*mask.getX(ia)+wb*mask.getX(ib)+wc*mask.getX(ic))*(1-warm*warm*(3-2*warm)),shade=Math.min(1.0,Math.max(.65,Math.hypot(r,gc,bl)/255*2.0));r=r*(1-a)+194*shade*a;gc=gc*(1-a)+121*shade*a;bl=bl*(1-a)+145*shade*a;}
             const l=wa*light[ia]+wb*light[ib]+wc*light[ic];
             // Source maps are sRGB. Untextured uniform materials use Three's linear colors.
             r=Math.min(255,r*(texture?color.r:Math.pow(color.r,1/2.2))*l);

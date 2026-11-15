@@ -95,6 +95,8 @@ export async function createDoctorMaterials(renderer) {
       shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
         #include <map_fragment>
         float orbitCloth = clamp(vOrbitClothing, 0.0, 1.0);
+        // The source scrubs are blue and skin is warm: keep skin (arms, hands, V-neck) out of the fabric tint.
+        orbitCloth *= 1.0 - smoothstep(1.25, 1.7, diffuseColor.r / max(diffuseColor.b, .01));
         // Atlas hair is darker than exposed skin. Avoid giving it skin gloss.
         float orbitSkin = (1.0 - orbitCloth) * smoothstep(.09, .25, diffuseColor.r);
         ${persona === 'female' ? 'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(.34,.115,.17) * clamp(length(diffuseColor.rgb)*2.0,.65,1.0), orbitCloth);' : 'diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(.76,.86,.93), orbitCloth);'}
@@ -122,7 +124,7 @@ export async function createDoctorMaterials(renderer) {
         #include <opaque_fragment>
       `);
     };
-    material.customProgramCacheKey = () => `orbit-studio-v1-${persona}-${Boolean(poreMap)}`;
+    material.customProgramCacheKey = () => `orbit-studio-v2-${persona}-${Boolean(poreMap)}`;
   }
   return { apply, hasDetail: Boolean(poreMap), dispose() { poreMap?.dispose(); for (const m of originals) m.dispose(); } };
 }
