@@ -25,7 +25,7 @@ export function ConfirmToolCard({ confirmation, onApprove, onDecline, onReview }
         <p className="font-mono text-xs text-ink-2">
           {confirmation.crew.callsign} · {d.kind} · {d.value} {d.unit} · {formatUtcTime(d.recordedAt)} · source assistant
         </p>
-        <p className="text-xs text-ink-2">Nothing is saved until a person presses Save.</p>
+        <p className="text-xs text-ink-2">Nothing is saved until a person presses Save or says &ldquo;Confirm save&rdquo;.</p>
         <div className="flex gap-2">
           <Button variant="primary" onClick={onApprove}>
             Save

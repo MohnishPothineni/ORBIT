@@ -42,7 +42,7 @@ from pipecat.workers.runner import WorkerRunner
 from . import config
 from .health import pipeline_health, warm_up_llm
 from .store import store
-from .tools import ClientToolBridge, openai_tools, register_client_tools, tools_schema
+from .tools import ClientToolBridge, ConfirmPhraseGate, openai_tools, register_client_tools, tools_schema
 from .voice_settings import VAD_CONFIDENCE, VoiceSettings, load_settings
 
 BASE_PROMPT = """You are the ORBIT crew assistant, a calm, warm and knowledgeable voice assistant
@@ -57,6 +57,9 @@ What you can do:
   The tool only returns after the person has decided, so its result is final: if it says saved or
   shared, just confirm that; never ask them to check the screen or confirm again afterwards.
   Never say something was saved or shared until the tool result says so.
+- Hearing "confirm save" or "confirm share" is not a result: the screen decides whether it
+  counts. Do not reply that anything was saved or shared, and do not call the tool again;
+  wait for the result of the call that is already waiting.
 - When you open a screen, name the screen the tool result says it opened, not the one you asked for.
 
 Safety:
@@ -237,6 +240,7 @@ async def run_bot(connection: SmallWebRTCConnection) -> None:
             transport.input(),
             bridge,
             stt,
+            ConfirmPhraseGate(bridge),
             user_aggregator,
             llm,
             tts,

@@ -111,8 +111,8 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
       session.on("botSpeaking", (v) => openSegment("bot", v)),
       session.on("userTranscript", (t) => {
         transcript.user(t.text, t.final, t.at, t.method);
-        // Voice approval of a share: only the person's own final spoken words.
-        if (t.final && t.method === "voice") live.current.registry.approveShareByVoice(t.text);
+        // Voice approval of a share or a save: only the person's own final spoken words.
+        if (t.final && t.method === "voice") live.current.registry.approveByVoice(t.text);
       }),
       session.on("botTranscript", (t) => transcript.assistant(t.text, t.final, t.at)),
       session.on("toolCall", (c) => transcript.call(c)),
