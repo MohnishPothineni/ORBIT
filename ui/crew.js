@@ -3,11 +3,8 @@
 let crewViewer=null,crewViewerToken=0,crewSearch='',focusedConditionId=null;
 const CREW_REGIONS={none:'General / no specific structure',skull:'Head / skull',cervical:'Cervical spine',thoracic:'Thoracic spine',lumbar:'Lumbar spine',pelvis:'Pelvis',leftShoulder:'Left shoulder',rightShoulder:'Right shoulder',leftKnee:'Left knee / patella',rightKnee:'Right knee / patella',leftLeg:'Left lower limb',rightLeg:'Right lower limb',heart:'Heart',lungs:'Lungs',brain:'Brain',skeleton:'Whole skeleton'};
 const crewUID=prefix=>prefix+'-'+(crypto.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10));
-function initCrewData(){
- for(const mode of ['demo','personal']){
-  const w=state.data[mode];
-  if(!w.crewDataVersion){
-   const primary={id:'crew-01',name:'Crew 01',role:mode==='demo'?'Mission commander':'Crew member',conditions:[],notes:'',sample:mode==='demo'};
+function seedCrewWorkspace(w,mode){
+   const primary={access:mode==='demo'?'leader':undefined,id:'crew-01',name:'Crew 01',role:mode==='demo'?'Mission commander':'Crew member',conditions:[],notes:'',sample:mode==='demo'};
    w.entries.forEach(e=>{if(!e.crewId)e.crewId='crew-01';});
    w.crew=[primary];
    if(mode==='demo'){
@@ -18,12 +15,28 @@ function initCrewData(){
      {id:'crew-04',name:'Crew 04',role:'Flight engineer',shift:2,sleep:8.0,conditions:[]}
     ];
     for(const [j,p]of templates.entries()){
-     w.crew.push({id:p.id,name:p.name,role:p.role,conditions:p.conditions,notes:'',sample:true});
+     w.crew.push({id:p.id,name:p.name,role:p.role,conditions:p.conditions,notes:'',sample:true,access:p.id==='crew-03'?'medical':undefined});
      const sample=seedDemo().entries.map((e,i)=>({...e,id:p.id+'-sample-'+i,crewId:p.id,hr:e.hr+p.shift,sys:e.sys+(j-1)*3,dia:e.dia+(j-1),sleep:Number((p.sleep+(i%4)*.1-.1).toFixed(1)),glucose:e.glucose+j,temp:Number((36.6+(i%3)*.1).toFixed(1)),mood:4,notes:'Synthetic routine check for '+p.name+'. No actual astronaut data.'}));
      w.entries.push(...sample);
     }
    }
+}
+function initCrewData(){
+ for(const mode of ['demo','personal']){
+  const w=state.data[mode];
+  if(!w.crewDataVersion){
+   seedCrewWorkspace(w,mode);
    w.crewDataVersion=1;
+  }
+  if(mode==='demo'){
+   const sample={entries:seedDemo().entries};seedCrewWorkspace(sample,'demo');
+   if(!Array.isArray(w.crew))w.crew=[];
+   for(const profile of sample.crew){
+    if(!w.crew.some(p=>p.id===profile.id)){
+     w.crew.push(profile);
+    }
+    if(!w.entries.some(e=>e.crewId===profile.id))w.entries.push(...sample.entries.filter(e=>e.crewId===profile.id));
+   }
   }
   if(!Array.isArray(w.crew)||!w.crew.length)w.crew=[{id:'crew-01',name:'Crew 01',role:'Crew member',conditions:[],sample:false}];
   w.crew.forEach(p=>{if(!Array.isArray(p.conditions))p.conditions=[];});
@@ -76,7 +89,7 @@ function handleCrewControl(t){
  if(t.dataset.anatomyView){crewViewer?.setView(t.dataset.anatomyView);return true;}
  if(t.dataset.anatomyZoom){crewViewer?.zoom(t.dataset.anatomyZoom);return true;}
  if(t.dataset.anatomyLayer){if(!crewViewer){toast('The anatomy viewer is still loading.');return true;}const visible=t.getAttribute('aria-pressed')!=='true';t.setAttribute('aria-pressed',visible);t.classList.toggle('active',visible);crewViewer.setLayer(t.dataset.anatomyLayer,visible).catch(()=>toast('That anatomy layer could not load. Try it again.'));return true;}
- const actions={'crew-add':()=>crewProfileModal(false),'crew-edit':()=>crewProfileModal(true),'crew-select':crewSelectModal,'viewer-select':viewerSelectModal,'viewer-clear':()=>{setViewer(null);closeModal();render();toast('Handed over. Mood and wellbeing detail is hidden until someone chooses who is using ORBIT.');},'crew-open':()=>{closeModal();location.hash='crew';},'crew-export':exportCrewData,'condition-add':()=>conditionModal(),'anatomy-credits':anatomyCredits,'anatomy-retry':()=>render()};
+ const actions={'show-sample-crew':()=>{setMode('demo');crewSearch='';location.hash='crew';render();},'crew-add':()=>crewProfileModal(false),'crew-edit':()=>crewProfileModal(true),'crew-select':crewSelectModal,'viewer-select':viewerSelectModal,'viewer-clear':()=>{setViewer(null);closeModal();render();toast('Handed over. Mood and wellbeing detail is hidden until someone chooses who is using ORBIT.');},'crew-open':()=>{closeModal();location.hash='crew';},'crew-export':exportCrewData,'condition-add':()=>conditionModal(),'anatomy-credits':anatomyCredits,'anatomy-retry':()=>render()};
  if(actions[t.dataset.action]){actions[t.dataset.action]();return true;}return false;
 }
 document.addEventListener('input',e=>{if(e.target.id==='crew-search'){crewSearch=e.target.value;const list=$('#crew-roster-list');list.innerHTML=crewProfiles().filter(c=>(c.name+' '+c.role).toLowerCase().includes(crewSearch.toLowerCase())).map(crewCard).join('')||'<p class="crew-no-results">No matching profiles.</p>';hydrateIcons(list);}});
