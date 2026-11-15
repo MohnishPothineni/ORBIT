@@ -2,7 +2,7 @@
 
 (() => {
   /* The public ElevenLabs agent the crew assistant connects to directly, with no sign-in or server (as on GitHub's dhruv branch). */
-  const AGENT_ID = 'agent_2001m6ckgq6rfy5vjabzcsb19wvd';
+  const AGENT_ID = 'agent_3801m7fw0fbvf95969qwr52phbpd';
   let doctorQuality='balanced';try{doctorQuality=localStorage.getItem('orbit-doctor-quality')==='high'?'high':'balanced';}catch{}
   let doctorPersona='male';try{doctorPersona=localStorage.getItem('orbit-doctor-persona')==='female'?'female':'male';}catch{}
   let assistantTab='chat';
