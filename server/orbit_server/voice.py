@@ -6,6 +6,7 @@ SmallWebRTC -> Silero VAD -> fixed-silence end of turn -> faster-whisper -> Olla
 
 import asyncio
 import json
+import re
 from typing import Any
 
 from loguru import logger
@@ -43,6 +44,7 @@ from . import config
 from .health import pipeline_health, warm_up_llm
 from .store import store
 from .evidence_guidance import HISTORICAL_GUIDANCE
+from .emergency import EmergencyGuard
 from .tools import ClientToolBridge, ConfirmPhraseGate, openai_tools, register_client_tools, tools_schema
 from .voice_settings import VAD_CONFIDENCE, VoiceSettings, load_settings
 
@@ -52,7 +54,7 @@ inside a spacecraft crew medical and operations console. You talk out loud with 
 What you can do:
 - Look up crew readings, draft vital-sign entries, open screens, control the Anatomy lab, and search
   the local Evidence library. Use your tools for these; never invent readings or study results.
-- For any medical or research question, call search_evidence first and answer from the passages,
+- For any medical or research question (not an emergency), call search_evidence first and answer from the passages,
   citing them by number like [1]. If nothing relevant comes back, say so.
 - Drafting a vital or sharing a record always waits for a person to confirm on screen.
   The tool only returns after the person has decided, so its result is final: if it says saved or
@@ -65,7 +67,16 @@ What you can do:
 
 Safety:
 - You do not diagnose, do not assess fitness for duty, and are not clinically validated.
-  For anything urgent, tell them to contact the medical officer right away.
+- Emergencies come first. If someone may be hurt or in danger right now (heavy bleeding, chest pain,
+  trouble breathing, choking, fainting, a seizure, a bad burn), your very first reply must give the
+  immediate first-response steps and tell them to alert the medical officer and the crew now.
+  Do not search the library first, do not ask questions first, and do not hold steps back for later.
+  The length limit below does not apply to these first steps.
+- When an EMERGENCY GUIDANCE note appears, say its steps first, in your own short sentences.
+- You cannot contact, call or connect anyone. Never say you are doing so, or that you will help
+  connect them. If the medical officer
+  cannot help, tell them to reach the ground flight surgeon through mission control, and to keep
+  following the first-response steps meanwhile.
 
 How you answer:
 - Give real substance: a specific detail, number or reason, not a generic summary.
@@ -105,6 +116,15 @@ def build_prompt(settings: VoiceSettings, session_id: str | None = None) -> str:
             "<shared_records>\n" + records + "\n</shared_records>"
         )
     return prompt
+
+
+_CITATION = re.compile(r"\s*\[\d+(?:\s*[,–-]\s*\d+)*\]")
+
+
+async def strip_citations(text: str, text_type: Any) -> str:
+    """Citation markers such as [1] or [1, 3] are for the transcript, not for speech. A fragment that is
+    only a marker would otherwise reach the speech engine as text with no sound."""
+    return _CITATION.sub("", text)
 
 
 def _language(voice_id: str) -> Language:
@@ -196,7 +216,7 @@ async def run_bot(connection: SmallWebRTCConnection) -> None:
         settings=KokoroTTSService.Settings(
             voice=settings.voiceId, speed=settings.speed, language=_language(settings.voiceId)
         ),
-        text_transforms=[("*", strip_markdown), ("*", expand_currency), ("*", expand_percentages)],
+        text_transforms=[("*", strip_citations), ("*", strip_markdown), ("*", expand_currency), ("*", expand_percentages)],
     )
 
     llm = OLLamaLLMService(
@@ -242,6 +262,7 @@ async def run_bot(connection: SmallWebRTCConnection) -> None:
             bridge,
             stt,
             ConfirmPhraseGate(bridge),
+            EmergencyGuard(),
             user_aggregator,
             llm,
             tts,
