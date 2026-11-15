@@ -2,8 +2,6 @@
 
 // Search this static tool directory, never private health records or images.
 const WORKSPACE_FEATURES = [
- {group:'Daily health',title:'Neural model & data upload',description:'Upload JSON or CSV, preview experimental pattern scores, and review model inputs.',icon:'activity',page:'model'},
- {group:'Daily health',title:'Overview',description:'Latest indicators, reminders, trends and your daily tasks.',icon:'overview',page:'overview'},
  {group:'Daily health',title:'Log a health check',description:'Enter vital signs, glucose, sleep, mood and daily totals.',icon:'plus',action:'log'},
  {group:'Daily health',title:'Health log',description:'Search saved readings, inspect a check and export records.',icon:'clipboard',page:'log'},
  {group:'Daily health',title:'Health assessment',description:'Record responsiveness, breathing, symptoms and next actions.',icon:'shield',page:'care',section:'assessment'},
@@ -33,13 +31,9 @@ const WORKSPACE_FEATURES = [
  {group:'Crew & anatomy',title:'Dissection & section planes',description:'Layer presets, isolate, hide, restore, section and exploded views.',icon:'layers',page:'anatomy',target:'#lab-dissection-tools'},
  {group:'Crew & anatomy',title:'Motion illustrations',description:'Elbow movement, ocular rotation and the cardiopulmonary pathway.',icon:'activity',page:'anatomy',target:'#lab-motion-tools'},
  {group:'Crew & anatomy',title:'Conditions & fractures',description:'Describe a concern, show teaching effects and search the local condition reference.',icon:'body',page:'anatomy',target:'#lab-condition-tools'},
- {group:'Crew & anatomy',title:'Body systems explained',description:'Understand cardiovascular, immune, musculoskeletal and other systems.',icon:'body',page:'systems'},
  {group:'Mission & records',title:'Mission readiness & offline package',description:'Review environment hazards and prepare the app for offline use.',icon:'globe',page:'care',section:'mission'},
  {group:'Mission & records',title:'Mission health risks',description:'Track radiation dose, bone density and muscle strength against limits.',icon:'radiation',page:'risks'},
- {group:'Mission & records',title:'Medical supplies',description:'Track stock, log use and see what could run out before the mission ends.',icon:'box',page:'supplies'},
- {group:'Mission & records',title:'Earth link simulator',description:'Send a simulated message and watch the signal delay to Earth and back.',icon:'signal',page:'earthlink'},
  {group:'Mission & records',title:'Evidence library',description:'Research behind ORBIT, with evidence labels and paper links.',icon:'book',page:'research'},
- {group:'Mission & records',title:'Mission health brief',description:'NASA’s five spaceflight hazards and source references.',icon:'book',page:'brief'},
  {group:'Mission & records',title:'Mission settings & workspace',description:'Switch demo or personal records and set the mission environment.',icon:'settings',action:'settings'},
  {group:'Mission & records',title:'Export health records',description:'Export a CSV or health summary from the existing health log.',icon:'download',page:'log'},
  {group:'Mission & records',title:'Crew archive & profile management',description:'Add or edit profiles and export the crew archive, including images.',icon:'crew',page:'crew'},

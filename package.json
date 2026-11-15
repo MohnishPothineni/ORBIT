@@ -4,8 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "npm run build",
     "dev": "node scripts/serve-ui.mjs",
-    "dev:live": "node scripts/serve-ui.mjs",
+    "dev:live": "npm run dev",
     "dev:voice": "vite --mode live",
     "server": "python server/run.py",
     "build": "tsc -b && node scripts/build-ui.mjs",

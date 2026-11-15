@@ -6,16 +6,17 @@ The app does not diagnose, does not assess fitness for duty and is not clinicall
 
 ## Shared website design
 
-The complete NASA-TEST UI is tracked in `ui/` and is the default website.
-It includes every screen, stylesheet, bundled font, image, and 3D model.
+The NASA-TEST design is tracked in `ui/` and is the default website. The app
+contains Anatomy Lab, crew status and health tracking, the crew voice assistant,
+and the offline evidence library, with their supporting fonts, images and 3D models.
 Run `npm ci` and `npm run dev`, then open http://localhost:5173.
 Edit `ui/` to change the design; do not edit the generated `dist/` folder.
 See [UI setup and provenance](docs/ui-reference/README.md) and the retained
 [design system](docs/ui-reference/DESIGN.md).
 
 The existing React/Pipecat workspace is preserved at `/voice/` after building.
-Optional NASA-TEST cloud/account/ElevenLabs APIs require their own backend;
-the local FastAPI server implements the React voice workspace's API.
+The local FastAPI server implements the React voice workspace's API. The
+floating avatar assistant uses ElevenLabs and requires internet access.
 
 ## Stack
 
@@ -27,7 +28,7 @@ The backend (Python, FastAPI, Uvicorn, Pipecat) serves the built frontend and `/
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Complete NASA-TEST UI at http://localhost:5173. |
+| `npm run dev` | Build the voice workspace, then serve the core UI at http://localhost:5173. |
 | `npm run dev:live` | Same UI, with `/api` proxied to the local server. |
 | `npm run dev:voice` | Vite development server for the React voice workspace in live mode. |
 | `npm run server` | Starts the local Python server (`server/run.py`) on `https://localhost:8443`. |

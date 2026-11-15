@@ -4,7 +4,18 @@
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.OrbitSiteActions=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(inputs,conditionAnatomy,features){
   'use strict';
-  const pages={model:'Neural model',overview:'Crew overview',status:'Crew status',wellbeing:'Sleep & wellbeing',skin:'Skin & wounds',exercise:'Exercise',risks:'Mission health risks',supplies:'Medical supplies',earthlink:'Earth link','solar-system':'Solar system map',research:'Evidence library',crew:'Astronauts',log:'Health log',care:'Health assessment',trends:'Health trends',anatomy:'Anatomy lab',systems:'Body systems',routine:'Daily routine',brief:'Mission health brief'};
+  const pages={status:'Crew status',
+wellbeing:'Sleep & wellbeing',
+skin:'Skin & wounds',
+exercise:'Exercise',
+risks:'Mission health risks',
+research:'Evidence library',
+crew:'Astronauts',
+log:'Health log',
+care:'Health assessment',
+trends:'Health trends',
+anatomy:'Anatomy lab',
+routine:'Daily routine'};
   const sections=['assessment','inputs','measurements','mission'],methods=['manual','images','sensor','dataset'];
   const layers=['skeleton','cartilage','dental','muscles','connective','heart','arteries','veins','nervous','respiratory','digestive','urinary','reproductive','integumentary','lymphatic','endocrine','sensory'];
   const regions=['all','head-neck','thorax','abdomen','pelvis','upper','lower'];
@@ -13,13 +24,18 @@
   const clean=s=>String(s??'').toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9. /-]+/g,' ').replace(/\.(?=\s|$)/g,' ').replace(/(\d)\s*\/\s*(\d)/g,'$1 / $2').replace(/\s+/g,' ').trim();
   const metricAliases={hr:['heart rate','resting heart rate','pulse'],sys:['blood pressure','pressure'],temp:['temperature','body temperature'],sleep:['sleep','sleep duration'],glucose:['glucose','blood sugar','blood glucose'],mood:['mood'],spo2:['oxygen saturation','spo2','oxygen'],rr:['respiratory rate','breathing rate'],fluids:['fluids','fluid intake','hydration'],exercise:['exercise','exercise duration']};
   const layerAliases={skeleton:['bones','skeleton','skeletal system'],cartilage:['cartilage','discs'],dental:['teeth','dental'],muscles:['muscles','muscular system'],connective:['tendons','ligaments','connective tissue'],heart:['heart','cardiovascular system'],arteries:['arteries'],veins:['veins'],nervous:['nerves','nervous system'],respiratory:['lungs','respiratory system'],digestive:['digestive organs','digestive system'],urinary:['kidneys','urinary system'],reproductive:['reproductive system'],integumentary:['skin'],lymphatic:['lymphatic system'],endocrine:['endocrine system'],sensory:['eyes','sensory structures']};
-  const aliases={
-    overview:['home','overview','dashboard','crew overview'],crew:['astronauts','astronaut dashboard','crew dashboard','crew roster','vitals dashboard'],
-    log:['health log','log','logged vitals','health records','recorded vitals','vital records'],care:['health assessment','assessment'],
-    model:['neural model','model tab','neural network','model'],
-    trends:['health trends','trends'],anatomy:['anatomy','anatomy lab','3d anatomy','3d model'],systems:['body systems','systems'],
-    routine:['routine','daily routine','checklist'],status:['crew status','crew health','crew health overview','status'],wellbeing:['sleep and wellbeing','wellbeing','check-in','check in','mental health'],exercise:['exercise','workouts','exercise tracking'],skin:['skin and wounds','skin check','skin','wounds','wound tracking','rash'],risks:['mission health risks','mission risks','radiation','bone density'],supplies:['medical supplies','supplies','inventory','medications'],research:['evidence library','research','evidence','citations','sources'],earthlink:['earth link','signal delay','delay simulator','communication delay'],'solar-system':['solar system','solar system map','3d solar system','planets','planet map','orbits'],brief:['mission brief','health brief','mission health brief','spaceflight hazards']
-  };
+  const aliases={crew:['astronauts','astronaut dashboard','crew dashboard','crew roster','vitals dashboard'],
+log:['health log','log','logged vitals','health records','recorded vitals','vital records'],
+care:['health assessment','assessment'],
+trends:['health trends','trends'],
+anatomy:['anatomy','anatomy lab','3d anatomy','3d model'],
+routine:['routine','daily routine','checklist'],
+status:['home','overview','dashboard','crew status','crew health','crew health overview','status'],
+wellbeing:['sleep and wellbeing','wellbeing','check-in','check in','mental health'],
+exercise:['exercise','workouts','exercise tracking'],
+skin:['skin and wounds','skin check','skin','wounds','wound tracking','rash'],
+risks:['mission health risks','mission risks','radiation','bone density'],
+research:['evidence library','research','evidence','citations','sources']};
   const match=(map,s)=>Object.keys(map).find(k=>k===s||map[k].includes(s));
   function validate(request){
     if(!request||typeof request!=='object'||Array.isArray(request))throw new Error('Choose a supported site command.');

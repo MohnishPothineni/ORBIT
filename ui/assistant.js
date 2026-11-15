@@ -463,7 +463,7 @@
       return siteReply('applied','Showing '+META[action.metric].label+' over '+action.days+' days.',{page:'trends',metric:action.metric,days:action.days});
     }
     if(action.kind==='body-system'){
-      systemSelected=action.system;await navigateSite('systems',null,null,true);return siteReply('opened','The selected body system reference is open.',{page:'systems',system:action.system});
+      await navigateSite('anatomy',null,null,true);return siteReply('opened','Anatomy lab is open. Use the system layers to explore the reference.',{page:'anatomy'});
     }
     if(action.kind==='search-log'){
       filterQuery=action.query;logLimit=20;await navigateSite('log',null,null,true);return siteReply('applied','The health log filter is applied. Review matching entries on this device; their contents have not been shared.',{page:'log'});
@@ -828,7 +828,6 @@
     updateDoctorState();void loadDoctor();
   }));
   window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',event=>{doctorPaused=event.matches;doctorAvatar?.setPaused(doctorPaused);updateDoctorState();});
-  window.addEventListener('orbit:account-change',()=>{if(window.OrbitAPI?.me&&!OrbitAPI.me.authenticated){permissions.reset();void stop('Portal signed out');}});
   el('voice').addEventListener('click',() => void start('voice'));
   el('text').addEventListener('click',() => void start('text'));
   el('end').addEventListener('click',() => void stop());

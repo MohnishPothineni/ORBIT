@@ -1,11 +1,10 @@
 'use strict';
 
-/* Pages and forms for crew status, mission risks, supplies, wellbeing, exercise, emergency checklists and the flight surgeon report. */
-const MISSION_STORES = { riskRecords: [], supplies: [], supplyLog: [], workouts: [], emergencyRuns: [], linkMessages: [] };
-let missionLinkDelay = null, missionLinkSpeed = 60;
+/* Pages and forms for crew status, health risks, wellbeing, exercise, emergency checklists and the flight surgeon report. */
+const MISSION_STORES = { riskRecords: [], workouts: [], emergencyRuns: [] };
+
 const MISSION_SAMPLE_ENTRY = /(^|-)sample-\d+$/;
 const MISSION_WORKOUTS = ['Aerobic', 'Resistance', 'Mobility'];
-const MISSION_SUPPLY_TYPES = ['Medication', 'Medical supply', 'Emergency equipment'];
 const MISSION_NASA_RADIATION = 'https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf';
 const MISSION_NASA_BONE = 'https://nasa.gov/wp-content/uploads/2023/03/bone-loss-technical-brief-ochmo-1.pdf';
 const missionEmptyPlan = { start: '', days: 0, radiationLimit: 600, boneLimit: null, muscleLimit: null };
@@ -24,25 +23,7 @@ function missionSeedRisk(w) {
     });
   }
 }
-function missionSeedSupplies(w) {
-  const item = (name, type, unit, quantity, dailyUse, extra = {}) => ({ id: crewUID('supply'), name, type, unit, quantity, dailyUse, reserve: null, expires: '', sample: true, ...extra });
-  w.supplies = [
-    item('Ibuprofen 200 mg', 'Medication', 'tablets', 320, 1.5),
-    item('Melatonin 3 mg', 'Medication', 'tablets', 72, 1),
-    item('Antihistamine', 'Medication', 'tablets', 60, 0, { reserve: 20 }),
-    item('Epinephrine auto-injector', 'Emergency equipment', 'injectors', 4, 0, { expires: missionDateOffset(90).toLocaleDateString('en-CA') }),
-    item('Sterile dressings', 'Medical supply', 'dressings', 70, .25),
-    item('Nitrile gloves', 'Medical supply', 'pairs', 260, 1),
-    item('Saline IV bags', 'Medical supply', 'bags', 6, 0, { reserve: 6 }),
-    item('AED pads', 'Emergency equipment', 'sets', 3, 0)
-  ];
-  const melatonin = w.supplies[1], ibuprofen = w.supplies[0];
-  for (let back = 13; back >= 0; back--) {
-    const crewId = ['crew-01', 'crew-02', 'crew-03'][back % 3];
-    w.supplyLog.push({ id: crewUID('use'), supplyId: melatonin.id, crewId: 'crew-01', at: missionDateOffset(-back).toISOString(), amount: 2, sample: true });
-    if (back % 2 === 0) w.supplyLog.push({ id: crewUID('use'), supplyId: ibuprofen.id, crewId, at: missionDateOffset(-back).toISOString(), amount: 2, sample: true });
-  }
-}
+
 function missionSeedExercise(w) {
   const skipDays = { 'crew-02': [1, 3, 4, 6], 'crew-03': [2] };
   for (const p of w.crew) {
@@ -78,7 +59,7 @@ function missionKeepSampleCurrent(w) {
   if (gap < 1) return;
   const shift = at => new Date(Math.min(Date.parse(at) + gap * MissionLogic.DAY, Date.now())).toISOString();
   samples.forEach(e => { e.at = shift(e.at); });
-  for (const list of [w.riskRecords, w.supplyLog, w.workouts]) list.filter(r => r.sample).forEach(r => { r.at = shift(r.at); });
+  for (const list of [w.riskRecords, w.workouts]) list.filter(r => r.sample).forEach(r => { r.at = shift(r.at); });
   skinShiftSamples(w, gap);
   if (w.mission.start) w.mission.start = new Date(Date.parse(`${w.mission.start}T00:00:00`) + gap * MissionLogic.DAY).toLocaleDateString('en-CA');
 }
@@ -90,7 +71,7 @@ function initMissionData() {
     if (!w.missionDataVersion) {
       if (mode === 'demo') {
         w.mission = { start: missionDateOffset(-42).toLocaleDateString('en-CA'), days: 180, radiationLimit: 600, boneLimit: 10, muscleLimit: 15 };
-        missionSeedRisk(w); missionSeedSupplies(w); missionSeedExercise(w); missionSeedWellbeing(w); missionSeedTrend(w);
+        missionSeedRisk(w); missionSeedExercise(w); missionSeedWellbeing(w); missionSeedTrend(w);
       }
       w.missionDataVersion = 1;
     }
@@ -98,7 +79,7 @@ function initMissionData() {
   initSkinData();
   missionKeepSampleCurrent(state.data.demo);
 }
-function missionEmptyStores() { return { riskRecords: [], supplies: [], supplyLog: [], workouts: [], emergencyRuns: [], linkMessages: [], skinChecks: [], wounds: [], mission: { ...missionEmptyPlan } }; }
+function missionEmptyStores() { return { riskRecords: [], workouts: [], emergencyRuns: [], skinChecks: [], wounds: [], mission: { ...missionEmptyPlan } }; }
 
 const missionPlan = () => db().mission;
 const missionStamp = at => `${dayLabel(at)} · ${new Date(at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
@@ -126,19 +107,8 @@ function missionCrewView(profile) {
   const exercise = MissionLogic.exerciseSummary(db().workouts.filter(w => w.crewId === profile.id), { target: profile.carePlan?.exerciseTarget });
   return { profile, records, alerts, openRuns, risks, wellbeing, status, exercise };
 }
-function missionSupplyRows() {
-  return db().supplies.map(item => ({ item, forecast: MissionLogic.supplyForecast(item, db().supplyLog, { mission: missionPlan() }) })).sort((a, b) => a.forecast.rank - b.forecast.rank || a.item.name.localeCompare(b.item.name));
-}
-const missionSupplyConcern = row => row.forecast.rank < MissionLogic.SUPPLY_LEVELS.ok.rank;
-function missionSupplyDetail({ item, forecast: f }) {
-  const expiry = item.expires ? new Date(`${item.expires}T12:00:00`).toLocaleDateString('en-US', { dateStyle: 'medium' }) : '';
-  if (f.status === 'expired') return `Expired ${expiry}.`;
-  if (f.status === 'out') return 'None left.';
-  if (f.status === 'short') return `Lasts about ${f.stockDays} days, with ${f.daysLeft} left in the mission. Short by ${f.shortfall} ${item.unit}.`;
-  if (f.status === 'expiring') return `Expires ${expiry}, before the mission ends.`;
-  if (f.status === 'low') return `${item.quantity} ${item.unit} left, reserve is ${item.reserve}.`;
-  return f.stockDays === null ? `${item.quantity} ${item.unit} on hand.` : `Lasts about ${f.stockDays} days.`;
-}
+
+
 
 /* Crew status */
 function missionCrewCard(view) {
@@ -152,14 +122,13 @@ function missionCrewCard(view) {
 function missionStatusPage() {
   const views = crewProfiles().map(missionCrewView).sort((a, b) => a.status.rank - b.status.rank);
   const attention = views.filter(v => v.status.rank < MissionLogic.STATUS.due.rank), overdue = views.filter(v => v.status.overdue);
-  const supplies = missionSupplyRows().filter(missionSupplyConcern), day = MissionLogic.missionDay(missionPlan()), top = views[0];
+  const top = views[0];
   const topReason = top?.status.reasons[0];
   return `${pageHeading('Crew status', 'Who needs attention first, across the whole crew.', button('<span class="export-label">Flight surgeon report</span>', 'mission-report', '', 'document'))}${demoNotice()}
     ${topReason && top.status.rank <= MissionLogic.STATUS.review.rank ? `<section class="mission-priority ${top.status.level}">${icon('alert')}<div><span class="eyebrow">MOST URGENT</span><strong>${esc(top.profile.name)}: ${esc(topReason.text)}</strong></div><button class="button small" data-action="mission-crew-open" data-id="${esc(top.profile.id)}">Open record</button></section>` : ''}
-    <div class="stat-strip mission-tiles">${missionTile('NEED ATTENTION', attention.length, `of ${views.length} crew members`)}${missionTile('CHECKS OVERDUE', overdue.length, 'no vitals in 36 hours')}${missionTile('SUPPLY CONCERNS', supplies.length, `of ${db().supplies.length} items tracked`)}${missionTile('MISSION DAY', day ? day.day : '—', day ? `of ${day.total}, ${day.left} left` : 'mission plan not set')}</div>
+    <div class="stat-strip mission-tiles">${missionTile('NEED ATTENTION', attention.length, `of ${views.length} crew members`)}${missionTile('CHECKS OVERDUE', overdue.length, 'no vitals in 36 hours')}${missionTile('CREW TRACKED', views.length, 'local crew profiles')}</div>
     <div class="section-label"><h2>Crew, most urgent first</h2></div>
     <div class="mission-crew-grid">${views.map(missionCrewCard).join('')}</div>
-    ${supplies.length ? `<section class="panel mission-panel"><div class="panel-head"><div><h2>Supply concerns</h2><p>Items that may not last the mission</p></div><a class="text-button" href="#supplies">All supplies ${icon('arrowright')}</a></div><ul class="mission-reasons">${supplies.slice(0, 4).map(row => `<li><strong>${esc(row.item.name)}:</strong> ${esc(missionSupplyDetail(row))}</li>`).join('')}</ul></section>` : ''}
     <div class="notice">${icon('lock')}<p>Status comes from records saved in this browser, not live telemetry. “No flags” does not mean a crew member is well. Wellbeing scores stay out of this shared view; only a neutral prompt appears.</p></div>`;
 }
 
@@ -226,44 +195,9 @@ function missionRiskModal() {
   });
 }
 
-/* Medical supplies */
-function missionSuppliesPage() {
-  const rows = missionSupplyRows(), concerns = rows.filter(missionSupplyConcern), day = MissionLogic.missionDay(missionPlan());
-  const levels = { expired: 'urgent', out: 'urgent', short: 'urgent', expiring: 'review', low: 'review', ok: 'clear', open: 'due' };
-  return `${pageHeading('Medical supplies', 'What the crew has, and whether it will last.', button('Mission plan', 'mission-plan', '', 'settings') + button('Add item', 'mission-supply-add', 'primary', 'plus'))}${demoNotice()}
-    <div class="stat-strip mission-tiles">${missionTile('ITEMS TRACKED', rows.length, 'in this workspace')}${missionTile('CONCERNS', concerns.length, 'need a decision')}${missionTile('DAYS REMAINING', day ? day.left : '—', day ? `of ${day.total} mission days` : 'mission plan not set')}</div>
-    <section class="panel mission-panel"><div class="panel-head"><div><h2>Inventory</h2><p>Forecast uses planned use or the last 14 days of actual use, whichever is higher</p></div></div>${rows.length ? `<div class="table-wrap" tabindex="0" aria-label="Medical supplies. Scroll horizontally to view all columns."><table class="data-table mission-supply-table"><thead><tr><th>ITEM</th><th>ON HAND</th><th>USE / DAY</th><th>FORECAST</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody>${rows.map(row => `<tr><td><strong>${esc(row.item.name)}</strong><span class="small-sub">${esc(row.item.type)}</span></td><td>${row.item.quantity} ${esc(row.item.unit)}</td><td>${row.forecast.rate > 0 ? row.forecast.rate : 'As needed'}</td><td>${missionPill(levels[row.forecast.status], row.forecast.label)}<span class="small-sub">${esc(missionSupplyDetail(row))}</span></td><td class="mission-row-actions"><button class="text-button" data-action="mission-supply-use" data-id="${esc(row.item.id)}" ${row.item.quantity <= 0 ? 'disabled' : ''}>Log use</button><button class="text-button" data-action="mission-supply-edit" data-id="${esc(row.item.id)}">Edit</button></td></tr>`).join('')}</tbody></table></div>` : '<p class="mission-clear-note">No items yet. Add the medications and supplies carried on this mission.</p>'}</section>
-    ${missionSupplyLog()}<div class="notice">${icon('info')}<p>Forecasts assume use continues at the same rate and do not allow for an emergency. Resupply is not modelled. Follow the medical plan for all medication decisions.</p></div>`;
-}
-function missionSupplyLog() {
-  const log = [...db().supplyLog].sort((a, b) => Date.parse(b.at) - Date.parse(a.at)).slice(0, 6);
-  if (!log.length) return '';
-  return `<section class="panel mission-panel"><div class="panel-head"><div><h2>Recent use</h2><p>Latest logged use across the crew</p></div></div><div class="table-wrap" tabindex="0" aria-label="Recent supply use"><table class="data-table"><thead><tr><th>WHEN</th><th>ITEM</th><th>AMOUNT</th><th>CREW</th></tr></thead><tbody>${log.map(u => { const item = db().supplies.find(s => s.id === u.supplyId); return `<tr><td>${missionStamp(u.at)}</td><td>${esc(item?.name || 'Removed item')}</td><td>${u.amount} ${esc(item?.unit || '')}</td><td>${esc(crewProfiles().find(c => c.id === u.crewId)?.name || '—')}</td></tr>`; }).join('')}</tbody></table></div></section>`;
-}
-function missionSupplyModal(id) {
-  const item = db().supplies.find(s => s.id === id);
-  modal(item ? 'Edit item' : 'Add item', 'Copy amounts from the mission medical inventory.', `<form id="mission-supply-form"><div class="form-grid"><label class="field full"><span>Name</span><input class="field-input" name="name" maxlength="80" required value="${esc(item?.name || '')}" placeholder="e.g. Ibuprofen 200 mg"></label><label class="field"><span>Type</span><select class="field-input" name="type">${MISSION_SUPPLY_TYPES.map(t => `<option ${item?.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label>${missionField('Unit', 'unit', `maxlength="24" required value="${esc(item?.unit || '')}" placeholder="tablets"`)}${missionField('On hand', 'quantity', `type="number" min="0" step="any" required value="${item?.quantity ?? ''}"`)}${missionField('Planned use per day', 'dailyUse', `type="number" min="0" step="any" value="${item?.dailyUse || ''}"`, 'blank if as needed')}${missionField('Reserve', 'reserve', `type="number" min="0" step="any" value="${item?.reserve ?? ''}"`, 'optional')}${missionField('Expiry date', 'expires', `type="date" value="${esc(item?.expires || '')}"`, 'optional')}</div></form>`, `${item ? `<button class="button danger" data-action="mission-supply-delete" data-id="${esc(item.id)}" style="margin-right:auto">Delete</button>` : ''}${button('Cancel', 'close-modal')}<button class="button primary" type="submit" form="mission-supply-form">Save item</button>`);
-  $('#mission-supply-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const f = new FormData(e.target), target = item || { id: crewUID('supply') }, name = f.get('name').trim(), unit = f.get('unit').trim();
-    if (!name || !unit) return;
-    Object.assign(target, { name, unit, type: f.get('type'), quantity: Number(f.get('quantity')), dailyUse: missionNumber(f.get('dailyUse')) ?? 0, reserve: missionNumber(f.get('reserve')), expires: f.get('expires') });
-    if (!item) db().supplies.push(target);
-    missionSave(item ? 'Item updated.' : 'Item added.');
-  });
-}
-function missionSupplyUseModal(id) {
-  const item = db().supplies.find(s => s.id === id); if (!item) return;
-  modal('Log use', `${esc(item.name)} · ${item.quantity} ${esc(item.unit)} on hand`, `<form id="mission-use-form"><div class="form-grid">${crewFieldMarkup()}${missionField(`Amount (${esc(item.unit)})`, 'amount', `type="number" min="0.01" max="${item.quantity}" step="any" required value="1"`)}</div><p class="form-error" id="mission-form-error" role="alert"></p></form>`, `${button('Cancel', 'close-modal')}<button class="button primary" type="submit" form="mission-use-form">Log use</button>`);
-  $('#mission-use-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const f = new FormData(e.target), amount = Number(f.get('amount'));
-    if (!(amount > 0) || amount > item.quantity) return missionFormError(`Enter an amount up to ${item.quantity}.`);
-    item.quantity = Number((item.quantity - amount).toFixed(2));
-    db().supplyLog.push({ id: crewUID('use'), supplyId: item.id, crewId: f.get('crewId'), at: new Date().toISOString(), amount });
-    missionSave(`${item.name} use logged.`);
-  });
-}
+
+
+
 
 /* Sleep and wellbeing */
 function missionSpark(title, values, min, max, note) {
@@ -414,47 +348,12 @@ function missionStepToggle(target) {
 
 /* Earth link simulator */
 const missionLinkKey = () => missionLinkDelay || MissionLogic.linkDelayFor(state.settings.environment);
-function missionLinkStages(s) {
-  const steps = [['outbound', 'To Earth'], ['review', 'Flight surgeon'], ['inbound', 'Back to crew'], ['delivered', 'Received']], at = steps.findIndex(([id]) => id === s.stage);
-  return `<ol class="mission-link-stages">${steps.map(([, label], i) => `<li class="${i < at || s.delivered ? 'done' : i === at ? 'current' : ''}">${label}</li>`).join('')}</ol>`;
-}
-function missionLinkBody(message) {
-  const s = MissionLogic.linkStatus(message);
-  return `<div class="mission-link-state">${missionPill(s.delivered ? 'clear' : 'review', s.label)}<strong>${s.delivered ? 'Round trip ' + MissionLogic.linkClock(s.total) : 'Reply in ' + MissionLogic.linkClock(s.remaining)}</strong></div><div class="mission-meter"><span class="now" style="width:${s.percent}%"></span></div>${missionLinkStages(s)}${s.delivered ? `<div class="mission-link-reply"><span class="eyebrow">SIMULATED REPLY</span><p>${esc(MissionLogic.LINK_REPLY)}</p><small>Not real medical advice.</small></div>` : ''}`;
-}
-function missionLinkCard(message) {
-  const delay = MissionLogic.LINK_DELAYS[message.delayKey];
-  return `<article class="panel mission-link-card"><div class="mission-link-meta"><strong>${esc(crewProfiles().find(c => c.id === message.crewId)?.name || 'Crew member')}</strong><small>${missionStamp(message.sentAt)} · ${esc(delay?.label || 'Custom')} · ${message.speed === 1 ? 'Real time' : message.speed + 'x speed'}</small></div>${message.text ? `<p>${esc(message.text)}</p>` : ''}${message.attachReport ? `<p class="mission-link-attachment">${icon('document')}Flight surgeon report attached</p>` : ''}<div data-link-message="${esc(message.id)}" data-link-stage="${MissionLogic.linkStatus(message).stage}">${missionLinkBody(message)}</div></article>`;
-}
-function missionLinkPage() {
-  const key = missionLinkKey(), delay = MissionLogic.LINK_DELAYS[key], messages = [...db().linkMessages].sort((a, b) => Date.parse(b.sentAt) - Date.parse(a.sentAt)).slice(0, 8);
-  const round = delay.seconds * 2 + MissionLogic.LINK_REVIEW_SECONDS, clock = s => s < 60 ? `${s} sec` : `${Math.round(s / 60)} min`;
-  return `${pageHeading('Earth link', 'See what signal delay means when the crew needs help.', messages.length ? button('Clear messages', 'mission-link-clear', '', 'trash') : '')}
-    <div class="mission-setup">${icon('info')}<p><strong>Simulation only.</strong> Nothing leaves this device, and replies are placeholders. In an emergency, start care onboard. Do not wait for Earth.</p></div>
-    <section class="panel mission-panel mission-link-settings"><div class="panel-head"><div><h2>Distance from Earth</h2><p>${esc(delay.detail)} each way. Starts from your mission environment.</p></div></div><div class="mission-link-options" role="group" aria-label="Distance from Earth">${Object.entries(MissionLogic.LINK_DELAYS).map(([id, d]) => `<button class="${id === key ? 'active' : ''}" aria-pressed="${id === key}" data-action="mission-link-delay" data-id="${id}">${esc(d.label)}<small>${esc(d.detail)}</small></button>`).join('')}</div><div class="mission-link-speed"><span>Simulation speed</span><div class="segmented" role="group" aria-label="Simulation speed">${MissionLogic.LINK_SPEEDS.map(n => `<button class="${n === missionLinkSpeed ? 'active' : ''}" aria-pressed="${n === missionLinkSpeed}" data-action="mission-link-speed" data-id="${n}">${n === 1 ? 'Real time' : n + 'x'}</button>`).join('')}</div></div></section>
-    <div class="stat-strip mission-tiles">${missionTile('ONE WAY', clock(delay.seconds), 'signal travel time')}${missionTile('EARLIEST REPLY', clock(round), `includes ${MissionLogic.LINK_REVIEW_SECONDS / 60} min for the surgeon to respond`)}</div>
-    <div class="mission-link-grid"><section class="panel mission-panel"><div class="panel-head"><div><h2>Message the flight surgeon</h2><p>From ${esc(activeCrew().name)}</p></div></div><form id="mission-link-form" class="mission-link-form"><label class="field"><span class="sr-only">Message</span><textarea class="field-input" name="text" maxlength="1000" placeholder="Describe what happened and what the crew has done so far."></textarea></label><label class="care-enable-reminders"><input type="checkbox" name="attachReport">Attach the flight surgeon report</label><p class="form-error" id="mission-form-error" role="alert"></p><button class="button primary" type="submit">Send simulated message ${icon('arrowright')}</button></form></section>
-    <section class="panel mission-panel"><div class="panel-head"><div><h2>While you wait</h2><p>Care does not stop for the signal</p></div></div><div class="mission-link-actions">${button('Medical response', 'emergency', '', 'alert')}${button('Flight surgeon report', 'mission-report', '', 'document')}<a class="button" href="#care">Health assessment</a></div></section></div>
-    <div class="section-label"><h2>Messages</h2><span>${messages.length} SHOWN</span></div>${messages.length ? `<div class="mission-link-list">${messages.map(missionLinkCard).join('')}</div>` : '<p class="mission-clear-note">No messages yet. Send one to watch the delay play out.</p>'}`;
-}
-function attachMissionLink() {
-  $('#mission-link-form')?.addEventListener('submit', e => {
-    e.preventDefault();
-    const f = new FormData(e.target), text = f.get('text').trim(), attachReport = f.has('attachReport'), key = missionLinkKey();
-    if (!text && !attachReport) return missionFormError('Write a message or attach the report.');
-    db().linkMessages.push({ id: crewUID('link'), crewId: activeCrewId(), text, attachReport, delayKey: key, delaySeconds: MissionLogic.LINK_DELAYS[key].seconds, speed: missionLinkSpeed, sentAt: new Date().toISOString(), notified: false });
-    persist(); render(); toast('Simulated message sent. Nothing has left this device.');
-  });
-}
-/* Updates messages in place so a half-written message is not lost. */
-function missionLinkTick() {
-  for (const message of db().linkMessages) {
-    if (message.notified) continue;
-    const s = MissionLogic.linkStatus(message), el = document.querySelector(`[data-link-message="${CSS.escape(message.id)}"]`);
-    if (el) { el.innerHTML = missionLinkBody(message); hydrateIcons(el); }
-    if (s.delivered) { message.notified = true; persist(); toast(`Simulated reply received for ${crewProfiles().find(c => c.id === message.crewId)?.name || 'crew member'}.`); }
-  }
-}
+
+
+
+
+
+
 
 /* Evidence library */
 let missionResearchQuery = '';
@@ -497,6 +396,7 @@ function missionResearchTopic() {
 function missionResearchPage() {
   const R = ResearchLibrary, topic = missionResearchTopic(), count = Object.keys(R.SOURCES).length;
   return `${pageHeading('Evidence library', `The research behind ORBIT, from ${count} published sources.`)}
+    <section class="panel care-offline-panel"><h2>Offline evidence and anatomy</h2><p>The evidence entries below are bundled with ORBIT and searchable without an internet connection. Prepare this device before going offline.</p><p id="care-offline-status" role="status">${esc(careOfflineMessage)}</p><button class="button small" data-action="care-offline" ${careOfflineBusy ? 'disabled' : ''}>${careOfflineBusy ? 'Preparing…' : careOfflineReady ? 'Refresh offline package' : 'Prepare offline package'} ${icon('download')}</button></section>
     ${onboardAskPanel()}
     <h2 class="mission-research-heading" id="research-heading">Evidence entries</h2>
     <div class="mission-research-context"><p>Study labels show the type of evidence. Full papers need internet access.</p><details><summary>About the evidence & limits</summary><p>Researched by the ORBIT team and checked against each published paper. Each label shows the kind of evidence behind an entry. Many studies are small, on the ground or in animals, so findings may not apply to an individual astronaut. This library does not diagnose conditions or set clinical limits. Tracking guidance connects the research to what you can record in ORBIT.</p></details></div>
@@ -511,22 +411,15 @@ function missionReportData() {
   const p = activeCrew(), view = missionCrewView(p), now = Date.now(), week = now - 7 * MissionLogic.DAY, form = careReadForm();
   const saved = careAssessments().at(-1), check = form.response || form.breathing || form.flags.length ? form : saved;
   const runs = db().emergencyRuns.filter(r => r.crewId === p.id && (!r.closedAt || Date.parse(r.startedAt) >= week)).map(r => { const list = MissionLogic.CHECKLISTS[r.checklist]; return { title: list?.title || 'Emergency', startedAt: r.startedAt, closedAt: r.closedAt, steps: (list?.steps || []).map((text, i) => ({ text, at: r.steps[i] || null })) }; });
-  const used = new Map();
-  for (const u of db().supplyLog.filter(u => u.crewId === p.id && Date.parse(u.at) >= week)) {
-    const item = db().supplies.find(s => s.id === u.supplyId);
-    if (item?.type !== 'Medication') continue;
-    const row = used.get(item.id) || { name: item.name, unit: item.unit, amount: 0, last: u.at };
-    row.amount += u.amount; if (Date.parse(u.at) > Date.parse(row.last)) row.last = u.at; used.set(item.id, row);
-  }
   const notes = view.records.filter(e => e.notes && Date.parse(e.at) >= week && !/^Routine morning check|^Synthetic routine check/.test(e.notes)).slice(-6).map(e => ({ at: e.at, text: e.notes }));
   return {
     crew: { name: p.name, role: p.role }, mission: { ...state.settings }, workspace: state.mode, generatedAt: now, day: MissionLogic.missionDay(missionPlan()),
     priorities: view.status.reasons.map(r => r.text), alerts: view.alerts, readings: careLatestReadings(), notes, runs,
     assessment: check ? { ...check, title: CareLogic.assessSafety(check).title, flagLabels: (check.flags || []).map(f => CARE_FLAGS[f]).filter(Boolean) } : null,
-    conditions: p.conditions, medications: [...used.values()], instructions: carePlan().careInstructions || '', wellbeing: view.wellbeing, exercise: view.exercise,
+    conditions: p.conditions, medications: [], instructions: carePlan().careInstructions || '', wellbeing: view.wellbeing, exercise: view.exercise,
     risks: view.risks.map(r => ({ label: { radiation: 'Radiation', bone: 'Bone density', muscle: 'Muscle strength' }[r.kind], count: r.count, text: missionRiskText(r) })),
     skin: SkinLogic.reportLines(db().skinChecks.filter(c => c.crewId === p.id), db().wounds.filter(w => w.crewId === p.id)),
-    supplies: missionSupplyRows().filter(missionSupplyConcern).map(row => ({ name: row.item.name, label: row.forecast.label, detail: missionSupplyDetail(row) }))
+
   };
 }
 function missionReportModal() {
@@ -548,12 +441,6 @@ function handleMissionControl(t) {
     'mission-plan': missionPlanModal, 'mission-risk-add': missionRiskModal,
     'mission-risk-delete': () => missionConfirm('Delete this reading?', 'This removes the reading from this browser and changes the results built on it.', 'mission-risk-confirm', id, 'Delete reading'),
     'mission-risk-confirm': () => { db().riskRecords = db().riskRecords.filter(r => r.id !== id); missionSave('Reading deleted.'); },
-    'mission-supply-add': () => missionSupplyModal(), 'mission-supply-edit': () => missionSupplyModal(id), 'mission-supply-use': () => missionSupplyUseModal(id),
-    'mission-supply-delete': () => missionConfirm('Delete this item?', 'This removes the item from the inventory. Its logged use stays in the report history.', 'mission-supply-confirm', id, 'Delete item'),
-    'mission-supply-confirm': () => { db().supplies = db().supplies.filter(s => s.id !== id); missionSave('Item deleted.'); },
-    'mission-link-delay': () => { missionLinkDelay = id; render(); }, 'mission-link-speed': () => { missionLinkSpeed = Number(id); render(); },
-    'mission-link-clear': () => missionConfirm('Clear all messages?', 'This removes every simulated message in this workspace.', 'mission-link-confirm', 'all', 'Clear messages'),
-    'mission-link-confirm': () => { db().linkMessages = []; missionSave('Messages cleared.'); },
     'mission-checkin': missionCheckinModal, 'mission-workout': missionWorkoutModal,
     'mission-workout-delete': () => missionConfirm('Delete this workout?', 'This removes the session and updates the day’s exercise total.', 'mission-workout-confirm', id, 'Delete workout'),
     'mission-workout-confirm': () => { const w = db().workouts.find(x => x.id === id); db().workouts = db().workouts.filter(x => x.id !== id); if (w) missionSyncExercise(w.crewId, MissionLogic.dayKey(w.at)); missionSave('Workout deleted.'); },
@@ -563,7 +450,6 @@ function handleMissionControl(t) {
   actions[a]?.();
   return Boolean(actions[a]);
 }
-setInterval(() => { if (typeof state !== 'undefined' && state) missionLinkTick(); }, 1000);
 document.addEventListener('input', e => { if (e.target.id !== 'research-search') return; missionResearchQuery = e.target.value; missionResearchRefresh(); });
 document.addEventListener('click', e => {
   if (!e.target.closest('#research-clear')) return;

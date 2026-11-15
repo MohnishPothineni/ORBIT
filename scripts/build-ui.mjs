@@ -1,12 +1,17 @@
-import { cp, mkdir } from "node:fs/promises";
+import { cp, mkdir, rm } from "node:fs/promises";
+import { relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "vite";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = new URL("../dist/", import.meta.url);
 
-// Keep the React voice workspace available alongside the complete reference UI.
+// Remove generated output so deleted screens cannot survive a rebuild.
+const outputPath = fileURLToPath(output);
+if (relative(root, outputPath) !== "dist" || outputPath === resolve(root)) throw new Error("Invalid build output directory.");
+await rm(outputPath, { recursive: true, force: true });
+// Keep the React voice workspace available alongside the retained UI.
 await build({ root, base: "/voice/", build: { outDir: "dist/voice", emptyOutDir: true } });
 await mkdir(output, { recursive: true });
 await cp(new URL("../ui/", import.meta.url), output, { recursive: true });
-console.log("Built NASA-TEST UI at / and React voice workspace at /voice/.");
+console.log("Built core workspaces at / and voice assistant at /voice/.");

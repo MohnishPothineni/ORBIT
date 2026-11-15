@@ -2,24 +2,18 @@
    Controls reach a 44px target on a coarse pointer, while mouse and trackpad layouts keep their density.
    Small visual marks (checkboxes, inline text buttons) keep their look and gain an invisible hit area instead. */
 @media (pointer: coarse) {
-  .button, .button.small, main .button, .page-heading .button, .feature-finder-trigger, .demo-tag, .viewer-tag, .care-header-response,
-  .main-nav a, .rail-settings, .segmented button, .chart-metric-tabs button, .app-footer button,
-  .field-input, select.field-input, .trends-select { min-height: 44px }
-  .hero .button, .hero-action .button, .health-warning-action, .instruction-link, .system-layer-toggle, .layer-isolate,
-  .anatomy-view-bar button, .system-menu-tools button, .body-hotspot { min-height: 44px }
-  .icon-button, .table-delete, .feature-finder-trigger, .demo-tag, .assistant-launch, .topbar .crew-avatar, .topbar-actions .crew-avatar, .care-header-response,
-  .segmented button, .chart-metric-tabs button, .anatomy-stage-tools button, .layer-isolate { min-width: 44px; min-height: 44px }
+  .button, .button.small, main .button, .page-heading .button, .feature-finder-trigger, .demo-tag, .viewer-tag, .care-header-response, .main-nav a, .rail-settings, .segmented button, .chart-metric-tabs button, .app-footer button, .field-input, select.field-input, .trends-select { min-height: 44px }
+  .hero .button, .hero-action .button, .health-warning-action, .instruction-link, .system-layer-toggle, .layer-isolate, .anatomy-view-bar button, .system-menu-tools button, .body-hotspot { min-height: 44px }
+  .icon-button, .table-delete, .feature-finder-trigger, .demo-tag, .assistant-launch, .topbar .crew-avatar, .topbar-actions .crew-avatar, .care-header-response, .segmented button, .chart-metric-tabs button, .anatomy-stage-tools button, .layer-isolate { min-width: 44px; min-height: 44px }
   .care-radio-row label, .care-symptoms label { min-height: 44px }
   .anatomy-view-bar button, .system-menu-tools button { min-width: 44px }
   .anatomy-source-link { min-height: 44px }
-  .anatomy-panel .button, .conditions-add .button, .lab-jump-nav button, .condition-examples button,
-  .lab-workspace-toolbar button, main select, main input[type=search], main input[type=range] { min-height: 44px }
+  .anatomy-panel .button, .conditions-add .button, .lab-jump-nav button, .condition-examples button, .lab-workspace-toolbar button, main select, main input[type=search], main input[type=range] { min-height: 44px }
   .lab-workspace-toolbar button { min-width: 44px }
   .mission-research-tabs a, .lab-tool-row select, .lab-motion-controls select, .lab-browser .field-input { min-height: 44px }
   .mission-research-tabs a { display: inline-flex; align-items: center }
   .system-nav button { min-height: 44px }
-  main select.field-input, main input.field-input, main .lab-region-tools .field-input,
-  .lab-browser #anatomy-browser-controls > .field-input, #lab-region-select { min-height: 44px }
+  main select.field-input, main input.field-input, main .lab-region-tools .field-input, .lab-browser #anatomy-browser-controls > .field-input, #lab-region-select { min-height: 44px }
   .mission-evidence-foot { align-items: stretch }
   .mission-evidence-foot>div { width: 100%; gap: 4px }
   .mission-evidence-foot a { min-height: 44px; display: inline-flex; align-items: center }

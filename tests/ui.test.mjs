@@ -4,13 +4,52 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import vm from "node:vm";
 
 const root = fileURLToPath(new URL("../ui/", import.meta.url));
+
+test("retained health screens render and removed routes and commands are unavailable", async () => {
+  const events = { addEventListener() {}, dispatchEvent() {}, removeEventListener() {} };
+  const storage = new Map();
+  const context = vm.createContext({
+    ...events, console, Date, URLSearchParams, URL, FormData, crypto, structuredClone,
+    setTimeout() {}, clearTimeout() {}, setInterval() {}, clearInterval() {},
+    Event: class {}, CustomEvent: class {},
+    location: { hash: "#status" }, navigator: {},
+    document: {
+      ...events, getElementById: (id) => id === "modal" ? events : null,
+      querySelector: (selector) => ["#modal", ".mobile-scrim"].includes(selector) ? events : null,
+      querySelectorAll: () => [], hidden: false,
+    },
+    localStorage: { getItem: (key) => storage.get(key) || null, setItem: (key, value) => storage.set(key, value) },
+  });
+  vm.runInContext("window = globalThis;", context);
+  const html = await readFile(resolve(root, "index.html"), "utf8");
+  for (const [, name] of html.matchAll(/<script src="([^"]+)" defer>/g)) {
+    let source = await readFile(resolve(root, name), "utf8");
+    if (name === "app.js") source = source.slice(0, source.indexOf("hydrateIcons();persist();render();"));
+    vm.runInContext(source, context, { filename: name });
+    if (name === "app.js") break;
+  }
+  for (const page of ["missionStatusPage", "crewDashboardPage", "logPage", "trendsPage", "routinePage", "carePage", "missionWellbeingPage", "missionExercisePage", "skinPage", "missionRisksPage", "anatomyLabPage", "missionResearchPage"]) {
+    assert.ok(vm.runInContext(`${page}()`, context).includes("<"), page);
+  }
+  assert.ok(vm.runInContext("MissionLogic.reportSections(missionReportData()).length", context) > 0);
+  vm.runInContext(await readFile(resolve(root, "condition-anatomy.js"), "utf8"), context);
+  vm.runInContext(await readFile(resolve(root, "assistant-features.js"), "utf8"), context);
+  vm.runInContext(await readFile(resolve(root, "assistant-actions.js"), "utf8"), context);
+  for (const page of ["solar-system", "supplies", "earthlink", "brief", "systems", "model", "overview"]) {
+    context.location.hash = `#${page}`;
+    assert.equal(vm.runInContext("currentPage()", context), "status");
+    assert.throws(() => vm.runInContext(`OrbitSiteActions.validate({kind:'navigate',page:'${page}'})`, context));
+    assert.ok(!html.includes(`data-nav="${page}"`));
+  }
+});
 
 test("every local stylesheet, script, font, and offline shell asset exists", async () => {
   const html = await readFile(resolve(root, "index.html"), "utf8");
   for (const [, url] of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
-    if (/^(?:https?:|data:|mailto:|tel:|#)/.test(url)) continue;
+    if (/^(?:https?:|data:|mailto:|tel:|#|\/voice\/)/.test(url)) continue;
     assert.ok((await stat(resolve(root, url.split(/[?#]/)[0]))).isFile(), url);
   }
   const fonts = await readFile(resolve(root, "assets/fonts.css"), "utf8");

@@ -1,4 +1,4 @@
-/* Rules behind crew status, trends, mission risks, supplies, wellbeing, exercise and the flight surgeon report. Loaded before mission.js. */
+/* Rules behind crew status, trends, health risks, wellbeing, exercise and the flight surgeon report. Loaded before mission.js. */
 'use strict';
 
 const MissionLogic = (() => {
@@ -105,29 +105,8 @@ const MissionLogic = (() => {
     return summaries.flatMap(s => s.status === 'over' ? [`${name[s.kind]} is past the entered limit`] : s.status === 'projected' ? [`${name[s.kind]} is projected to pass the entered limit`] : []);
   }
 
-  const SUPPLY_LEVELS = {
-    expired: { rank: 0, label: 'Expired' }, out: { rank: 0, label: 'Out of stock' },
-    short: { rank: 1, label: 'Runs out early' }, expiring: { rank: 2, label: 'Expires in mission' },
-    low: { rank: 3, label: 'Below reserve' }, ok: { rank: 4, label: 'Enough for mission' },
-    open: { rank: 5, label: 'As needed' }
-  };
-  const USE_WINDOW = 14;
-  /* Uses whichever is higher, the planned rate or actual recent use, so heavier use shows up as an earlier run-out date. */
-  function supplyForecast(item, log = [], { mission = null, now = Date.now() } = {}) {
-    const used = log.filter(u => u.supplyId === item.id && now - time(u.at) <= USE_WINDOW * DAY && time(u.at) <= now).reduce((n, u) => n + u.amount, 0);
-    const actual = used / USE_WINDOW, planned = Number.isFinite(item.dailyUse) ? item.dailyUse : 0, rate = Math.max(actual, planned);
-    const end = missionEnd(mission), daysLeft = end ? Math.max(0, Math.ceil((end - now) / DAY)) : null;
-    const stockDays = rate > 0 ? Math.floor(item.quantity / rate) : null;
-    const shortfall = rate > 0 && daysLeft !== null ? Math.max(0, Math.ceil(rate * daysLeft - item.quantity)) : 0;
-    const expires = item.expires ? Date.parse(`${item.expires}T23:59:59`) : null;
-    let status = rate > 0 && daysLeft !== null ? 'ok' : 'open';
-    if (Number.isFinite(item.reserve) && item.quantity <= item.reserve) status = 'low';
-    if (expires && end && expires < end) status = 'expiring';
-    if (shortfall > 0) status = 'short';
-    if (item.quantity <= 0) status = 'out';
-    if (expires && expires < now) status = 'expired';
-    return { status, label: SUPPLY_LEVELS[status].label, rank: SUPPLY_LEVELS[status].rank, rate: round(rate, 2), actual: round(actual, 2), stockDays, shortfall, daysLeft, runOutAt: stockDays === null ? null : now + stockDays * DAY };
-  }
+
+
 
   function exerciseSummary(workouts, { target = null, now = Date.now(), days = 7 } = {}) {
     const hasTarget = Number.isFinite(target) && target > 0;
@@ -199,29 +178,12 @@ const MissionLogic = (() => {
     return { done, total: list?.steps.length || 0 };
   }
 
-  /* One-way signal times in seconds. Mars varies with orbital position, so these are approximate. */
-  const LINK_DELAYS = {
-    station: { label: 'Space station', detail: 'Near instant', seconds: 1 },
-    moon: { label: 'Moon', detail: 'About 1.3 seconds', seconds: 1.3 },
-    marsNear: { label: 'Mars, closest', detail: 'About 3 minutes', seconds: 180 },
-    marsAverage: { label: 'Mars, average', detail: 'About 12 minutes', seconds: 720 },
-    marsFar: { label: 'Mars, farthest', detail: 'About 22 minutes', seconds: 1320 }
-  };
-  const LINK_REVIEW_SECONDS = 300, LINK_SPEEDS = [1, 10, 60];
-  const LINK_STAGES = { outbound: 'Travelling to Earth', review: 'With flight surgeon', inbound: 'Reply on its way', delivered: 'Reply received' };
-  const LINK_REPLY = 'Message received. Keep following your onboard procedure and keep recording what you do.';
-  const linkDelayFor = environment => /mars/i.test(environment || '') ? 'marsAverage' : /station/i.test(environment || '') ? 'station' : 'moon';
-  /* All times come from the send time, so a message keeps its place after a reload. Clock values are simulated seconds. */
-  function linkStatus(message, now = Date.now()) {
-    const delay = message.delaySeconds, total = 2 * delay + LINK_REVIEW_SECONDS, speed = message.speed > 0 ? message.speed : 1;
-    const elapsed = Math.max(0, (now - time(message.sentAt)) / 1000 * speed);
-    const stage = elapsed < delay ? 'outbound' : elapsed < delay + LINK_REVIEW_SECONDS ? 'review' : elapsed < total ? 'inbound' : 'delivered';
-    return { stage, label: LINK_STAGES[stage], delivered: stage === 'delivered', elapsed: Math.min(elapsed, total), remaining: Math.max(0, total - elapsed), total, percent: Math.min(100, round(elapsed / total * 100, 0)) };
-  }
-  function linkClock(seconds) {
-    const whole = Math.ceil(seconds), m = Math.floor(whole / 60), s = whole % 60;
-    return `${m}:${String(s).padStart(2, '0')}`;
-  }
+
+
+
+
+
+
 
   function reportSections(d) {
     const stamp = at => at ? new Date(at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'time not recorded';
@@ -240,7 +202,6 @@ const MissionLogic = (() => {
       { title: 'Exercise, past 7 days', lines: [`${x.total} minutes across ${x.sessions} sessions on ${x.activeDays} of 7 days.`, x.target ? `Daily target of ${x.target} minutes met on ${x.metDays} of 7 days.` : 'No daily exercise target entered.', ...Object.entries(x.byType).map(([type, minutes]) => `${type}: ${minutes} minutes`)] },
       { title: 'Mission health risks', lines: d.risks.map(r => r.count ? `${r.label}: ${r.text}` : `${r.label}: no measurements recorded.`) },
       { title: 'Skin and wounds', lines: none(d.skin || [], 'No skin or wound records.') },
-      { title: 'Supply concerns', lines: none(d.supplies.map(s => `${s.name}: ${s.label}. ${s.detail}`), 'No supply concerns.') }
     ];
   }
   function reportText(d) {
@@ -303,6 +264,6 @@ const MissionLogic = (() => {
     return n;
   }
 
-  return { tasksCompleted, REFLECTION_PROMPTS, reflectionPrompt, CHECK_FIELDS, exerciseCheck, formatExerciseCheck, LINK_DELAYS, LINK_REVIEW_SECONDS, LINK_SPEEDS, LINK_REPLY, linkDelayFor, linkStatus, linkClock, DAY, TRENDS, STATUS, RISK_KINDS, WELLBEING_SCALES, CHECKLISTS, SUPPLY_LEVELS, dayKey, missionEnd, missionDay, trendAlerts, crewStatus, riskSummary, riskFlags, supplyForecast, exerciseSummary, wellbeingSummary, checklistFor, checklistForReport, runProgress, reportSections, reportText };
+  return { tasksCompleted, REFLECTION_PROMPTS, reflectionPrompt, CHECK_FIELDS, exerciseCheck, formatExerciseCheck, DAY, TRENDS, STATUS, RISK_KINDS, WELLBEING_SCALES, CHECKLISTS, dayKey, missionEnd, missionDay, trendAlerts, crewStatus, riskSummary, riskFlags, exerciseSummary, wellbeingSummary, checklistFor, checklistForReport, runProgress, reportSections, reportText };
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = MissionLogic;

@@ -19,8 +19,8 @@ const types = {
   ".glb": "model/gltf-binary", ".txt": "text/plain; charset=utf-8",
 };
 
-function insideRoot(path) {
-  const name = relative(root, path);
+function insideRoot(path, directory = root) {
+  const name = relative(directory, path);
   return !isAbsolute(name) && name !== ".." && !name.startsWith(`..${sep}`);
 }
 
@@ -45,12 +45,14 @@ const server = createServer(async (request, response) => {
     return;
   }
   try {
+    const voice = url.pathname === "/voice" || url.pathname.startsWith("/voice/");
+    const directory = !built && voice ? fileURLToPath(new URL("../dist/", import.meta.url)) : root;
     if (!["GET", "HEAD"].includes(request.method)) {
       response.writeHead(405, { Allow: "GET, HEAD" }).end();
       return;
     }
-    let file = resolve(root, `.${decodeURIComponent(url.pathname)}`);
-    if (!insideRoot(file)) { response.writeHead(403).end(); return; }
+    let file = resolve(directory, `.${decodeURIComponent(url.pathname)}`);
+    if (!insideRoot(file, directory)) { response.writeHead(403).end(); return; }
     try {
       if ((await stat(file)).isDirectory()) {
         if (!url.pathname.endsWith("/")) {
@@ -61,10 +63,10 @@ const server = createServer(async (request, response) => {
       }
       file = await realpath(file);
     } catch (error) {
-      if (!built || !url.pathname.startsWith("/voice/") || extname(url.pathname)) throw error;
-      file = resolve(root, "voice/index.html");
+      if (!voice || extname(url.pathname)) throw error;
+      file = resolve(directory, "voice/index.html");
     }
-    if (!insideRoot(file)) { response.writeHead(403).end(); return; }
+    if (!insideRoot(file, directory)) { response.writeHead(403).end(); return; }
     const info = await stat(file);
     response.writeHead(200, {
       "Content-Type": types[extname(file)] || "application/octet-stream", "Content-Length": info.size,

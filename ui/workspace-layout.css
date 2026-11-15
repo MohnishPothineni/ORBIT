@@ -113,8 +113,7 @@ main { width: 100%; margin-inline: auto; }
   .crew-companion[data-expanded=true]:has(#assistant-avatar-tools[open]) .companion-portrait { width: 54px; height: 54px; }
 }
 @media (pointer: coarse) {
-  .main-nav a, .nav-group summary, .rail-settings, .companion-room .text-button, .companion-room summary,
-  .companion-motion button, .companion-personas button { min-height: 44px; }
+  .main-nav a, .nav-group summary, .rail-settings, .companion-room .text-button, .companion-room summary, .companion-motion button, .companion-personas button { min-height: 44px; }
 }
 
 .crew-companion[data-corner=left] { right: auto; left: calc(var(--nav-width) + max(var(--companion-gap), env(safe-area-inset-left, 0px))); }
