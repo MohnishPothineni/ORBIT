@@ -176,6 +176,8 @@
   }
 
   async function navigateSite(page,section,input,force=false) {
+    // Merged pages (for example exercise) open the page and tab that now hold them.
+    const alias=PAGE_ALIASES[page];if(alias){if(alias.tab&&!section)section=alias.tab;page=alias.page;}
     if(section)careTab=section;if(input)inputKind=input;
     if(currentPage()===page){if(force||section||input)render();return;}
     await new Promise((resolve,reject)=>{
@@ -470,11 +472,11 @@
     }
     if(action.kind==='navigate'){
       await navigateSite(action.page,action.section,action.input);if(!check())return siteReply('cancelled','The crew changed.');
-      return siteReply('opened',OrbitSiteActions.pages[action.page]+(action.section?' / '+({assessment:'Crew assessment',inputs:'Health inputs',measurements:'Measurement guide',mission:'Mission readiness'}[action.section]):'')+(action.input?' / '+action.input:'')+' is open.',{page:action.page,section:action.section||'',input:action.input||''});
+      return siteReply('opened',OrbitSiteActions.pages[action.page]+(action.section&&!OrbitSiteActions.pages[action.page].includes(' / ')?' / '+CARE_TAB_LABELS[action.section]:'')+(action.input?' / '+action.input:'')+' is open.',{page:action.page,section:action.section||'',input:action.input||''});
     }
     if(action.kind==='trends'){
-      chartMetric=action.metric;chartRange=action.days;await navigateSite('trends',null,null,true);
-      return siteReply('applied','Showing '+META[action.metric].label+' over '+action.days+' days.',{page:'trends',metric:action.metric,days:action.days});
+      chartMetric=action.metric;chartRange=action.days;await navigateSite('log',null,null,true);scrollToLogSection('health-trends');
+      return siteReply('applied','Showing '+META[action.metric].label+' over '+action.days+' days.',{page:'log',section:'trends',metric:action.metric,days:action.days});
     }
     if(action.kind==='body-system'){
       await navigateSite('anatomy',null,null,true);return siteReply('opened','Anatomy lab is open. Use the system layers to explore the reference.',{page:'anatomy'});
@@ -611,7 +613,7 @@
   function paint() {
     const previouslyFocused = document.activeElement;
     const session = bridge.active(), connected = Boolean(session);
-    el('page').textContent = PAGE_NAMES[currentPage()] + (currentPage() === 'care' ? ' / ' + ({assessment:'Crew assessment',inputs:'Health inputs',measurements:'Measurement guide',mission:'Mission readiness'}[careTab] || '') : '');
+    el('page').textContent = PAGE_NAMES[currentPage()] + (currentPage() === 'care' ? ' / ' + (CARE_TAB_LABELS[careTab] || '') : '');
     el('panel').dataset.connected = el('launch').dataset.connected = String(connected);
     el('voice').hidden = connected || starting;
     el('voice').disabled = !navigator.onLine;

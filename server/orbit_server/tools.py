@@ -58,8 +58,8 @@ SCHEMAS = [
         description=(
             "Open a screen in this console. Paths: /crew, /crew?crew=c01, /anatomy, /anatomy?region=left_knee, "
             "/evidence, /assistant. Crew ids: VEGA=c01, HALO=c02, TALON=c03, IRIS=c04. "
-            "Website pages: /status (crew status), /log (health log), /trends (health trends), "
-            "/care (health assessment), /wellbeing (sleep and wellbeing), /exercise, /skin (skin and wounds), "
+            "Website pages: /status (crew status), /log (health log and trends), /trends (the trends section of /log), "
+            "/care (health assessment), /wellbeing, /exercise and /skin (tabs inside health assessment), "
             "/routine (daily routine), /risks (health risk readings). "
             "The result names the screen that opened."
         ),

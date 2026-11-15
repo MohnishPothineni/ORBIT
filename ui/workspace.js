@@ -3,13 +3,13 @@
 // Search this static tool directory, never private health records or images.
 const WORKSPACE_FEATURES = [
  {group:'Daily health',title:'Log a health check',description:'Enter vital signs, glucose, sleep, mood and daily totals.',icon:'plus',action:'log'},
- {group:'Daily health',title:'Health log',description:'Search saved readings, inspect a check and export records.',icon:'clipboard',page:'log'},
+ {group:'Daily health',title:'Health log & trends',description:'Search saved readings, chart any indicator and export records.',icon:'clipboard',page:'log'},
  {group:'Daily health',title:'Health assessment',description:'Record responsiveness, breathing, symptoms and next actions.',icon:'shield',page:'care',section:'assessment'},
  {group:'Daily health',title:'Health trends',description:'Compare any recorded indicator over 7, 14 or 30 days.',icon:'chart',page:'trends'},
  {group:'Daily health',title:'Trend alerts',description:'Find sustained changes in heart rate, sleep, mood and other indicators.',icon:'chart',page:'trends'},
- {group:'Daily health',title:'Sleep & wellbeing',description:'Complete a daily check-in on sleep, fatigue, stress, mood and crew connection.',icon:'moon',page:'wellbeing'},
- {group:'Daily health',title:'Skin & wounds',description:'Complete a daily skin check and track wounds until they heal.',icon:'shield',page:'skin'},
- {group:'Daily health',title:'Exercise',description:'Log workouts and compare them with the daily target.',icon:'dumbbell',page:'exercise'},
+ {group:'Daily health',title:'Sleep & wellbeing',description:'Complete a daily check-in on sleep, fatigue, stress, mood and crew connection.',icon:'moon',page:'care',section:'wellbeing'},
+ {group:'Daily health',title:'Skin & wounds',description:'Complete a daily skin check and track wounds until they heal.',icon:'shield',page:'care',section:'skin'},
+ {group:'Daily health',title:'Exercise',description:'Log workouts and compare them with the daily target.',icon:'dumbbell',page:'care',section:'exercise'},
  {group:'Daily health',title:'Daily routine',description:'Complete planned exercise, nutrition, wellbeing and sleep tasks.',icon:'checksquare',page:'routine'},
  {group:'Health inputs & guidance',title:'Manual health data',description:'Record approved measurements with clear units.',icon:'clipboard',page:'care',section:'inputs',input:'manual'},
  {group:'Health inputs & guidance',title:'Photos, camera & imaging',description:'Capture or upload an observation and review saved image records.',icon:'body',page:'care',section:'inputs',input:'images'},

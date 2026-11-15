@@ -1,14 +1,10 @@
-import { Activity, AudioLines, BookOpen, ChevronDown, ClipboardList, Dumbbell, HeartPulse, Layers, Moon, Shield, Users } from "lucide-react";
+import { Activity, AudioLines, BookOpen, ChevronDown, ClipboardList, HeartPulse, Layers, Shield, Users } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { currentSection } from "./section";
 
 const HEALTH_LINKS = [
-  ["log", "Health log", ClipboardList],
-  ["trends", "Health trends", Activity],
+  ["log", "Health log & trends", ClipboardList],
   ["care", "Health assessment", Shield],
-  ["wellbeing", "Sleep & wellbeing", Moon],
-  ["exercise", "Exercise", Dumbbell],
-  ["skin", "Skin & wounds", Shield],
   ["routine", "Daily routine", ClipboardList],
   ["risks", "Health risk readings", HeartPulse],
 ] as const;

@@ -37,12 +37,13 @@ const WEBSITE_TAB: Record<string, string> = {
 export const WEBSITE_PAGES: Record<string, string> = {
   status: "Crew status",
   crew: "Crew profiles",
-  log: "Health log",
-  trends: "Health trends",
+  log: "Health log & trends",
+  // Merged into other pages; the website still opens these paths (as a section or tab).
+  trends: "Health log & trends",
   care: "Health assessment",
-  wellbeing: "Sleep & wellbeing",
-  exercise: "Exercise",
-  skin: "Skin & wounds",
+  wellbeing: "Health assessment / Sleep & wellbeing",
+  exercise: "Health assessment / Exercise",
+  skin: "Health assessment / Skin & wounds",
   routine: "Daily routine",
   risks: "Health risk readings",
   anatomy: "Anatomy lab",
