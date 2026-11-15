@@ -31,14 +31,14 @@ test("retained health screens render and removed routes and commands are unavail
     vm.runInContext(source, context, { filename: name });
     if (name === "app.js") break;
   }
-  // Showcase migration restores missing demo profiles and histories without changing personal records.
-  assert.equal(vm.runInContext("state.data.demo.crew.filter(p=>p.id.startsWith('crew-')).length", context), 4);
-  assert.equal(vm.runInContext("state.data.demo.entries.filter(e=>e.crewId?.startsWith('crew-')).length", context), 112);
+  // Fresh and saved demo workspaces contain only the two historical profiles.
+  assert.deepEqual(Array.from(vm.runInContext("state.data.demo.crew.map(p=>p.name).sort()", context)), ['Gordon Cooper','Scott Carpenter']);
+  assert.equal(vm.runInContext("state.data.demo.entries.length", context), 13);
   const personalBefore = vm.runInContext("JSON.stringify(state.data.personal)", context);
-  vm.runInContext("state.data.demo.crew = state.data.demo.crew.filter(p=>p.id!=='crew-03'); state.data.demo.entries=state.data.demo.entries.filter(e=>e.crewId!=='crew-03'); initCrewData(); initCrewData();", context);
-  assert.equal(vm.runInContext("state.data.demo.crew.filter(p=>p.id.startsWith('crew-')).length", context), 4);
-  assert.equal(vm.runInContext("state.data.demo.entries.filter(e=>e.crewId?.startsWith('crew-')).length", context), 112);
-  assert.equal(vm.runInContext("state.data.demo.crew.find(p=>p.id==='crew-03').access", context), 'medical');
+  vm.runInContext("state.data.demo.crew.push({id:'crew-03',name:'Fictional crew',sample:true});state.data.demo.entries.push({id:'old-sample',crewId:'crew-03',hr:72});state.data.demo.activeCrewId='crew-03';initCrewData();initCrewData();", context);
+  assert.equal(vm.runInContext("state.data.demo.crew.length", context), 2);
+  assert.equal(vm.runInContext("state.data.demo.entries.length", context), 13);
+  assert.ok(vm.runInContext("state.data.demo.activeCrewId.startsWith('hist-')", context));
   assert.equal(vm.runInContext("JSON.stringify(state.data.personal)", context), personalBefore);
   assert.ok(vm.runInContext("demoNotice()", context).includes('Show sample crew'));
   for (const page of ["missionStatusPage", "crewDashboardPage", "logPage", "trendsPage", "routinePage", "carePage", "missionWellbeingPage", "missionExercisePage", "skinPage", "missionRisksPage", "anatomyLabPage", "missionResearchPage", "voicePage"]) {
