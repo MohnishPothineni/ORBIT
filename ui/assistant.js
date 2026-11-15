@@ -8,6 +8,9 @@
   let assistantTab='chat';
   const scope = () => `${state.mode}/${activeCrewId()}`;
   const micIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg>';
+  const wifiIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><path d="M12 20h.01"/></svg>';
+  const LOCAL_VOICE_SRC = '/voice/assistant?embed=1&dock=1';
+  let localVoice = false;
   let run = 0, starting = false, sessionKind = null, muted = false, selectedImage = null;
   let sdkPromise, contextSignature = '', contextTimer, startTimer, consentURL, consentAction, sending = false, consentRevision = 0;
   let doctorAvatar=null,doctorPromise=null,doctorSpeech=null,doctorEpoch=0,doctorMode='idle',doctorPaused=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -35,7 +38,7 @@
           <button type="button" id="assistant-tab-chat" role="tab" aria-controls="assistant-room" aria-selected="true">Assistant</button>
           <button type="button" id="assistant-tab-appearance" role="tab" aria-controls="assistant-appearance" aria-selected="false" tabindex="-1">Appearance</button>
         </div>
-        <button class="companion-collapse" id="assistant-collapse" aria-label="Collapse assistant controls" title="Collapse assistant controls">${icon('chevronright')}</button>
+        <button class="companion-collapse" id="assistant-collapse" type="button" aria-label="Close assistant" title="Close assistant">${icon('close')}</button>
       </div>
       <header class="companion-head">
         <div class="companion-portrait" id="assistant-avatar-canvas" aria-label="3D crew avatar">
@@ -48,10 +51,12 @@
           </button>
           <p id="assistant-status" role="status">Here when you need me</p>
         </div>
-        <button class="companion-mic" id="assistant-voice" title="Start voice with ElevenLabs" aria-label="Start voice with ElevenLabs">${micIcon}</button>
-        <button class="companion-mic" id="assistant-mute" aria-pressed="false" hidden>${micIcon}</button>
-        <button class="companion-end" id="assistant-end" aria-label="End assistant session" hidden>End</button>
+        <button class="companion-mic" id="assistant-voice" type="button" title="Start voice with ElevenLabs" aria-label="Start voice with ElevenLabs">${micIcon}</button>
+        <button class="companion-mic" id="assistant-local" type="button" title="Open the offline crew voice assistant" aria-label="Open the offline crew voice assistant" aria-pressed="false">${wifiIcon}</button>
+        <button class="companion-mic" id="assistant-mute" type="button" aria-pressed="false" hidden>${micIcon}</button>
+        <button class="companion-end" id="assistant-end" type="button" aria-label="End assistant session" hidden>End</button>
       </header>
+      <div id="assistant-local-host" hidden></div>
       <div class="companion-room" id="assistant-room" role="tabpanel" aria-labelledby="assistant-tab-chat" hidden>
         <div class="assistant-content" id="assistant-content">
         <div class="companion-connect"><span>Voice and connected text use ElevenLabs.</span><button class="text-button" id="assistant-text">Connect text ${icon('arrowright')}</button></div>
@@ -78,6 +83,7 @@
       </div>
       <div class="companion-appearance" id="assistant-appearance" role="tabpanel" aria-labelledby="assistant-tab-appearance" hidden></div>
     </aside>
+    <button class="assistant-reopen" id="assistant-reopen" type="button" hidden>Open assistant</button>
     <dialog class="assistant-consent" id="assistant-consent" aria-labelledby="assistant-consent-title"><header><h2 id="assistant-consent-title"></h2><p id="assistant-consent-subtitle"></p></header><div class="assistant-consent-body" id="assistant-consent-body"></div><p class="assistant-consent-status" id="assistant-consent-status" role="status"></p><footer><button class="button" id="assistant-consent-cancel">Keep private</button><button class="button primary" id="assistant-consent-approve">Share with agent</button></footer></dialog>`;
   document.body.append(host); hydrateIcons(host);
   const el = id => document.getElementById(`assistant-${id}`);
@@ -103,7 +109,15 @@
     doctorMode=mode;
     doctorAvatar?.setMode(mode,sessionKind==='voice');updateDoctorState();
   }
+  function releaseDoctor() {
+    doctorEpoch++;
+    const api = doctorAvatar;
+    doctorAvatar = null;
+    doctorPromise = null;
+    api?.destroy();
+  }
   function loadDoctor() {
+    if(localVoice)return Promise.resolve(null);
     if(doctorPromise)return doctorPromise;
     const epoch=doctorEpoch;
     doctorPromise=import('./doctor-avatar.js').then(module=>module.mountDoctorAvatar({
@@ -116,7 +130,7 @@
         return playback??session.getOutputVolume();
       }
     })).then(api=>{
-      if(epoch!==doctorEpoch){api.destroy();return null;}
+      if(epoch!==doctorEpoch||localVoice){api.destroy();if(localVoice){doctorAvatar=null;doctorPromise=null;}return null;}
       doctorAvatar=api;el('avatar-loading')?.remove();
       api.setQuality(doctorQuality);api.setFraming('portrait');api.setPaused(doctorPaused);api.setMode(doctorMode,sessionKind==='voice');api.setVisible(isOpen());
       updateDoctorState();return api;
@@ -639,7 +653,75 @@
     setExpanded(true);
   }
   function openPanel() {
-    setAssistantTab('chat');paint();void loadDoctor();doctorAvatar?.setVisible(true);
+    el('panel').hidden = false;
+    document.body.dataset.assistantClosed = 'false';
+    el('reopen').hidden = true;
+    setAssistantTab('chat');paint();
+    if(localVoice)return;
+    void loadDoctor();doctorAvatar?.setVisible(true);
+  }
+  function closePanel() {
+    el('panel').hidden = true;
+    document.body.dataset.assistantClosed = 'true';
+    el('reopen').hidden = false;
+    doctorAvatar?.setVisible(false);
+    el('reopen').focus({preventScroll:true});
+  }
+  function setLocalVoice(on, options = {}) {
+    if (on === localVoice && !options.drop) return;
+    const host = el('local-host');
+    if (on) {
+      if (bridge.active() || starting) void stop('Switched to the offline assistant');
+      releaseDoctor();
+      localVoice = true;
+      document.body.dataset.localVoice = 'true';
+      el('panel').dataset.localVoice = 'true';
+      let frame = document.getElementById('voice-frame');
+      if (!frame) {
+        frame = document.createElement('iframe');
+        frame.id = 'voice-frame';
+        frame.title = 'Crew voice AI assistant';
+        frame.allow = 'microphone; autoplay';
+        frame.src = LOCAL_VOICE_SRC;
+      }
+      frame.classList.remove('voice-frame');
+      frame.classList.add('assistant-local-frame');
+      host.append(frame);
+      host.hidden = false;
+      setExpanded(true);
+      setStatus('Offline assistant stays open while you change pages');
+      el('local').setAttribute('aria-pressed', 'true');
+      el('local').title = 'Close the offline crew voice assistant';
+      el('local').setAttribute('aria-label', 'Close the offline crew voice assistant');
+      if (typeof currentPage === 'function' && currentPage() === 'voice' && typeof render === 'function') render();
+      window.dispatchEvent(new Event('orbit:local-voice'));
+      paint();
+      return;
+    }
+    localVoice = false;
+    document.body.dataset.localVoice = 'false';
+    el('panel').dataset.localVoice = 'false';
+    el('local').setAttribute('aria-pressed', 'false');
+    el('local').title = 'Open the offline crew voice assistant';
+    el('local').setAttribute('aria-label', 'Open the offline crew voice assistant');
+    const frame = host.querySelector('iframe');
+    host.hidden = true;
+    const onVoice = typeof currentPage === 'function' && currentPage() === 'voice';
+    if (frame && !options.drop && onVoice) {
+      document.body.append(frame);
+      if (typeof render === 'function') render();
+    } else {
+      frame?.remove();
+      if (onVoice && typeof render === 'function') render();
+    }
+    if (isOpen()) {
+      doctorAvatar?.setPaused(doctorPaused);
+      if (doctorAvatar) doctorAvatar.setVisible(!document.hidden);
+      else void loadDoctor();
+    }
+    setStatus('Here when you need me');
+    window.dispatchEvent(new Event('orbit:local-voice'));
+    paint();
   }
   async function stop(message = 'Session ended') {
     run++; starting = false; sessionKind = null; muted = false; contextSignature = '';
@@ -657,6 +739,7 @@
     return 'The agent could not connect. Check your internet connection and ElevenLabs agent availability, then try again. The medical response guide is available below.';
   }
   async function start(kind) {
+    if (localVoice) setLocalVoice(false, {drop:true});
     if (starting || bridge.active()) return;
     if (kind === 'text') setAssistantTab('chat');
     showError();
@@ -813,7 +896,8 @@
     event.preventDefault();setAssistantTab(event.key==='Home'?'chat':event.key==='End'?'appearance':assistantTab==='chat'?'appearance':'chat');el('tab-'+assistantTab).focus();
   });
   el('launch').addEventListener('click',()=>setExpanded(el('panel').dataset.expanded!=='true'));
-  el('collapse').addEventListener('click',()=>setExpanded(false));
+  el('collapse').addEventListener('click',closePanel);
+  el('reopen').addEventListener('click',()=>{openPanel();el('collapse').focus({preventScroll:true});});
   host.addEventListener('click',event=>{const command=event.target.closest('[data-assistant-command]');if(command)void send(command.dataset.assistantCommand);});
   for(const type of ['input','change'])document.addEventListener(type,event=>{
     const form=event.target.closest('form');if(form?.matches('#health-form,#care-assessment-form,#condition-form,#crew-profile-form,#care-plan-form,#input-photo-form,#settings-form'))form.dataset.assistantDirty='true';
@@ -831,6 +915,7 @@
   }));
   window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',event=>{doctorPaused=event.matches;doctorAvatar?.setPaused(doctorPaused);updateDoctorState();});
   el('voice').addEventListener('click',() => void start('voice'));
+  el('local').addEventListener('click',() => setLocalVoice(!localVoice));
   el('text').addEventListener('click',() => void start('text'));
   el('end').addEventListener('click',() => void stop());
   el('mute').addEventListener('click',() => { const session = bridge.active(); if (!session) return; muted = !muted; session.setMicMuted(muted); setStatus(muted ? 'Microphone muted' : 'Listening'); paint(); });
@@ -866,7 +951,7 @@
     setExpanded(false);
   });
   document.addEventListener('visibilitychange',() => {
-    doctorAvatar?.setVisible(isOpen()&&!document.hidden);
+    doctorAvatar?.setVisible(isOpen()&&!document.hidden&&!localVoice);
     if(document.hidden)doctorSpeech?.reset();
     if (document.hidden && sessionKind === 'voice' && bridge.active()) { muted = true; bridge.active().setMicMuted(true); setStatus('Microphone muted while tab is hidden'); paint(); }
   });
@@ -876,7 +961,7 @@
   window.addEventListener('online',() => { if (isOpen()) { showError(); paint(); } });
   /* The dock opens on wide screens (ORBIT 2's dock layout) and folds away when the screen narrows, unless a conversation is running. */
   const wideDock = window.matchMedia('(min-width: 1100px)');
-  wideDock.addEventListener('change', event => { if (!event.matches && !bridge.active() && !starting) setExpanded(false); });
+  wideDock.addEventListener('change', event => { if (!event.matches && !bridge.active() && !starting && !localVoice) setExpanded(false); });
   setExpanded(wideDock.matches);paint();
   /* The avatar is about 7 MB with three.js. Mount the same portrait for the launcher and conversation after the page is usable, and only when the dock is open. */
   const whenIdle=run=>'requestIdleCallback' in window?requestIdleCallback(run,{timeout:3000}):setTimeout(run,1200);

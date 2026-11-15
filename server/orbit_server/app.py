@@ -21,6 +21,8 @@ from pipecat.transports.smallwebrtc.request_handler import (
 from pydantic import BaseModel, Field
 
 from . import config
+from .anatomy import router as anatomy_router
+from .onboard_library import router as onboard_library_router
 from .certs import cert_expiry, lan_ip
 from .health import ollama_state, pipeline_health
 from .store import VITAL_META, now_iso, store
@@ -240,6 +242,11 @@ async def voice_ice_candidates(request: Request):
         )
     )
     return {"status": "ok"}
+
+
+# Registered before the catch-all below, which answers every other /api/* with 404.
+app.include_router(anatomy_router)
+app.include_router(onboard_library_router)
 
 
 @app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])

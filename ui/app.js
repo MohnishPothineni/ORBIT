@@ -89,6 +89,26 @@ window.addEventListener('storage',e=>{
  state=StateLogic.adoptState(state,stored.state);initCrewData();initMissionData();
  if($('#modal').open||$('#main form')||['crew','anatomy'].includes(currentPage()))toast('Records changed in another tab. They appear here when this page next updates.');else render();
 });
+/* A vital the offline voice assistant saved after a person pressed Save. Only the website's own voice frame may send it. */
+const VOICE_VITAL_FIELDS={heart_rate:'hr',systolic_bp:'sys',diastolic_bp:'dia',temperature:'temp',spo2:'spo2',respiratory_rate:'rr'};
+const VOICE_VITAL_SOURCE='Crew voice assistant';
+window.addEventListener('message',e=>{
+ const m=e.data,frame=document.getElementById('voice-frame');
+ if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||m?.type!=='orbit:vital-saved')return;
+ const field=VOICE_VITAL_FIELDS[m.kind],limits=InputLogic.fields[field],value=Number(m.value),at=Date.parse(m.recordedAt);
+ if(!field||!limits||!Number.isFinite(value)||value<limits.min||value>limits.max||!Number.isFinite(at))return;
+ /* The assistant's crew ids are c01 to c04; the website's are crew-01 to crew-04. */
+ const crewId=/^c\d{2}$/.test(m.crewId)?'crew-'+m.crewId.slice(1):'';
+ const profile=crewProfiles().find(p=>p.id===crewId);
+ if(!profile){toast('The assistant saved a reading for a crew member who is not in this workspace, so it was not added to the Health log.');return;}
+ /* Readings said together (systolic, then diastolic) become one Health log row. */
+ const recent=db().entries.find(r=>r.source===VOICE_VITAL_SOURCE&&r.crewId===crewId&&!Number.isFinite(r[field])&&Math.abs(Date.parse(r.at)-at)<120000);
+ if(recent)recent[field]=value;
+ else db().entries.push({id:crypto.randomUUID?.()||'entry-'+Date.now().toString(36),crewId,at:new Date(at).toISOString(),source:VOICE_VITAL_SOURCE,notes:'',[field]:value});
+ persist();
+ if(!$('#modal').open&&!$('#main form'))render();
+ toast(`Added to ${profile.name}'s Health log.`);
+});
 function db(){return state.data[state.mode];}
 function entries(){return crewRecords(activeCrewId());}
 /* Shown in place of a mood score or check-in note the current viewer is not allowed to see. */
@@ -113,6 +133,7 @@ research:'Evidence library',
 care:'Health assessment',
 crew:'Astronauts',
 anatomy:'Anatomy lab',
+voice:'Crew voice AI assistant',
 log:'Health log & trends',
 routine:'Daily routine'};
 function button(text,action,type='',ic=''){return `<button class="button ${type}" data-action="${action}">${ic?icon(ic):''}${text}</button>`;}
@@ -178,8 +199,15 @@ function render(){
  const pendingAlias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(pendingAlias?.tab)careTab=pendingAlias.tab;
  const p=currentPage(),main=$('#main');
  if(main.dataset.page!==p){const group=document.querySelector('.main-nav [data-nav="'+p+'"]')?.closest('details');if(group)group.open=true;}
+ // Re-renders must not reload the embedded voice workspace (that would end a live session).
+ const keepVoice=p==='voice'&&main.dataset.page==='voice'&&!!main.querySelector('#voice-frame');
+ const parkedVoice=document.getElementById('voice-frame');
+ const voiceOutside=parkedVoice&&!main.contains(parkedVoice);
  main.dataset.page=p;const scroll=window.scrollY;cleanupHealthInputs();disposeCrewViewer();
- main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,risks:missionRisksPage,research:missionResearchPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,log:logPage,routine:routinePage}[p])();
+ if(!keepVoice){
+  main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,risks:missionRisksPage,research:missionResearchPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,voice:voicePage,log:logPage,routine:routinePage}[p])();
+  if(p==='voice'&&voiceOutside&&parkedVoice.isConnected){const slot=main.querySelector('#voice-slot');if(slot){parkedVoice.classList.remove('assistant-local-frame');parkedVoice.classList.add('voice-frame');slot.append(parkedVoice);}}
+ }
  $$('.main-nav a').forEach(a=>{a.classList.toggle('active',a.dataset.nav===p);if(a.dataset.nav===p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  $('#header-page').textContent=PAGE_NAMES[p];$('#data-mode').textContent=state.mode==='demo'?'DEMO MISSION':'MY HEALTH LOG';$('#rail-environment').textContent=state.settings.environment.toUpperCase();document.title=`${PAGE_NAMES[p]} | ORBIT`;
  syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();window.scrollTo(0,scroll);

@@ -27,7 +27,7 @@ body[data-assistant-expanded=false] .app-shell { margin-right: var(--assistant-c
 .companion-tabs [aria-selected=true]::after { content: ''; position: absolute; inset: auto 0 -1px; height: 2px; background: var(--blue); }
 #assistant-panel .companion-collapse { position: static; display: grid; place-items: center; flex: none; width: 36px; height: 44px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); }
 #assistant-panel .companion-collapse:hover { color: var(--ink); background: #e6edef; }
-#assistant-panel .companion-head { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto auto auto; gap: 10px; padding: 0 0 15px; }
+#assistant-panel .companion-head { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto auto auto auto; gap: 10px; padding: 0 0 15px; }
 #assistant-panel .companion-portrait {
   grid-column: 1 / -1;
   grid-row: 1;
@@ -122,3 +122,23 @@ body[data-assistant-expanded=false] .app-shell { margin-right: var(--assistant-c
 
 @media (max-width: 1099px) { #assistant-panel[data-expanded=false] .companion-launch { font-size: 12px; } }
 @media (max-height: 670px) and (min-width: 1100px) { #assistant-panel[data-expanded=false] .companion-portrait { height: 280px; } }
+#assistant-local[aria-pressed=true] { box-shadow: inset 0 0 0 2px #fff; }
+#assistant-local-host { display: none; min-height: 0; }
+#assistant-panel[data-local-voice=true][data-expanded=true] #assistant-local-host { display: flex; flex: 1 1 auto; min-height: 0; }
+.assistant-local-frame { display: block; width: 100%; height: 100%; border: 0; background: var(--paper); }
+#assistant-panel[data-local-voice=true] .companion-portrait,
+#assistant-panel[data-local-voice=true] .companion-portrait-note,
+#assistant-panel[data-local-voice=true] .companion-room,
+#assistant-panel[data-local-voice=true] .companion-appearance { display: none; }
+#assistant-panel[data-local-voice=true] .companion-head { display: flex; align-items: center; padding-bottom: 12px; }
+/* The page scroller stays in the main column. The assistant scroller stays inside the panel. */
+body[data-local-voice=true] { height: 100%; overflow: hidden; }
+body[data-local-voice=true] .app-shell { height: 100dvh; overflow: auto; }
+/* Closed: reserve a narrow strip for the vertical reopen tab so it never covers page content. */
+body[data-assistant-closed=true] .app-shell { margin-right: var(--assistant-reopen-width); }
+:root { --assistant-reopen-width: 40px; }
+.assistant-reopen { display: none; position: fixed; z-index: 28; top: 50%; right: 0; transform: translateY(-50%); width: var(--assistant-reopen-width); min-height: 44px; padding: 14px 0; writing-mode: vertical-rl; border: 1px solid var(--line); border-right: 0; border-radius: 10px 0 0 10px; background: var(--paper); color: var(--ink); font: 600 12px/1.3 var(--sans); box-shadow: 0 6px 18px #152b3e1a; }
+body[data-assistant-closed=true] .assistant-reopen:not([hidden]) { display: block; }
+@media (max-width: 1099px) {
+  body[data-assistant-closed=true] .app-footer { padding-bottom: 26px; }
+}

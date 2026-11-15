@@ -41,8 +41,9 @@ SCHEMAS = [
     FunctionSchema(
         name="log_vital",
         description=(
-            "Draft a vital-sign reading for a crew member. A person must press Save on screen before it is stored, "
-            "so tell them to check the screen and confirm."
+            "Draft a vital-sign reading for a crew member. The person presses Save on screen before it is stored; "
+            "this tool returns only after they decide, and the result says whether it was saved. "
+            "Saved readings also appear in the website's Health log."
         ),
         properties={
             "callsign": CALLSIGN,
@@ -56,7 +57,11 @@ SCHEMAS = [
         name="navigate",
         description=(
             "Open a screen in this console. Paths: /crew, /crew?crew=c01, /anatomy, /anatomy?region=left_knee, "
-            "/evidence, /assistant. Crew ids: VEGA=c01, HALO=c02, TALON=c03, IRIS=c04."
+            "/evidence, /assistant. Crew ids: VEGA=c01, HALO=c02, TALON=c03, IRIS=c04. "
+            "Website pages: /status (crew status), /log (health log and trends), /trends (the trends section of /log), "
+            "/care (health assessment), /wellbeing, /exercise and /skin (tabs inside health assessment), "
+            "/routine (daily routine), /risks (health risk readings). "
+            "The result names the screen that opened."
         ),
         properties={"path": {"type": "string", "description": "A path starting with /."}},
         required=["path"],

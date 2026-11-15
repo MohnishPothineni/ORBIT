@@ -1,7 +1,7 @@
 /* Caches public application assets only. Medical records remain in localStorage. */
-const CACHE = 'orbit-assets-shared-design-v44';
+const CACHE = 'orbit-assets-shared-design-v45';
 const SHELL = [
-  './', './index.html', './studio.css', './assistant-dock.css', './doctor-appearance.mjs', './doctor-materials.js', './assets/avatar/skin-microdetail.png', './style.css', './crew.css', './anatomy-lab.css', './anatomy-workspace.css', './care.css', './theme-scale.css', './design-tokens.css', './theme.css', './mission.css', './touch.css',
+  './', './index.html', './studio.css', './assistant-dock.css', './doctor-appearance.mjs', './doctor-materials.js', './assets/avatar/skin-microdetail.png', './style.css', './crew.css', './anatomy-lab.css', './anatomy-workspace.css', './voice.css', './voice.js', './care.css', './theme-scale.css', './design-tokens.css', './theme.css', './mission.css', './touch.css',
 
   './neural-model.js', './neural-logic.js', './neural-adapter.js', './models/neural-health.json',
   './app.js', './crew.js', './anatomy-lab.js', './care.js', './care-logic.js',

@@ -14,6 +14,7 @@ crew:'Astronauts',
 log:'Health log & trends',
 care:'Health assessment',
 anatomy:'Anatomy lab',
+voice:'Crew voice AI assistant',
 routine:'Daily routine'};
   const sections=['assessment','wellbeing','exercise','skin','inputs','measurements','mission'],methods=['manual','images','sensor','dataset'];
   const layers=['skeleton','cartilage','dental','muscles','connective','heart','arteries','veins','nervous','respiratory','digestive','urinary','reproductive','integumentary','lymphatic','endocrine','sensory'];

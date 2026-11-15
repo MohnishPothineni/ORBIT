@@ -1,7 +1,11 @@
-import { cp, mkdir, rm } from "node:fs/promises";
+import { cp, mkdir, rm, writeFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "vite";
+import { exportResearch, OUTPUT as RESEARCH_OUTPUT } from "./export-research.mjs";
+
+// The voice assistant's server searches the same Evidence library the website shows.
+await writeFile(RESEARCH_OUTPUT, exportResearch(), "utf8");
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = new URL("../dist/", import.meta.url);

@@ -15,6 +15,11 @@ See [UI setup and provenance](docs/ui-reference/README.md) and the retained
 [design system](docs/ui-reference/DESIGN.md).
 
 The existing React/Pipecat workspace is preserved at `/voice/` after building.
+The website's **Crew voice AI assistant** tab (`#voice`, `ui/voice.js`) embeds it as
+`/voice/assistant?embed=1`, so it shares the website's sidebar, top bar, page heading
+and colors (`ui/design-tokens.css` is imported by both apps). In that mode the
+workspace hides its own shell, and its links open the website's tabs. Re-renders keep
+the frame, so a live voice session is not interrupted.
 The local FastAPI server implements the React voice workspace's API. The
 floating avatar assistant uses ElevenLabs and requires internet access.
 
@@ -61,7 +66,13 @@ Or `npm run build` and open `https://localhost:8443` directly (also from other d
 
 **Tools** run in the browser. The server advertises them to the model (`server/orbit_server/tools.py`) and relays each call to the page and its result back. `log_vital` and `share_record_with_assistant` survive interruptions and wait for a person. The browser gives up after 4 min 45 s and tells the model nothing was saved or shared, before the server's 5-minute backstop, so no Save button outlives the request.
 
-**Data** is synthetic (`server/data/seed.json`, matching the frontend mocks). Saved vitals and voice settings go to `server/data/runtime/` (gitignored). Evidence search is keyword matching over the local passages; there is no FAISS index yet, so the status bar reports the index as missing.
+**Data:** crew data is synthetic (`server/data/seed.json`, matching the frontend mocks). Saved vitals and voice settings go to `server/data/runtime/` (gitignored).
+
+**Evidence:** the assistant searches the website's Evidence library. `scripts/export-research.mjs` exports `ui/research-library.js` to `server/data/research-library.json` (run by `npm run build`; the file is committed, and `npm test` fails if it falls out of date). Each passage carries its evidence type, tracking guidance and source papers. Citations link to `#research?doc=<topic>&chunk=<entry>`, which opens that entry. Search is keyword matching; there is no FAISS index yet, so the status bar reports the index as missing.
+
+**Anatomy lab** (`/api/anatomy/*`, `server/orbit_server/anatomy.py`) serves the React Anatomy lab module. Regions come from the module's own `src/modules/anatomy/mocks/regions.json`. Pins start from the synthetic `server/data/anatomy-pins.json`, and changes are saved to `server/data/runtime/anatomy-pins.json`. Region references list pin notes only.
+
+**Ask the onboard library** (`/api/assistant/status`, `/api/assistant/ask`, `server/orbit_server/onboard_library.py`) powers the panel on the website's Evidence library page. It answers from the matching library passages with the local model and streams the answer with its sources. If nothing in the library matches, the model is not called and the answer is marked as not covered.
 
 **Shared records** belong to the voice session they were shared with (keyed by its WebRTC `pc_id`). They reach only that session's prompt, framed as data rather than instructions, and are dropped when that session ends or the person removes them.
 

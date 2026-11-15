@@ -1,8 +1,10 @@
 import { Cpu, Database, Lock, Menu, ServerCrash, ShieldAlert, WifiOff, type LucideIcon } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { useSystemStatus } from "../../shared/context/SystemStatusContext";
 import { formatCount, formatUtcDate, formatUtcDateTime } from "../../shared/format";
 import type { NetworkMode, StatusLevel, SystemStatus } from "../../shared/types";
 import { CrewSelector } from "./CrewSelector";
+import { SECTION_LABEL, currentSection } from "./section";
 import { StatusChip } from "./StatusChip";
 
 const NETWORK: Record<NetworkMode, { level: StatusLevel; icon: LucideIcon; text: string }> = {
@@ -100,11 +102,12 @@ function IndexChip({ faiss }: { faiss: SystemStatus["faiss"] }) {
 
 export function StatusBar({ navigationOpen, onToggleNav }: { navigationOpen: boolean; onToggleNav: () => void }) {
   const { status } = useSystemStatus();
+  const label = SECTION_LABEL[currentSection(useLocation().pathname)];
   const ready = status?.ollama.state === "ready" && status.network.mode !== "unreachable";
   return (
     <header className="orbit-topbar">
       <button className="orbit-menu-button" type="button" aria-label="Toggle navigation" aria-expanded={navigationOpen} aria-controls="orbit-navigation" onClick={onToggleNav}><Menu size={20} /></button>
-      <div className="orbit-location"><span>Mission control</span><b aria-hidden="true">/</b> Crew voice assistant</div>
+      <div className="orbit-location"><span>Mission control</span><b aria-hidden="true">/</b> {label}</div>
       <div className="orbit-topbar-actions">
         <details className="orbit-system-status">
           <summary><span aria-hidden="true" className={ready ? "text-nominal" : "text-ink-2"}>&#9679;</span>{ready ? "Ready" : "System status"}</summary>

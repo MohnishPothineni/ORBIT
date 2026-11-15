@@ -389,11 +389,23 @@ function missionResearchRefresh() {
   $('#research-clear').hidden = !missionResearchQuery;
   $('#research-ask').hidden = !missionResearchQuery.trim();
 }
+/* Voice assistant citations link here as #research?doc=<topic>&chunk=<entry id>
+   (scripts/export-research.mjs). Show that entry once per link, then leave the search to the person. */
+let missionResearchLinked = '';
+function missionResearchApplyLink() {
+  const params = new URLSearchParams(location.hash.split('?')[1] || ''), chunk = params.get('chunk');
+  if (!chunk || location.hash === missionResearchLinked) return;
+  missionResearchLinked = location.hash;
+  const slug = title => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const item = ResearchLibrary.allItems().find(i => i.topic === params.get('doc') && slug(i.title) === chunk);
+  if (item) missionResearchQuery = item.title;
+}
 function missionResearchTopic() {
-  const topic = new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
+  const params = new URLSearchParams(location.hash.split('?')[1] || ''), topic = params.get('topic') || params.get('doc');
   return topic === 'all' || Object.hasOwn(ResearchLibrary.TOPICS, topic) ? topic : 'behavior';
 }
 function missionResearchPage() {
+  missionResearchApplyLink();
   const R = ResearchLibrary, topic = missionResearchTopic(), count = Object.keys(R.SOURCES).length;
   return `${pageHeading('Evidence library', `The research behind ORBIT, from ${count} published sources.`)}
     <section class="panel care-offline-panel"><h2>Offline evidence and anatomy</h2><p>The evidence entries below are bundled with ORBIT and searchable without an internet connection. Prepare this device before going offline.</p><p id="care-offline-status" role="status">${esc(careOfflineMessage)}</p><button class="button small" data-action="care-offline" ${careOfflineBusy ? 'disabled' : ''}>${careOfflineBusy ? 'Preparing…' : careOfflineReady ? 'Refresh offline package' : 'Prepare offline package'} ${icon('download')}</button></section>

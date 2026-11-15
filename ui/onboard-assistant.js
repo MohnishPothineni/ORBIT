@@ -117,16 +117,19 @@ function onboardAnswerHtml() {
 }
 
 const onboardUnavailable = () => !!onboard.status && !onboard.status.ready;
+const localVoiceHoldsModel = () => document.body?.dataset?.localVoice === 'true';
+const LOCAL_VOICE_HOLD = 'The offline crew assistant is using the onboard model. Ask it from the side panel so this computer does not run a second answer.';
 const onboardShowStarters = () => !!onboard.status?.ready && !onboard.checking && (onboard.state === 'idle' || (onboard.state === 'done' && !onboard.covered));
 /* With no summary on screen, only the emergency sentence of the caveat applies. */
 const onboardNoSummary = () => onboardUnavailable() || (onboard.state === 'done' && !onboard.covered) || (onboard.state === 'error' && !onboard.answer);
 function onboardAskPanel() {
   const busy = onboard.state === 'asking' || onboard.checking;
+  const held = localVoiceHoldsModel();
   return `<details class="panel onboard-ask" id="onboard-panel" ${onboard.expanded ? 'open' : ''}>
     <summary aria-labelledby="onboard-ask-title" aria-describedby="onboard-status"><h2 id="onboard-ask-title">Ask the onboard library</h2><span class="onboard-status" id="onboard-status">${esc(onboardStatusText())}</span></summary>
     <div class="onboard-body"><p class="onboard-intro">Answers use only this library and the MedlinePlus topics stored on board. ${onboardPrivacy()} The separate Crew assistant uses an internet connection.</p>
-    <form id="onboard-ask-form" class="onboard-form"><label for="onboard-question">Question for the onboard library</label><div><input id="onboard-question" class="field-input" maxlength="500" autocomplete="off" aria-describedby="onboard-field-msg onboard-help" placeholder="For example: why do astronauts get headaches?" value="${esc(onboard.question)}" ${onboardUnavailable() ? 'disabled' : ''}><button class="button primary" type="submit" ${busy || onboardUnavailable() ? 'disabled' : ''}>${busy ? 'Answering…' : 'Ask'}</button><button class="button" id="onboard-stop" type="button" aria-keyshortcuts="Escape" ${busy ? '' : 'hidden'}>Stop</button></div></form>
-    <p class="onboard-field-msg" id="onboard-field-msg" role="alert">${esc(onboard.fieldMsg)}</p>
+    <form id="onboard-ask-form" class="onboard-form"><label for="onboard-question">Question for the onboard library</label><div><input id="onboard-question" class="field-input" maxlength="500" autocomplete="off" aria-describedby="onboard-field-msg onboard-help" placeholder="For example: why do astronauts get headaches?" value="${esc(onboard.question)}" ${onboardUnavailable() || held ? 'disabled' : ''}><button class="button primary" type="submit" ${busy || onboardUnavailable() || held ? 'disabled' : ''}>${busy ? 'Answering…' : 'Ask'}</button><button class="button" id="onboard-stop" type="button" aria-keyshortcuts="Escape" ${busy ? '' : 'hidden'}>Stop</button></div></form>
+    <p class="onboard-field-msg" id="onboard-field-msg" role="alert">${esc(held && !onboard.fieldMsg ? LOCAL_VOICE_HOLD : onboard.fieldMsg)}</p>
     <div class="onboard-starters" id="onboard-starters" ${onboardShowStarters() ? '' : 'hidden'}><span id="onboard-starters-label">Ask an example</span><div role="group" aria-labelledby="onboard-starters-label">${ONBOARD_STARTERS.map(q => `<button class="button small" type="button" data-onboard-starter>${esc(q)}</button>`).join('')}</div></div>
     <div id="onboard-help">${onboardHelp()}</div>
     <div class="onboard-answer" id="onboard-answer" aria-busy="${busy}">${onboardAnswerHtml()}</div>
@@ -147,10 +150,11 @@ function onboardRefresh() {
   const msg = $('#onboard-field-msg'); if (msg.textContent !== onboard.fieldMsg) msg.textContent = onboard.fieldMsg;
   onboardTimingRefresh();
   const busy = onboard.state === 'asking' || onboard.checking;
+  const held = localVoiceHoldsModel();
   document.documentElement.toggleAttribute('data-onboard-ready', !!onboard.status?.ready);
   $('#onboard-starters').hidden = !onboardShowStarters();
   $('#onboard-caveat-summary').hidden = onboardNoSummary();
-  const submit = $('#onboard-ask-form button[type="submit"]'); submit.disabled = busy || onboardUnavailable(); $('#onboard-question').disabled = onboardUnavailable(); submit.textContent = onboard.state === 'asking' ? 'Answering…' : onboard.checking ? 'Checking…' : 'Ask';
+  const submit = $('#onboard-ask-form button[type="submit"]'); submit.disabled = busy || onboardUnavailable() || held; $('#onboard-question').disabled = onboardUnavailable() || held; submit.textContent = onboard.state === 'asking' ? 'Answering…' : onboard.checking ? 'Checking…' : 'Ask';
   $('#onboard-stop').hidden = !onboard.controller;
   const retry = $('[data-onboard-retry]'); if (retry) retry.disabled = busy;
 }
@@ -166,6 +170,7 @@ async function onboardCheck(force = false, signal) {
 }
 
 async function onboardAsk(question, rewrite = null) {
+  if (localVoiceHoldsModel()) { onboard.fieldMsg = LOCAL_VOICE_HOLD; onboardRefresh(); return; }
   /* Check the model first. If it is not available, say the question was not sent and keep the last answer on screen. */
   const startedAt = performance.now();
   const controller = new AbortController(); onboard.controller = controller;
@@ -299,4 +304,10 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape' || !onboard.controller || document.querySelector('dialog[open]')) return;
   onboard.controller.abort(); $('#onboard-question')?.focus();
+});
+window.addEventListener('orbit:local-voice', () => {
+  if (!localVoiceHoldsModel()) { if (onboard.fieldMsg === LOCAL_VOICE_HOLD) onboard.fieldMsg = ''; onboardRefresh(); return; }
+  onboard.controller?.abort();
+  onboard.fieldMsg = LOCAL_VOICE_HOLD;
+  onboardRefresh();
 });
