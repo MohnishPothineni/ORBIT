@@ -49,6 +49,18 @@ def _stem(word: str) -> str:
     return word[:5] if len(word) > 5 else word.rstrip("s")
 
 
+def _dated_today(item: dict[str, Any], field: str) -> dict[str, Any]:
+    """Replace a "dailyAt" local time of day ("07:00") with today's date at that time, in UTC."""
+    if "dailyAt" not in item:
+        return item
+    hour, minute = (int(x) for x in item["dailyAt"].split(":"))
+    local = datetime.now().astimezone().replace(hour=hour, minute=minute, second=0, microsecond=0)
+    at = min(local, datetime.now().astimezone())  # never in the future, as on the website
+    out = {k: v for k, v in item.items() if k != "dailyAt"}
+    out[field] = at.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return out
+
+
 class Store:
     def __init__(self) -> None:
         self._lock = threading.Lock()
@@ -85,7 +97,14 @@ class Store:
         return next((c for c in self.crew if c["id"] == crew_id), None)
 
     def summary(self, crew_id: str) -> dict[str, Any]:
-        return self.summaries.get(crew_id) or {"crewId": crew_id, "readings": [], "wellbeing": None}
+        summary = self.summaries.get(crew_id) or {"crewId": crew_id, "readings": [], "wellbeing": None}
+        # The sample crew's readings roll forward on the website (a reading every morning), so the
+        # seed gives a local time of day ("dailyAt") and they are dated today here.
+        readings = [_dated_today(r, "recordedAt") for r in summary["readings"]]
+        wellbeing = summary.get("wellbeing")
+        if wellbeing and "dailyAt" in wellbeing:
+            wellbeing = _dated_today(wellbeing, "checkInAt")
+        return {**summary, "readings": readings, "wellbeing": wellbeing}
 
     def add_vital(self, crew_id: str, kind: str, value: float, recorded_at: str | None) -> dict[str, Any]:
         """Validate and store a reading. Raises ValueError with a readable message."""
@@ -136,16 +155,46 @@ class Store:
 
     def search_evidence(self, query: str, k: int) -> list[dict[str, Any]]:
         """Keyword search over the local passages (no embeddings yet)."""
-        terms = {_stem(w) for w in _WORD.findall(query.lower()) if len(w) > 2}
+        # Keep short numerical record identifiers (e.g. 001, 9) and ignore question filler.
+        stop = {"what", "was", "were", "the", "for", "and", "with", "does", "this", "that", "show", "tell", "about", "during"}
+        terms = {_stem(w) for w in _WORD.findall(query.lower()) if (len(w) > 2 or w.isdigit()) and w not in stop}
         if not terms:
             return []
+        q = query.lower()
+        # Historical records name a crew role. Longest first, so "pilot" never means "Scientist Pilot".
+        asked_role = next((r for r in ("scientist pilot", "commander", "pilot") if re.search(rf"\b{r}\b", q)), None)
+        # What was measured. A record that measures what is asked outranks one that only shares
+        # context words (e.g. "after landing" heart rates for a body temperature question).
+        measure_words = {
+            "heart": ("heart rate",), "pulse": ("heart rate",),
+            "temperature": ("body temperature",), "fever": ("body temperature",),
+            "respiratory": ("respiratory rate",), "breathing": ("respiratory rate",), "breaths": ("respiratory rate",),
+            "systolic": ("systolic bp",), "diastolic": ("diastolic bp",), "blood pressure": ("systolic bp", "diastolic bp"),
+            "ventilation": ("minute ventilation",), "oxygen": ("oxygen consumption",),
+            "co2": ("co2 production",), "carbon dioxide": ("co2 production",),
+        }
+        asked_measures = {m for word, names in measure_words.items() if re.search(rf"\b{word}\b", q) for m in names}
         scored = []
         for chunk in self.evidence:
             words = {_stem(w) for w in _WORD.findall(f"{chunk['title']} {chunk['excerpt']}".lower())}
             words |= {_stem(w) for w in chunk.get("keywords", [])}
             hits = len(terms & words)
             if hits:
-                scored.append((hits / len(terms), chunk))
+                # Exact record ids outrank incidental word matches in other records.
+                record_ids = re.findall(r"\b(?:NASA-VITAL-\d+|SKYLAB[\w-]+)\b", query, re.IGNORECASE)
+                exact = any(record_id.lower() in chunk["title"].lower() for record_id in record_ids)
+                score = hits / len(terms) + (1 if exact else 0)
+                role = re.search(r"Crew role: ([^;.]+)", chunk["excerpt"])
+                if asked_role and role:
+                    score += 0.5 if role.group(1).strip().lower() == asked_role else -0.5
+                measured = re.search(r"Measurements: (.*?)(?:\. Source|$)", chunk["excerpt"])
+                if asked_measures and measured:
+                    names = [n.strip() for n in re.findall(r"([a-z0-9 ]+?): [\d.]+", measured.group(1))]
+                    # A bonus only: a record of the right person and phase that lacks the measure
+                    # must still reach the model, so it can say the measure was not recorded.
+                    if any(n == a or n.startswith(a + " ") for n in names for a in asked_measures):
+                        score += 0.5
+                scored.append((score, chunk))
         scored.sort(key=lambda s: s[0], reverse=True)
         return [
             {k_: c[k_] for k_ in ("documentId", "chunkId", "title", "excerpt")} | {"score": round(score, 2)}

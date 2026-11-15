@@ -42,6 +42,7 @@ from pipecat.workers.runner import WorkerRunner
 from . import config
 from .health import pipeline_health, warm_up_llm
 from .store import store
+from .evidence_guidance import HISTORICAL_GUIDANCE
 from .tools import ClientToolBridge, ConfirmPhraseGate, openai_tools, register_client_tools, tools_schema
 from .voice_settings import VAD_CONFIDENCE, VoiceSettings, load_settings
 
@@ -79,7 +80,7 @@ How you answer:
 Because your words are spoken aloud:
 - Use short, natural sentences of about 15 words or fewer.
 - Plain text only. No emojis, asterisks, dashes, bullet points, markdown or lists.
-- Say numbers and units the way a person would say them out loud."""
+- Say numbers and units the way a person would say them out loud.""" + "\n" + HISTORICAL_GUIDANCE
 
 LENGTH = {
     "concise": "Answer in 1 to 3 sentences unless they ask for more.",

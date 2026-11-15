@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import { Send } from "lucide-react";
 import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Button, IconButton } from "../../../shared/ui/Button";
@@ -17,7 +18,9 @@ export interface ComposerProps {
 
 /** Enter sends, Shift+Enter adds a new line. */
 export function Composer({ disabled, disabledHint, onSend }: ComposerProps) {
-  const [text, setText] = useState("");
+  // Module 4: reviewed library questions prefill the composer; never auto-send.
+  const [params] = useSearchParams();
+  const [text, setText] = useState(() => params.get("question") ?? "");
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const send = (value: string) => {

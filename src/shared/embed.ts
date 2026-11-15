@@ -59,6 +59,8 @@ export function websiteTab(path: string): string {
 
 /** Website URL for an in-app path such as `/anatomy?region=knee_left`. */
 export function websiteHref(path: string): string {
+  // Crew ids are shared with the website (hist-ma9, hist-ma7). A name or callsign such as
+  // "Gordon Cooper" or "COOPER" is matched by the website itself.
   const [, query = ""] = path.split("?");
   const tab = websiteTab(path);
   return `/#${tab}${query ? `?${query}` : ""}`;

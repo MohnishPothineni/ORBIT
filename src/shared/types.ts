@@ -1,6 +1,6 @@
 export type StatusLevel = "nominal" | "caution" | "critical" | "standby" | "nodata";
 
-export type CrewRole = "commander" | "medical_officer" | "flight_engineer" | "mission_specialist";
+export type CrewRole = "commander" | "medical_officer" | "flight_engineer" | "mission_specialist" | "pilot";
 
 export interface CrewMember {
   id: string;              // "c01"
@@ -28,6 +28,7 @@ export const ROLE_LABEL: Record<CrewRole, string> = {
   medical_officer: "Medical officer",
   flight_engineer: "Flight engineer",
   mission_specialist: "Mission specialist",
+  pilot: "Pilot",
 };
 
 /** Wellbeing visibility rule (Section A.4). */

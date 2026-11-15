@@ -52,11 +52,17 @@ const MissionLogic = (() => {
 
   const STATUS = {
     urgent: { rank: 0, label: 'Urgent' }, review: { rank: 1, label: 'Needs review' },
-    due: { rank: 2, label: 'Check overdue' }, clear: { rank: 3, label: 'No flags' }
+    due: { rank: 2, label: 'Check overdue' }, clear: { rank: 3, label: 'No flags' },
+    historical: { rank: 4, label: 'Historical record' }
   };
   const OVERDUE_HOURS = 36, URGENT_HOURS = 24, VITALS = ['hr', 'sys', 'temp', 'spo2', 'rr'];
   /* Private wellbeing detail stays out of this crew-wide view: only a neutral support prompt is listed. */
-  function crewStatus({ records = [], alerts = [], assessments = [], openRuns = [], riskFlags = [], extraReasons = [], supportSuggested = false, now = Date.now() }) {
+  function crewStatus({ records = [], alerts = [], assessments = [], openRuns = [], riskFlags = [], extraReasons = [], supportSuggested = false, historical = null, now = Date.now() }) {
+    /* A past mission's reference record: decades-old readings are neither overdue nor a current concern. */
+    if (historical) {
+      const lastVitals = records.filter(r => VITALS.some(k => Number.isFinite(r[k]))).sort(byTime).at(-1)?.at || null;
+      return { level: 'historical', label: STATUS.historical.label, rank: STATUS.historical.rank, reasons: [{ level: 'historical', text: `Reference readings from ${historical}. Not a current crew member.` }], lastVitals, overdue: false };
+    }
     const reasons = [];
     openRuns.forEach(run => reasons.push({ level: 'urgent', text: `Emergency checklist in progress: ${run.title}` }));
     const recentUrgent = assessments.filter(a => a.level === 'emergency' && now - time(a.at) <= URGENT_HOURS * 3600000).sort(byTime).at(-1);

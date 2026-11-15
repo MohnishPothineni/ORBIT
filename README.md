@@ -66,7 +66,7 @@ Or `npm run build` and open `https://localhost:8443` directly (also from other d
 
 **Tools** run in the browser. The server advertises them to the model (`server/orbit_server/tools.py`) and relays each call to the page and its result back. `log_vital` and `share_record_with_assistant` survive interruptions and wait for a person. The browser gives up after 4 min 45 s and tells the model nothing was saved or shared, before the server's 5-minute backstop, so no Save button outlives the request.
 
-**Data:** crew data is synthetic (`server/data/seed.json`, matching the frontend mocks). Saved vitals and voice settings go to `server/data/runtime/` (gitignored).
+**Data:** the voice assistant's crew are the website's demo crew, with the same ids: Crew 01 to 04 (`crew-01`…`crew-04`, fictional sample crew whose readings the server dates today) and the historical profiles Gordon Cooper (`hist-ma9`) and Scott Carpenter (`hist-ma7`). `node scripts/seed-voice-crew.cjs` rebuilds `server/data/seed.json` from the website's own scripts, and `npm test` fails if the two drift apart. The React mock mode keeps its own synthetic crew (`src/shared/mocks/crew.ts`). Saved vitals and voice settings go to `server/data/runtime/` (gitignored).
 
 **Evidence:** the assistant searches the website's Evidence library. `scripts/export-research.mjs` exports `ui/research-library.js` to `server/data/research-library.json` (run by `npm run build`; the file is committed, and `npm test` fails if it falls out of date). Each passage carries its evidence type, tracking guidance and source papers. Citations link to `#research?doc=<topic>&chunk=<entry>`, which opens that entry. Search is keyword matching; there is no FAISS index yet, so the status bar reports the index as missing.
 
@@ -89,11 +89,12 @@ src/
   app/            route table and application shell (status bar, sidebar, crew selector)
   shared/         design tokens, UI kit, types, API client, mock mode, contexts
   modules/
+    crew/         Module 1 — Crew status and health tracking (built)
     anatomy/      Module 2 — Anatomy lab (built)
     assistant/    Module 3 — Crew assistant (built)
 ```
 
-Crew status and Evidence library show a placeholder until their modules are added. Modules never import from each other; they link through routes.
+All four modules are registered in the React application. Modules never import from each other; they link through routes.
 
 ## Crew assistant (`/assistant`)
 
@@ -132,6 +133,17 @@ With `VITE_USE_MOCKS=true`, a `MockVoiceSession` plays a scripted conversation w
 
 A **Demo controls** card can step the script, force any turn state, simulate errors, say the share approval phrase and cycle the status-bar states. Append `?state=loading|empty|error` to the URL in development to see those page states.
 
+## Offline evidence library
+
+Module 4 is implemented at `/evidence`, with cited search/Ask, a passage viewer,
+Offline center, import/indexing jobs, and a separate historical CSV reference view.
+Production builds include a Workbox service worker; live API responses are never
+cached. See [the module guide](src/modules/evidence/README.md) for API contracts,
+offline behavior, mock-mode limits, tests, and the colon-containing workspace path
+caveat. The separate local FastAPI/FAISS/Ollama backend is required for real search,
+indexing and generated answers.
+
+Run `npm run build` then `npm run test:evidence` for the evidence regression checks.
 ## Anatomy lab (`/anatomy`)
 
 An anatomical reference workspace. Crew members inspect body systems, pin symptoms, injuries and observations to a region for one crew member, and cross-reference notes, health-log entries and Evidence library sources for that region.
@@ -152,3 +164,21 @@ The model is a **generic adult reference** shared by every profile. Pins change 
 - **Driving the viewer from other modules:** dispatch `window.dispatchEvent(new CustomEvent("orbit:anatomy", { detail: { action: "selectRegion", payload: "knee_left" } }))`. Actions: `selectRegion`, `focusRegion`, `setPreset`, `toggleLayer`, `isolate`, `setSection`, `frameSelection`, `resetView`. The Crew assistant's flat snake_case form (`{ action: "focus_region", region: "knee_left" }`) is accepted too. See `modules/anatomy/public.ts`.
 - **API:** `GET /api/anatomy/regions`, `GET|POST /api/anatomy/pins`, `PATCH|DELETE /api/anatomy/pins/{id}`, `GET /api/anatomy/regions/{id}/references?crew=`.
 - **Dev overrides:** `?state=loading|empty|error`, and `?webgl=off` to force the 2D fallback.
+
+
+## Crew status (`/crew`)
+
+The ranked roster opens profiles with latest vitals, 24-hour sparklines, live telemetry, Recharts trends, a searchable health log, and editable crew review bands. Deep links: `/crew/:id/log` and `/crew/:id/bands`. Overview logging defaults to the active viewer; logging from another profile requires explicitly choosing the subject. Paired blood-pressure readings share a `pairId`; partial failures can retry the remaining reading.
+
+- **Product rules:** inclusive min/max bands; readings outside by at most 10% of the span are caution, beyond that critical. Stale values become no-data. Wellbeing never drives ranking. Alerts require the configured consecutive count. Trend comparisons use daily means over 7 versus 21 days.
+- **Visibility:** stress, fatigue and sleep quality are filtered in mock services and at rendering boundaries. Viewer changes clear old query results. There is no sign-in on this device. Visibility rules control what the screen shows; they are not security. The server must enforce the same visibility and write policies.
+- **API:** services use the brief's `/api/crew/*` and `/api/alerts/*` contracts, with `X-Orbit-Viewer` on JSON requests. Native EventSource cannot set headers, so `/api/telemetry/stream` receives `crew` and `viewer` query parameters. Reconnection backs off from 1 to 30 seconds. No third-party hosts are contacted.
+- **Synthetic mode:** 30 days of seeded data, relative to page-load time. TALON is critical, HALO caution, IRIS stale, VEGA nominal. HALO's demo SpO₂ band is 91.8–100: the brief's example 94–100 band would make 91–92 critical under its specified formula. These are synthetic product settings, never clinical guidance. Mock writes are session-memory only and reset on reload; persistent real records belong to the backend.
+- **Development states:** append `?state=loading`, `?state=empty`, or `?state=error` to overview or profile routes. Browser offline mode pauses the demo wearable; locally loaded mock screens remain usable. This module does not install a service worker or guarantee a cold offline page load.
+- **Checks:** `npm test` covers status boundaries, missing/stale readings, wellbeing exclusion, sustained trends, scenario ranking, privacy, and acknowledgements. Run `npm run typecheck`, `npm run build`, and `npm run lint` before integrating.
+
+Backend integration is required to validate real writes, permission enforcement and wearable SSE. Profile queries follow pagination cursors with cancellation and repeated-cursor protection.
+
+### React crew development
+
+Run `npm run dev:crew` to open the React crew app at `http://127.0.0.1:5173/crew`. After installing dependencies or merging changes to `vite.config.ts`, restart the dev server so it loads the current plugin configuration. `virtual:pwa-register` is generated by `vite-plugin-pwa`; it is not a physical file. The production build retains offline precaching and update notifications.

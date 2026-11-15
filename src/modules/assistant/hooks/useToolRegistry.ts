@@ -98,9 +98,14 @@ export function useToolRegistry() {
     const { crew: list, getCrew: byId } = live.current;
     const id = readString(args.crew_id) ?? readString(args.crewId);
     if (id) return byId(id) ?? null;
-    const callsign = readString(args.callsign)?.toUpperCase();
-    if (callsign) return list.find((c) => c.callsign === callsign) ?? null;
-    return null;
+    // The model may give a callsign ("COOPER"), a full name ("Gordon Cooper") or a surname.
+    const said = (readString(args.callsign) ?? readString(args.name))?.trim().toUpperCase();
+    if (!said) return null;
+    return (
+      list.find((c) => c.callsign === said || c.fullName.toUpperCase() === said) ??
+      list.find((c) => c.fullName.toUpperCase().split(" ").at(-1) === said) ??
+      null
+    );
   }, []);
 
   const waitFor = useCallback((req: Confirmation, signal: AbortSignal): Promise<Decision> => {
@@ -207,7 +212,8 @@ export function useToolRegistry() {
           update({ status: "running" });
           setPendingNavigation(path);
           // Name the screen that actually opens, so the reply cannot claim a different one.
-          const label = EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path;
+          const crewAsked = new URLSearchParams(path.split("?")[1] ?? "").get("crew");
+          const label = (EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path) + (crewAsked ? ` for ${crewAsked}` : "");
           return ok(`Opening ${label}`, { path, screen: label });
         }
 

@@ -4,6 +4,9 @@ import { CrewProvider } from "./shared/context/CrewContext";
 import { SystemStatusProvider } from "./shared/context/SystemStatusContext";
 import { ToastProvider } from "./shared/ui/Toast";
 
+// Module 4: offline packaging update notification, inside the existing toast provider.
+import { OfflineUpdateNotice } from "./modules/evidence/components/OfflineUpdateNotice";
+
 function AppRoutes() {
   return useRoutes(appRoutes);
 }
@@ -11,6 +14,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <ToastProvider>
+      <OfflineUpdateNotice />
       <SystemStatusProvider>
         <CrewProvider>
           <AppRoutes />
