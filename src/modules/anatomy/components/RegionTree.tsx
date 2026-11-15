@@ -98,7 +98,11 @@ export function RegionTree({ index, selectedId, onSelect, onHover, pins }: Regio
 
   const focusNode = (key: string) => {
     setFocusKey(key);
-    requestAnimationFrame(() => listRef.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(key)}"]`)?.focus());
+    const find = () => listRef.current?.querySelector<HTMLElement>(`[data-key="${CSS.escape(key)}"]`);
+    const el = find();
+    // Rows that are already on screen take focus at once; newly expanded ones next frame.
+    if (el) el.focus();
+    else requestAnimationFrame(() => find()?.focus());
   };
 
   const toggle = (key: string, open?: boolean) =>
