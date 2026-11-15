@@ -29,6 +29,16 @@ class HistoricalRetrieval(unittest.TestCase):
         hits = namespace['search_evidence'](self.store, 'Gordon Cooper prelaunch heart rate', 4)
         self.assertIn('NASA-VITAL-001:', hits[0]['title'])
 
+    def test_atlas9_scope_never_returns_other_missions(self):
+        for query in ['Atlas 9 heart rate', 'What was the blood pressure during Atlas-9?', 'Mercury Atlas IX', 'atlas nine', 'ATLAS 9 sleep']:
+            hits = namespace['search_evidence'](self.store, query, 100)
+            self.assertTrue(hits, query)
+            self.assertTrue(all('Mission: Mercury-Atlas 9;' in hit['excerpt'] for hit in hits), query)
+
+    def test_atlas90_is_not_atlas9(self):
+        self.store.evidence = [{'documentId':'other','chunkId':'90','title':'Atlas 90', 'excerpt':'Mission: Atlas 90; heart rate 70 bpm'}]
+        self.assertEqual(namespace['search_evidence'](self.store, 'Atlas 9 heart rate', 100), [])
+
     def test_shared_interpretation_guidance(self):
         guidance = (ROOT / 'server/orbit_server/evidence_guidance.py').read_text()
         for phrase in ['grouped protocol means', 'Missing fields are unknown', 'BTPS and STPD', 'PDF/page/table']:

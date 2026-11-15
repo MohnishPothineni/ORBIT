@@ -141,8 +141,13 @@ class Store:
         terms = {_stem(w) for w in _WORD.findall(query.lower()) if (len(w) > 2 or w.isdigit()) and w not in stop}
         if not terms:
             return []
+        # Mission identity is a filter, never merely a keyword boost. Check passage
+        # metadata text, not shared document keywords (the CSV contains many missions).
+        atlas9 = bool(re.search(r"\batlas[\s–—-]*(?:9|ix|nine)\b", query, re.IGNORECASE))
         scored = []
         for chunk in self.evidence:
+            if atlas9 and not re.search(r"\bMission:\s*Mercury[\s–—-]+Atlas[\s–—-]+9\b", chunk["excerpt"], re.IGNORECASE):
+                continue
             words = {_stem(w) for w in _WORD.findall(f"{chunk['title']} {chunk['excerpt']}".lower())}
             words |= {_stem(w) for w in chunk.get("keywords", [])}
             hits = len(terms & words)

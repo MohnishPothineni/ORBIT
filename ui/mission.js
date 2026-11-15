@@ -378,7 +378,7 @@ function missionResearchResults(topic) {
 function missionResearchStatus(topic) {
   const query = missionResearchQuery.trim(), count = ResearchLibrary.search(query, topic).length;
   const area = topic === 'all' ? 'All topics' : ResearchLibrary.TOPICS[topic].title;
-  return `${count} ${count === 1 ? 'entry' : 'entries'}${query ? ` matching “${query}”` : ''} · ${area}`;
+  return `${count} ${count === 1 ? 'entry' : 'entries'}${/\batlas[\s–—-]*(?:9|ix|nine)\b/i.test(query) ? ' · Mercury-Atlas 9 only' : ''}${query ? ` matching “${query}”` : ''} · ${area}`;
 }
 function missionResearchRefresh() {
   const topic = missionResearchTopic(), list = $('#research-results');

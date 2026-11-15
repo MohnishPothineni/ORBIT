@@ -518,8 +518,13 @@ const ResearchLibrary = (() => {
   // END GENERATED HISTORICAL EVIDENCE
   const allItems = () => Object.entries(TOPICS).flatMap(([topic, t]) => t.items.map(item => ({ ...item, topic, topicTitle: t.title })));
   function search(query, topic = 'all') {
-    const terms = String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
+    const atlas9 = /\batlas[\s–—-]*(?:9|ix|nine)\b/i;
+    const scoped = atlas9.test(String(query || ''));
+    const text = scoped ? String(query).replace(/\bmercury[\s–—-]*/gi, '').replace(new RegExp(atlas9.source, 'gi'), '') : String(query || '');
+    const filler = new Set(['what','was','were','the','for','and','with','does','this','that','show','tell','me','about','during','mission','data','of','in','on','is']);
+    const terms = scoped ? (text.toLowerCase().match(/[a-z0-9]+/g) || []).filter(w => !filler.has(w)) : text.toLowerCase().split(/\s+/).filter(Boolean);
     return allItems().filter(item => {
+      if (scoped && !/\bMission:\s*Mercury[\s–—-]+Atlas[\s–—-]+9\b/i.test(item.text)) return false;
       if (topic !== 'all' && item.topic !== topic) return false;
       const words = [item.title, item.text, item.watch, item.topicTitle, ...item.sources.map(id => `${SOURCES[id].cite} ${SOURCES[id].title}`)].join(' ').toLowerCase();
       return terms.every(term => words.includes(term));
