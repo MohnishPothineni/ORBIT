@@ -76,8 +76,24 @@ function initMissionData() {
       w.missionDataVersion = 1;
     }
   }
+  missionReseedRestoredCrew(state.data.demo);
   initSkinData();
   missionKeepSampleCurrent(state.data.demo);
+}
+/* Sample crew restored by initCrewData (ui/crew.js) after a workspace was saved without them get the
+   mission data a fresh demo gives them: wellbeing check-ins and the heart-rate trend on their
+   restored entries, an exercise target, and workouts and risk records only where none survived. */
+function missionReseedRestoredCrew(w) {
+  const ids = new Set(w.restoredSampleCrew || []);
+  delete w.restoredSampleCrew;
+  if (!ids.size) return;
+  for (const p of w.crew.filter(c => ids.has(c.id))) {
+    const view = { crew: [p], entries: w.entries.filter(e => e.crewId === p.id), workouts: [], riskRecords: [] };
+    missionSeedWellbeing(view); missionSeedTrend(view);
+    if (!w.workouts.some(r => r.crewId === p.id)) { missionSeedExercise(view); w.workouts.push(...view.workouts); }
+    else p.carePlan = { schedule: {}, limits: {}, remindersEnabled: false, protocol: '', ...p.carePlan, exerciseTarget: p.carePlan?.exerciseTarget ?? 120 };
+    if (!w.riskRecords.some(r => r.crewId === p.id)) { missionSeedRisk(view); w.riskRecords.push(...view.riskRecords); }
+  }
 }
 function missionEmptyStores() { return { riskRecords: [], workouts: [], emergencyRuns: [], skinChecks: [], wounds: [], mission: { ...missionEmptyPlan } }; }
 
