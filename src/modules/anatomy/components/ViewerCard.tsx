@@ -4,7 +4,7 @@ import { cn } from "../../../shared/ui/cn";
 import { Skeleton } from "../../../shared/ui/Skeleton";
 import { useToast } from "../../../shared/ui/Toast";
 import type { ViewerAction, ViewerStore } from "../hooks/useViewerState";
-import { loadAttribution, type ModelAttribution } from "../lib/bodyModel";
+import { loadAttribution, type ModelAttribution } from "../lib/attribution";
 import type { RegionIndex } from "../lib/regionIndex";
 import type { AnatomyPin, PinPlacement } from "../types";
 import { PinPlacementBanner } from "./PinPlacementBanner";
