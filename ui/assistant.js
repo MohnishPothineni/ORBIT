@@ -616,9 +616,9 @@
     el('page').textContent = PAGE_NAMES[currentPage()] + (currentPage() === 'care' ? ' / ' + (CARE_TAB_LABELS[careTab] || '') : '');
     el('panel').dataset.connected = el('launch').dataset.connected = String(connected);
     el('voice').hidden = connected || starting;
-    el('voice').disabled = !navigator.onLine;
+    el('voice').disabled = !orbitOnline();
     el('text').hidden = connected || starting;
-    el('text').disabled = !navigator.onLine;
+    el('text').disabled = !orbitOnline();
     el('end').hidden = !connected && !starting;
     el('mute').hidden = sessionKind !== 'voice' || !connected;
     const micLabel = muted ? 'Unmute microphone' : 'Mute microphone';
@@ -737,6 +737,7 @@
     if (starting || bridge.active()) return;
     if (kind === 'text') setAssistantTab('chat');
     showError();
+    if (offlineMode) { setExpanded(true);showError('Offline mode is on, so the cloud assistant is off. Use the offline assistant (wifi button), or switch to Online at the top of the page.'); return; }
     if (!navigator.onLine) { setExpanded(true);showError('Voice and text require internet access. Your saved records and the medical response guide remain available.'); return; }
     if (kind === 'voice' && (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia)) { setExpanded(true);showError('Microphone access requires HTTPS and a compatible browser. You can use text instead.'); return; }
     const stamp = bridge.begin(), thisRun = ++run;
@@ -947,7 +948,13 @@
   window.addEventListener('pagehide',() => { run++;permissions.reset();siteController.reset();recentInputs.clear();lastSiteResult=null;lastHighlightReport=null;lastConditionReference=null;crewViewer?.clearReportedConcern();doctorEpoch++;doctorSpeech?.reset();doctorSpeech=null;doctorAvatar?.destroy();doctorAvatar=null;doctorPromise=null;void bridge.close(); });
   window.addEventListener('pageshow',event => { if (event.persisted){void stop();if(isOpen())void loadDoctor();} });
   window.addEventListener('offline',() => { if (bridge.active() || starting) void stop('Offline'); showError('The assistant needs internet access. The local medical response guide remains available.'); paint(); });
-  window.addEventListener('online',() => { if (isOpen()) { showError(); paint(); } });
+  window.addEventListener('online',() => { if (isOpen() && orbitOnline()) { showError(); paint(); } });
+  /* Switching to offline mode ends any cloud session; switching back clears the notice. */
+  window.addEventListener('orbit:connectivity',() => {
+    if (offlineMode) { if (bridge.active() || starting) void stop('Offline mode'); showError('Offline mode is on. The cloud assistant is off; the offline assistant (wifi button) still works.'); }
+    else if (navigator.onLine) showError();
+    paint();
+  });
   /* The dock is always open: a column beside the page, or its own section below it on small screens. */
   setExpanded(true);paint();
   /* The avatar is about 7 MB with three.js. Mount the same portrait for the launcher and conversation after the page is usable, and only when the dock is open. */
