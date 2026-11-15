@@ -86,18 +86,26 @@ function careOverviewStrip() {
 /* Health assessment tabs. Sleep & wellbeing, Exercise and Skin & wounds used to be separate pages. */
 const CARE_TAB_GROUPS = [
   ['Checks & tracking', [
-    ['assessment', 'Crew assessment', 'Symptoms, readings & next actions'],
-    ['wellbeing', 'Sleep & wellbeing', 'Daily check-in on rest, stress & connection'],
-    ['exercise', 'Exercise', 'Workouts against the daily target'],
-    ['skin', 'Skin & wounds', 'Daily skin check & wound tracking'],
+    ['assessment', 'Crew assessment', 'Symptoms, readings & next actions', 'clipboard'],
+    ['wellbeing', 'Sleep & wellbeing', 'Rest, stress & connection', 'moon'],
+    ['exercise', 'Exercise', 'Workouts against the target', 'dumbbell'],
+    ['skin', 'Skin & wounds', 'Daily skin check & wounds', 'shield'],
   ]],
   ['Recording & readiness', [
-    ['inputs', 'Health inputs', 'Manual entry, photos, sensors & datasets'],
-    ['measurements', 'Measurement guide', 'Equipment, technique & context'],
-    ['mission', 'Mission readiness', 'Environment, hazards & offline tools'],
+    ['inputs', 'Health inputs', 'Entry, photos, sensors & data', 'plus'],
+    ['measurements', 'Measurement guide', 'Equipment, technique & context', 'activity'],
+    ['mission', 'Mission readiness', 'Environment, hazards & offline', 'globe'],
   ]],
 ];
-const CARE_TAB_LABELS = Object.fromEntries(CARE_TAB_GROUPS.flatMap(([, tabs]) => tabs.map(([id, label]) => [id, label])));
+const CARE_TABS = CARE_TAB_GROUPS.flatMap(([, tabs]) => tabs);
+const CARE_TAB_LABELS = Object.fromEntries(CARE_TABS.map(([id, label]) => [id, label]));
+/* Headings for tabs whose content does not bring its own. */
+const CARE_TAB_INTROS = {
+  assessment: 'Check the person first, then symptoms and readings, then choose the next crew action.',
+  inputs: 'Add readings by hand, from photos, from a heart rate sensor, or from a dataset.',
+  measurements: 'How to take each reading consistently, with the right equipment and context.',
+  mission: 'Routines, environment considerations and offline preparation for this mission.',
+};
 const CARE_TAB_PAGES = {
   assessment: () => careAssessmentPage(),
   wellbeing: () => missionWellbeingPage(true),
@@ -108,15 +116,18 @@ const CARE_TAB_PAGES = {
   mission: () => careMissionPage(),
 };
 function careTabsNav() {
-  return `<nav class="care-tab-groups" aria-label="Health assessment sections">${CARE_TAB_GROUPS.map(([group, tabs]) => `<div class="care-tab-group"><span class="eyebrow care-tab-group-label">${group.toUpperCase()}</span><div class="care-tabs care-tabs-${tabs.length}">${tabs.map(([id, label, hint]) => `<button data-care-tab="${id}" aria-pressed="${careTab === id}" class="${careTab === id ? 'active' : ''}">${label}<small>${hint}</small></button>`).join('')}</div></div>`).join('')}</nav>`;
+  return `<nav class="care-rail" aria-label="Health assessment sections">${CARE_TAB_GROUPS.map(([group, tabs]) => `<div class="care-rail-group"><span class="care-rail-label">${group}</span><div class="care-rail-list">${tabs.map(([id, label, hint, ic]) => `<button type="button" data-care-tab="${id}" aria-pressed="${careTab === id}" ${careTab === id ? 'aria-current="true"' : ''} class="care-rail-item${careTab === id ? ' active' : ''}"><span class="care-rail-icon">${icon(ic)}</span><span class="care-rail-text"><strong>${label}</strong><small>${hint}</small></span></button>`).join('')}</div></div>`).join('')}</nav>`;
+}
+function careTabIntro() {
+  const intro = CARE_TAB_INTROS[careTab];
+  return intro ? `<div class="care-section-head"><div><h2>${CARE_TAB_LABELS[careTab]}</h2><p>${intro}</p></div></div>` : '';
 }
 function carePage() {
   const environment = careEnvironment();
   return `${pageHeading('Health assessment', 'Check symptoms, review your record, and choose the next crew action.', button('Prepare handoff', 'care-handoff', '', 'document'))}
     ${demoNotice()}
     <details class="workspace-mission-context"><summary><span><strong>Mission context</strong> · ${esc(state.settings.environment)}</span><small>${esc(environment.gravity)} · View guidance</small></summary><div class="care-context"><div><span class="eyebrow">MISSION CONTEXT</span><strong>${esc(state.settings.environment)}</strong><span>${esc(environment.gravity)}</span></div><p>${esc(environment.focus)}</p><button class="text-button" data-action="care-plan">Edit individual plan ${icon('arrowright')}</button></div></details>
-    ${careTabsNav()}
-    ${(CARE_TAB_PAGES[careTab] || careAssessmentPage)()}
+    <div class="care-layout">${careTabsNav()}<div class="care-pane" id="care-pane">${careTabIntro()}${(CARE_TAB_PAGES[careTab] || careAssessmentPage)()}</div></div>
     <p class="care-scope-note">Research prototype. The symptom checklist supports a crew conversation; it is not validated triage, a diagnosis, or medical clearance. Use mission medical procedures.</p>`;
 }
 function careAssessmentPage() {
@@ -205,7 +216,7 @@ function handleCareControl(target) {
     if (guide) { guide.hidden = !guide.hidden; target.setAttribute('aria-expanded', String(!guide.hidden)); }
     return true;
   }
-  if (target.dataset.careTab) { careTab = target.dataset.careTab; render(); return true; }
+  if (target.dataset.careTab) { careTab = target.dataset.careTab; render(); $(`.care-rail-item[data-care-tab="${careTab}"]`)?.focus({ preventScroll: true }); const pane = $('#care-pane'); if (pane && pane.getBoundingClientRect().top < 0) pane.scrollIntoView({ block: 'start' }); return true; }
   if (target.dataset.careHistory) { const check = careAssessments().find(a => a.id === target.dataset.careHistory); if (check) careHandoff(check,true); return true; }
   if (target.dataset.careExport) { const check = careAssessments().find(a => a.id === target.dataset.careExport); if (check) careHandoff(check); return true; }
   const actions = { emergency: () => emergencyResponseModal(), 'care-plan': carePlanModal, 'care-handoff': missionReportModal, 'care-guide': () => { closeModal(); careTab = 'measurements'; if (currentPage() === 'care') render(); else location.hash = 'care'; }, 'care-offline': prepareCareOffline };
@@ -213,6 +224,18 @@ function handleCareControl(target) {
   return false;
 }
 function attachCarePage() {
+  const rail = $('.care-rail');
+  // In the narrow chip row, keep the selected chip visible.
+  const activeItem = $('.care-rail-item.active');
+  if (rail && activeItem && rail.scrollWidth > rail.clientWidth) rail.scrollLeft = Math.max(0, activeItem.offsetLeft - rail.clientWidth / 2 + activeItem.offsetWidth / 2);
+  if (rail) rail.addEventListener('keydown', event => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    const items = $$('.care-rail-item'), i = items.indexOf(document.activeElement);
+    if (i < 0) return;
+    event.preventDefault();
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (i + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+    items[next].focus();
+  });
   if(careTab==='inputs')attachHealthInputs();
   if(careTab==='skin')attachSkinPage();
   const form = $('#care-assessment-form');

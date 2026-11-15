@@ -42,15 +42,44 @@ main{container:content / inline-size;max-width:1500px;padding:30px 28px 40px;min
 .chart-foot-link{font-size:inherit}
 .log-section .trends-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 
-/* Health assessment: seven tabs in two labelled groups (wellbeing, exercise and skin were separate pages) */
-.care-tab-groups{display:grid;gap:14px;margin:22px 0}
-.care-tab-group{display:grid;gap:7px}
-.care-tab-group-label{font-size:10px}
-.care-tab-groups .care-tabs{margin:0}
-.care-tab-groups .care-tabs-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.care-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:6px 0 18px}
-.care-section-head h2{margin:0;font-size:20px}
-.care-section-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
-.care-tab-groups .care-tabs-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.care-tab-groups .care-tabs button{min-height:0;padding:10px 12px}
-@container content (max-width:600px){.care-tab-groups .care-tabs-4,.care-tab-groups .care-tabs-3{grid-template-columns:1fr 1fr}}
+/* Health assessment: vertical side menu (left) with the selected tab's content (right) */
+.care-layout{display:grid;grid-template-columns:236px minmax(0,1fr);gap:24px;align-items:start;margin-top:22px}
+.care-rail{position:sticky;top:16px;display:grid;gap:16px;padding:12px 10px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgb(20 36 58 / .04)}
+.care-rail-group{display:grid;gap:6px}
+.care-rail-group+.care-rail-group{padding-top:14px;border-top:1px solid var(--line)}
+.care-rail-label{padding:0 10px;font:600 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.care-rail-list{display:grid;gap:2px}
+.care-rail-item{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr);gap:11px;align-items:center;width:100%;min-height:54px;padding:8px 10px;border:0;border-radius:9px;background:transparent;color:var(--ink);text-align:left;cursor:pointer;transition:background-color .15s,color .15s}
+.care-rail-item:hover{background:var(--paper)}
+.care-rail-item:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.care-rail-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--paper);color:var(--muted);transition:background-color .15s,color .15s}
+.care-rail-icon svg{width:17px;height:17px}
+.care-rail-text{display:grid;gap:2px;min-width:0}
+.care-rail-text strong{font:600 13px/1.3 var(--sans)}
+.care-rail-text small{font:400 11px/1.35 var(--sans);color:var(--muted)}
+.care-rail-item.active{background:#edf4fc;color:#1d4f86}
+.care-rail-item.active::before{content:"";position:absolute;left:-10px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--blue)}
+.care-rail-item.active .care-rail-icon{background:var(--blue);color:#fff}
+.care-rail-item.active small{color:#3d5d7c}
+.care-pane{min-width:0}
+.care-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 18px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.care-section-head h2{margin:0;font-size:20px;line-height:1.3}
+.care-section-head p{margin:4px 0 0;max-width:62ch;color:var(--muted);font-size:13px;line-height:1.5}
+.care-pane>:first-child,.care-pane .care-section-head+*{margin-top:0}
+@media (prefers-reduced-motion:reduce){.care-rail-item,.care-rail-icon{transition:none}}
+/* Narrow content: the menu becomes a scrollable row of chips above the content */
+@container content (max-width:760px){
+  .care-layout{grid-template-columns:1fr;gap:16px}
+  .care-rail{position:static;display:flex;gap:6px;padding:6px;overflow-x:auto;scrollbar-width:thin}
+  .care-rail-group{display:contents}
+  .care-rail-group+.care-rail-group{padding:0;border:0}
+  .care-rail-label{display:none}
+  .care-rail-list{display:flex;gap:6px}
+  .care-rail-item{flex:0 0 auto;grid-template-columns:auto auto;gap:8px;width:auto;min-height:44px;padding:6px 12px 6px 6px;white-space:nowrap}
+  .care-rail-text{min-width:max-content}
+  .care-rail-list{flex:0 0 auto}
+  .care-rail-group+.care-rail-group .care-rail-list{padding-left:8px;margin-left:2px;border-left:1px solid var(--line)}
+  .care-rail-item.active::before{display:none}
+  .care-rail-icon{width:30px;height:30px}
+  .care-rail-text small{display:none}
+}
