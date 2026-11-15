@@ -219,3 +219,55 @@ test("share previews exclude private wellbeing and unknown sections", () => {
   const ownPreview = buildSharePreview(["wellbeing"], subject, subject, summary);
   assert.equal(ownPreview.content.wellbeing.note, "Private");
 });
+
+test("the first reply starts its own bubble instead of continuing the spoken greeting", () => {
+  const session = new PipecatVoiceSession({ settings: null, clientTools: [], handleTool: async () => ({ status: "succeeded" }) });
+  const events = [];
+  session.on("botTranscript", (t) => events.push(t));
+  const cb = session.callbacks();
+  // The greeting is spoken directly (no LLM), so no onBotLlmStopped follows it.
+  cb.onBotOutput({ text: "Hi, I'm the ORBIT crew assistant.", output_type: "sentence" });
+  cb.onBotLlmStarted();
+  cb.onBotOutput({ text: "The Anatomy lab is open.", output_type: "sentence" });
+  cb.onBotLlmStopped();
+  assert.deepEqual(
+    events.map((e) => [e.text, e.final]),
+    [["Hi, I'm the ORBIT crew assistant.", false], ["", true], ["The Anatomy lab is open.", false], ["", true]],
+  );
+});
+
+test("sentences spoken after the LLM finishes stay in the same reply bubble", (context) => {
+  if (typeof window === "undefined") {
+    globalThis.window = globalThis;
+    context.after(() => { delete globalThis.window; });
+  }
+  const session = new PipecatVoiceSession({ settings: null, clientTools: [], handleTool: async () => ({ status: "succeeded" }) });
+  const events = [];
+  session.on("botTranscript", (t) => events.push(t));
+  const cb = session.callbacks();
+  cb.onBotLlmStarted();
+  cb.onBotStartedSpeaking();
+  cb.onBotOutput({ text: "The Anatomy lab is open.", output_type: "sentence" });
+  // The LLM is done, but the second sentence is still being spoken.
+  cb.onBotLlmStopped();
+  cb.onBotOutput({ text: "Which region would you like?", output_type: "sentence" });
+  cb.onBotStoppedSpeaking();
+  assert.deepEqual(
+    events.map((e) => [e.text, e.final]),
+    [["The Anatomy lab is open.", false], [" Which region would you like?", false], ["", true]],
+  );
+});
+
+test("the first reply keeps its ending when spoken sentences take over from the word stream", () => {
+  const session = new PipecatVoiceSession({ settings: null, clientTools: [], handleTool: async () => ({ status: "succeeded" }) });
+  let text = "";
+  session.on("botTranscript", (t) => { text += t.text; });
+  const cb = session.callbacks();
+  cb.onBotLlmStarted();
+  // Before any bot-output, the transcript follows the LLM's words.
+  for (const w of ["The lab is open.", " Which", " region", " would"]) cb.onBotLlmText({ text: w });
+  cb.onBotOutput({ text: "The lab is open.", output_type: "sentence" });
+  cb.onBotLlmText({ text: " you" }); // ignored once spoken sentences arrive
+  cb.onBotOutput({ text: "Which region would you like?", output_type: "sentence" });
+  assert.equal(text, "The lab is open. Which region would you like?");
+});
