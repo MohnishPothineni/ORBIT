@@ -41,6 +41,16 @@ test("retained health screens render and removed routes and commands are unavail
   assert.ok(vm.runInContext("state.data.demo.activeCrewId.startsWith('hist-')", context));
   assert.equal(vm.runInContext("JSON.stringify(state.data.personal)", context), personalBefore);
   assert.ok(vm.runInContext("demoNotice()", context).includes('Show sample crew'));
+  // Clustered historical readings get evenly spaced axis ticks, not one date per point.
+  for (const width of [360, 920]) {
+    const chart = vm.runInContext(`chartSVG(true, ${width})`, context);
+    assert.ok(chart.includes(`viewBox="0 0 ${width} 280"`));
+    assert.ok(chart.includes('preserveAspectRatio="xMidYMid meet"'));
+    const ticks = [...chart.matchAll(/class="chart-axis-tick" x="([\d.]+)"/g)].map(m=>Number(m[1]));
+    assert.ok(ticks.length >= 2 && ticks.length <= 5);
+    for(let i=1;i<ticks.length;i++) assert.ok(ticks[i]-ticks[i-1]>=100);
+    assert.equal((chart.match(/class="point-hit"/g)||[]).length, vm.runInContext('chartData().length',context));
+  }
   for (const page of ["missionStatusPage", "crewDashboardPage", "logPage", "trendsPage", "routinePage", "carePage", "missionWellbeingPage", "missionExercisePage", "skinPage", "missionRisksPage", "anatomyLabPage", "missionResearchPage", "voicePage"]) {
     assert.ok(vm.runInContext(`${page}()`, context).includes("<"), page);
   }
