@@ -107,6 +107,8 @@ TOOL_NAMES = [s.name for s in SCHEMAS]
 # Tools that wait for a person: keep them alive through interruptions (saying
 # "confirm share" is itself speech) and give people time to decide.
 HUMAN_CONFIRMED = {"log_vital", "share_record_with_assistant"}
+# The browser gives up at 285 s (CONFIRM_TIMEOUT_MS in src/modules/assistant/tools/definitions.ts)
+# and reports "declined", so this server timeout is only a backstop. Keep it the larger of the two.
 CONFIRM_TIMEOUT_SECS = 300
 DEFAULT_TIMEOUT_SECS = 30
 

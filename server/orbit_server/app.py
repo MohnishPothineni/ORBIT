@@ -24,7 +24,7 @@ from . import config
 from .certs import cert_expiry, lan_ip
 from .health import ollama_state, pipeline_health
 from .store import VITAL_META, now_iso, store
-from .voice import refresh_all_prompts, run_bot, warm_up_session_prompt
+from .voice import is_live_session, refresh_session_prompt, run_bot, warm_up_session_prompt
 from .voice_settings import SPEED_RANGE, VOICE_IDS, VOICES, VoiceSettings, load_settings, save_settings
 
 webrtc = SmallWebRTCRequestHandler()  # no ICE servers: host candidates only, local network
@@ -60,8 +60,9 @@ async def system_status():
         },
         "ollama": {"state": await ollama_state(), "model": config.LLM_MODEL, "loadProgress": None},
         "faiss": {
-            # Keyword search over the local passages until a vector index is built.
-            "state": "ready" if store.evidence else "missing",
+            # There is no FAISS index yet; evidence search is keyword matching over the
+            # local passages. Report the index as missing rather than claim one exists.
+            "state": "missing",
             "documentCount": store.document_count,
             "chunkCount": len(store.evidence),
             "buildProgress": None,
@@ -124,6 +125,7 @@ async def evidence_search(body: SearchIn):
 
 
 class ShareIn(BaseModel):
+    sessionId: str = Field(min_length=1)
     crewId: str
     sections: list[str]
     content: dict[str, Any]
@@ -133,16 +135,21 @@ class ShareIn(BaseModel):
 async def share_context(body: ShareIn):
     if not store.get_crew(body.crewId):
         return api_error(404, "crew_not_found", f"No crew member {body.crewId}.")
+    if not is_live_session(body.sessionId):
+        return api_error(409, "session_not_active", "Records can only be shared with an active voice session.")
     shared_at = now_iso()
-    store.shared_context.append({"crewId": body.crewId, "sections": body.sections, "content": body.content, "sharedAt": shared_at})
-    await refresh_all_prompts()
+    store.shared_context.setdefault(body.sessionId, []).append(
+        {"crewId": body.crewId, "sections": body.sections, "content": body.content, "sharedAt": shared_at}
+    )
+    await refresh_session_prompt(body.sessionId)
     return {"sharedAt": shared_at}
 
 
 @app.delete("/api/assistant/context", status_code=204)
-async def clear_context():
-    store.shared_context.clear()
-    await refresh_all_prompts()
+async def clear_context(sessionId: str):
+    """Forget what was shared with one session. Records also go when the session ends."""
+    store.shared_context.pop(sessionId, None)
+    await refresh_session_prompt(sessionId)
     return Response(status_code=204)
 
 
@@ -160,6 +167,8 @@ async def voice_config():
             "sttModel": f"faster-whisper {config.STT_MODEL}",
             "llmModel": config.LLM_MODEL,
             "ttsModel": "Kokoro-82M",
+            # Not Smart Turn: a fixed silence timer decides when the person has finished.
+            "turnDetection": f"Silence timer · {config.SILENCE_SECONDS:g} s",
         },
         "pipelineHealth": await pipeline_health(),
     }

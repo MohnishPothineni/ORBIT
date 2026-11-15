@@ -44,7 +44,9 @@ class Store:
         self.evidence_updated_at = datetime.fromtimestamp(
             (DATA_DIR / "seed.json").stat().st_mtime, timezone.utc
         ).isoformat(timespec="seconds").replace("+00:00", "Z")
-        self.shared_context: list[dict[str, Any]] = []
+        # Records a person approved for one voice session, keyed by its WebRTC pc_id.
+        # Never global: one session's records must not reach another session's prompt.
+        self.shared_context: dict[str, list[dict[str, Any]]] = {}
         RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
         self._vitals_log = RUNTIME_DIR / "vitals.jsonl"
         self._replay_saved_vitals()

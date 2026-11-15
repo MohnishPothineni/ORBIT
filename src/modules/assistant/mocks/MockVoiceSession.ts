@@ -47,6 +47,8 @@ export class MockVoiceSession implements VoiceSession, MockControls {
   private speech: AbortController | null = null;
   private busy = false;
   private turnSeq = 0;
+  /** Stands in for the server's WebRTC pc_id so shared records are scoped the same way. */
+  private readonly sessionId = `mock-${crypto.randomUUID()}`;
   private metrics: PipelineMetrics | null = null;
   private errorTimer: number | undefined;
   private autoTimer: number | undefined;
@@ -428,6 +430,7 @@ export class MockVoiceSession implements VoiceSession, MockControls {
           emit();
         },
         ctrl.signal,
+        { sessionId: this.sessionId },
       );
       call = { ...call, status: outcome.status, resultSummary: outcome.resultSummary, error: outcome.error, finishedAt: nowIso() };
       emit();

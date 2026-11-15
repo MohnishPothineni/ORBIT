@@ -358,7 +358,9 @@ export class PipecatVoiceSession implements VoiceSession {
     this.calls.set(id, { call, ctrl });
     this.emitCall(id);
     try {
-      const outcome = await this.opts.handleTool(call, (patch) => this.patchCall(id, patch), ctrl.signal);
+      const outcome = await this.opts.handleTool(call, (patch) => this.patchCall(id, patch), ctrl.signal, {
+        sessionId: this.created?.sessionId() ?? null,
+      });
       this.patchCall(id, { status: outcome.status, resultSummary: outcome.resultSummary, error: outcome.error });
       if (outcome.citations?.length) this.em.emit("citations", outcome.citations);
       return { status: outcome.status, ...(outcome.error ? { error: outcome.error } : {}), ...outcome.result };
