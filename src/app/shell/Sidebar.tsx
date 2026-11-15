@@ -1,4 +1,6 @@
 import { Activity, AudioLines, BookOpen, ChevronDown, ClipboardList, Dumbbell, HeartPulse, Layers, Moon, Shield, Users } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { currentSection } from "./section";
 
 const HEALTH_LINKS = [
   ["log", "Health log", ClipboardList],
@@ -12,6 +14,8 @@ const HEALTH_LINKS = [
 ] as const;
 
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const section = currentSection(useLocation().pathname);
+  const current = (name: string) => (section === name ? ("page" as const) : undefined);
   return (
     <aside id="orbit-navigation" className={"orbit-sidebar" + (open ? " is-open" : "")} onKeyDown={(event) => { if (event.key === "Escape") onClose(); }}>
       <a href="/#status" className="orbit-brand" aria-label="ORBIT Crew Health home">
@@ -27,8 +31,8 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
             {HEALTH_LINKS.map(([page, label, Icon]) => <a key={page} href={"/#" + page} onClick={onClose}><Icon /><span><strong>{label}</strong></span></a>)}
           </div>
         </details>
-        <a href="/#anatomy" onClick={onClose}><Layers /><span><strong>Anatomy lab</strong><small>Interactive reference anatomy</small></span></a>
-        <a href={import.meta.env.BASE_URL + "assistant"} aria-current="page" onClick={onClose}><AudioLines /><span><strong>Crew voice AI assistant</strong><small>Local voice workspace</small></span></a>
+        <a href="/#anatomy" aria-current={current("anatomy")} onClick={onClose}><Layers /><span><strong>Anatomy lab</strong><small>Interactive reference anatomy</small></span></a>
+        <a href={import.meta.env.BASE_URL + "assistant"} aria-current={current("assistant")} onClick={onClose}><AudioLines /><span><strong>Crew voice AI assistant</strong><small>Local voice workspace</small></span></a>
         <a href="/#research" onClick={onClose}><BookOpen /><span><strong>Offline evidence library</strong><small>Research and cited sources</small></span></a>
       </nav>
       <div className="orbit-sidebar-foot"><span className="orbit-storage-dot" /> Browser storage <small>Local records</small></div>
