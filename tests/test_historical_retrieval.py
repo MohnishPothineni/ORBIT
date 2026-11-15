@@ -29,6 +29,24 @@ class HistoricalRetrieval(unittest.TestCase):
         hits = namespace['search_evidence'](self.store, 'Gordon Cooper prelaunch heart rate', 4)
         self.assertIn('NASA-VITAL-001:', hits[0]['title'])
 
+    def test_pilot_is_not_scientist_pilot(self):
+        hits = namespace['search_evidence'](self.store, "How did the Skylab 4 pilot's resting heart rate change from preflight to in-flight?", 4)
+        titles = [h['title'] for h in hits]
+        self.assertTrue(all(t.startswith('SKYLAB4-PILOT-') for t in titles), titles)
+        self.assertTrue(any(t.startswith('SKYLAB4-PILOT-REST-PREFLIGHT:') for t in titles))
+        self.assertTrue(any(t.startswith('SKYLAB4-PILOT-REST-IN-FLIGHT:') for t in titles))
+        hits = namespace['search_evidence'](self.store, 'Skylab 4 scientist pilot resting heart rate in flight', 4)
+        self.assertIn('SKYLAB4-SCIENTISTPILOT-REST-IN-FLIGHT:', hits[0]['title'])
+
+    def test_record_with_the_asked_measure_ranks_first(self):
+        hits = namespace['search_evidence'](self.store, "What was Gordon Cooper's body temperature after landing?", 4)
+        self.assertIn('NASA-VITAL-007:', hits[0]['title'])
+
+    def test_record_without_the_measure_still_reaches_the_model(self):
+        # Only minute ventilation was recorded; the model must see this record to say so.
+        hits = namespace['search_evidence'](self.store, "What was the Skylab 4 pilot's respiratory rate in breaths per minute during postflight recovery?", 4)
+        self.assertIn('SKYLAB4-PILOT-RECOVERY-POSTFLIGHT:', hits[0]['title'])
+
     def test_shared_interpretation_guidance(self):
         guidance = (ROOT / 'server/orbit_server/evidence_guidance.py').read_text()
         for phrase in ['grouped protocol means', 'Missing fields are unknown', 'BTPS and STPD', 'PDF/page/table']:
