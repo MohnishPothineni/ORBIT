@@ -11,12 +11,23 @@ function arm(root,side,along,across){
  const sourceBasis=basis(vec(hand.userData.orbitAlong),vec(hand.userData.orbitAcross));
  const desiredBasis=basis(vec(along),vec(across));
  const rest=new Map([upper,lower,hand].map(b=>[b,b.quaternion.clone()]));
- return {root,upper,lower,hand,rest,restElbow:toModel(lower),restWrist:toModel(hand),gripOffset:vec(hand.userData.orbitGripOffset||[0,0,0]),handGoal:desiredBasis.multiply(sourceBasis.invert()),lastDistance:0};
+ const sourceInverse=sourceBasis.clone().invert();
+ return {root,upper,lower,hand,rest,restElbow:toModel(lower),restWrist:toModel(hand),gripOffset:vec(hand.userData.orbitGripOffset||[0,0,0]),handGoal:desiredBasis.multiply(sourceInverse.clone()),goal:(a,b)=>basis(vec(a),vec(b)).multiply(sourceInverse.clone()),lastDistance:0};
 }
 export function createDoctorArmRig(root){
  // Across runs from pinky to index: aiming it away exposes the pinky edge.
  const right=arm(root,'Right',[.12,.98,.10],[.25,.065,-.966]);
  right.left=arm(root,'Left',[-.96,.05,.27],[.05,.85,-.45]);
+ // Explaining pose: forearm forward at lower-chest height, open hand angled palm-up and inward.
+ right.gesture={wrist:vec([-.12,-.125,.17]),pole:vec([-.31,-.24,.02]),hand:right.goal([.22,.5,.84],[-.78,-.42,.2])};
+ // The right hand rests half-closed (it covers yawns). While gesturing, its fingers open
+ // to a mirror of the relaxed left hand.
+ right.fingers=[];
+ for(const f of ['Thumb','Index','Middle','Ring','Pinky'])for(let i=1;i<=3;i++){
+  const r=root.getObjectByName('RightHand'+f+i),l=root.getObjectByName('LeftHand'+f+i);
+  if(r&&l)right.fingers.push({bone:r,rest:r.quaternion.clone(),open:new THREE.Quaternion(l.quaternion.x,-l.quaternion.y,-l.quaternion.z,l.quaternion.w)});
+ }
+ right.left.gesture={wrist:vec([.12,-.125,.17]),pole:vec([.31,-.24,.02]),hand:right.left.goal([-.22,.5,.84],[.78,-.42,.2])};
  return right;
 }
 function worldRotation(bone,q){bone.quaternion.copy(bone.parent.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(q));bone.updateMatrixWorld(true);}
@@ -52,10 +63,15 @@ export function applyDoctorArmRig(rig,pose){
  const center=new THREE.Vector3(0,.133,.185).sub(neck).applyQuaternion(head).add(neck);
  const handGoal=head.clone().multiply(rig.handGoal);
  const wristGoal=center.clone().sub(rig.gripOffset.clone().applyQuaternion(handGoal));
- reach(rig,t,wristGoal,new THREE.Vector3(-.29,-.14,.23),handGoal);
+ const beat=pose.gestureBeat||0,gr=THREE.MathUtils.clamp(pose.gestureRight||0,0,1),gl=THREE.MathUtils.clamp(pose.gestureLeft||0,0,1);
+ // A yawn cover takes the right hand; otherwise it can gesture.
+ const open=t<.00001?gr:0;for(const f of rig.fingers)f.bone.quaternion.copy(f.rest).slerp(f.open,open);
+ if(t<.00001&&gr>.00001)reach(rig,gr,rig.gesture.wrist.clone().add(new THREE.Vector3(0,-.018*beat,.012*beat)),rig.gesture.pole,rig.gesture.hand);
+ else reach(rig,t,wristGoal,new THREE.Vector3(-.29,-.14,.23),handGoal);
  const {hand}=rig;
  const grip=rig.gripOffset.clone().applyQuaternion(hand.getWorldQuaternion(new THREE.Quaternion())).add(hand.getWorldPosition(new THREE.Vector3()));
  rig.lastDistance=t>.00001?grip.distanceTo(root.localToWorld(center)):0;
  const watch=THREE.MathUtils.clamp(pose.watchRaise||0,0,1);
- reach(rig.left,watch,new THREE.Vector3(.095,.025,.235),new THREE.Vector3(.28,-.17,.13),rig.left.handGoal);
+ if(watch<.00001&&gl>.00001)reach(rig.left,gl,rig.left.gesture.wrist.clone().add(new THREE.Vector3(0,-.018*beat,.012*beat)),rig.left.gesture.pole,rig.left.gesture.hand);
+ else reach(rig.left,watch,new THREE.Vector3(.095,.025,.235),new THREE.Vector3(.28,-.17,.13),rig.left.handGoal);
 }

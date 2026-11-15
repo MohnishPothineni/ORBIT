@@ -2,7 +2,7 @@ import { DoctorYawn } from './doctor-yawn.mjs';
 import { DoctorWatchCheck } from './doctor-watch.mjs';
 // Pure motion state used by both WebGL and software 3D rendering.
 const clamp=(n,min=0,max=1)=>Math.min(max,Math.max(min,Number.isFinite(n)?n:0));
-const rest=()=>({jaw:0,rounding:0,spread:0,press:0,fricative:0,tongue:0,blink:0,yaw:0,pitch:0,roll:0,brow:0,cheek:0,squint:0,gazeX:0,gazeY:0,headYaw:0,headPitch:0,headRoll:0,breath:0,shoulderLeft:0,shoulderRight:0,torsoTurn:0,bodyShift:0,idleLooking:false,yawning:false,yawnCover:0,yawnPreview:false,watchChecking:false,watchRaise:0,watchPreview:false,preview:false,speaking:false});
+const rest=()=>({jaw:0,rounding:0,spread:0,press:0,fricative:0,tongue:0,blink:0,yaw:0,pitch:0,roll:0,brow:0,cheek:0,squint:0,gazeX:0,gazeY:0,headYaw:0,headPitch:0,headRoll:0,breath:0,shoulderLeft:0,shoulderRight:0,torsoTurn:0,bodyShift:0,idleLooking:false,yawning:false,yawnCover:0,yawnPreview:false,watchChecking:false,watchRaise:0,watchPreview:false,gestureLeft:0,gestureRight:0,gestureBeat:0,preview:false,speaking:false});
 const ease=n=>{const t=clamp(n);return t*t*t*(t*(t*6-15)+10);};
 // A glance has an eye movement, a delayed neck turn, a hold, and a return.
 // Its clock advances only while visible and idle; no background catch-up turns.
@@ -29,6 +29,32 @@ export class DoctorIdleLook {
     return {headYaw:this.yaw*.64*head,headPitch:this.pitch*.62*head,attentionYaw:this.yaw*eyes,attentionPitch:this.pitch*eyes};
   }
 }
+// Explaining gestures: while the avatar talks, one hand (sometimes both) rises to
+// chest height, holds with small beats on stressed syllables, then lowers.
+export class DoctorGesture {
+  constructor(seed=Math.floor(Math.random()*0xffffffff)){this.seed=(seed>>>0)||1;this.lastSide='left';this.reset();}
+  random(){this.seed=(Math.imul(1664525,this.seed)+1013904223)>>>0;return this.seed/0x100000000;}
+  reset(){this.active=false;this.elapsed=0;this.duration=0;this.side='right';this.wait=.9+this.random()*1.6;this.last={left:0,right:0};}
+  start(){
+    if(this.active)return false;
+    const r=this.random();this.side=r<.22?'both':(this.lastSide==='left'?'right':'left');if(this.side!=='both')this.lastSide=this.side;
+    this.active=true;this.elapsed=0;this.duration=1.9+this.random()*1.7;return true;
+  }
+  sample(dt,enabled){
+    const step=clamp(dt,0,.1);
+    if(!this.active){
+      if(!enabled)return this.last={left:0,right:0};
+      this.wait-=step;if(this.wait>0)return this.last={left:0,right:0};
+      this.start();
+    }
+    this.elapsed+=step;
+    // Speech stopped: lower the hand now instead of finishing the hold.
+    if(!enabled&&this.elapsed<this.duration-.6)this.duration=this.elapsed+.6;
+    if(this.elapsed>=this.duration){this.active=false;this.wait=2.4+this.random()*4.2;return this.last={left:0,right:0};}
+    const up=ease(this.elapsed/.5)*(1-ease((this.elapsed-(this.duration-.6))/.6));
+    return this.last={left:this.side!=='right'?up:0,right:this.side!=='left'?up:0};
+  }
+}
 // The pinned ElevenLabs WebRTC client emits 25 ms PCM16 playback samples.
 // Keep only their level. Silence expires locally, with no retained audio buffer.
 export class DoctorSpeechSignal {
@@ -46,12 +72,14 @@ export class DoctorSpeechSignal {
 }
 const previewSyllables=[[.08,.18,.58],[.37,.14,.42],[.61,.23,.72],[1.02,.15,.5],[1.27,.20,.64],[1.76,.17,.46],[2.02,.26,.66],[2.47,.18,.53],[2.77,.15,.4]];
 export class DoctorMotion {
-  constructor({idleSeed}={}){this.idleLook=new DoctorIdleLook(idleSeed);this.yawn=new DoctorYawn({seed:idleSeed===undefined?undefined:idleSeed^0x5f12ad3b});this.watch=new DoctorWatchCheck({seed:idleSeed===undefined?undefined:idleSeed^0x7d30ace1});this.mode='idle';this.voice=false;this.paused=false;this.visible=false;this.amplitude=0;this.velocity=0;this.envelope=0;this.articulation=.5;this.press=0;this.gazeX=0;this.gazeY=0;this.previewUntil=0;this.previewStart=0;this.blinkAt=2.4;this.phrase=0;this.presence=0;this.posture={headYaw:0,headPitch:0,headRoll:0,shoulderLeft:0,shoulderRight:0,torsoTurn:0,bodyShift:0};}
+  constructor({idleSeed}={}){this.idleLook=new DoctorIdleLook(idleSeed);this.yawn=new DoctorYawn({seed:idleSeed===undefined?undefined:idleSeed^0x5f12ad3b});this.watch=new DoctorWatchCheck({seed:idleSeed===undefined?undefined:idleSeed^0x7d30ace1});this.gesture=new DoctorGesture(idleSeed===undefined?undefined:idleSeed^0x2b61f0d5);this.pointer={yaw:0,pitch:0,active:false};this.follow=0;this.followYaw=0;this.followPitch=0;this.slowAmp=0;this.nod=0;this.gestureLeft=0;this.gestureRight=0;this.mode='idle';this.voice=false;this.paused=false;this.visible=false;this.amplitude=0;this.velocity=0;this.envelope=0;this.articulation=.5;this.press=0;this.gazeX=0;this.gazeY=0;this.previewUntil=0;this.previewStart=0;this.blinkAt=2.4;this.phrase=0;this.presence=0;this.posture={headYaw:0,headPitch:0,headRoll:0,shoulderLeft:0,shoulderRight:0,torsoTurn:0,bodyShift:0};}
+  /* Where the visitor's pointer is, as a head turn toward it (radians). */
+  setPointer(yaw,pitch,active){this.pointer.yaw=clamp(yaw,-.45,.45);this.pointer.pitch=clamp(pitch,-.14,.2);this.pointer.active=Boolean(active);}
   setMode(mode,voice=false){this.mode=mode;this.voice=voice;this.previewUntil=0;}
-  resetSpeech(){this.amplitude=0;this.velocity=0;this.envelope=0;this.press=0;this.gazeX=0;this.gazeY=0;this.previewUntil=0;this.phrase=0;this.presence=0;this.idleLook.reset();this.yawn.reset();this.watch.reset();for(const key in this.posture)this.posture[key]=0;}
+  resetSpeech(){this.amplitude=0;this.velocity=0;this.envelope=0;this.press=0;this.gazeX=0;this.gazeY=0;this.previewUntil=0;this.phrase=0;this.presence=0;this.idleLook.reset();this.yawn.reset();this.watch.reset();this.gesture.reset();this.follow=0;this.followYaw=0;this.followPitch=0;this.slowAmp=0;this.nod=0;this.gestureLeft=0;this.gestureRight=0;for(const key in this.posture)this.posture[key]=0;}
   setVisible(visible){this.visible=visible;if(!visible)this.resetSpeech();}
   setPaused(paused){this.paused=paused;if(paused)this.resetSpeech();}
-  preview(now){if(!this.paused&&this.visible){this.previewStart=now;this.previewUntil=now+3.2;}}
+  preview(now){if(!this.paused&&this.visible){this.previewStart=now;this.previewUntil=now+3.2;this.gesture.wait=.15;}}
   previewYawn(now){if(this.paused||!this.visible||!['idle','text'].includes(this.mode)||now<this.previewUntil||this.watch.active)return false;return this.yawn.start(true);}
   /* The watch-check animation is turned off: the avatar never raises its wrist to look at the watch. */
   previewWatch(){return false;}
@@ -74,7 +102,19 @@ export class DoctorMotion {
     // Spectrum shapes are approximate articulation, never inferred phoneme timing.
     const closure=speaking?clamp(-this.velocity*.12)*(1-this.amplitude)*.24:0;
     this.press+=(closure-this.press)*(1-Math.exp(-step/.055));
-    const idle=!speaking&&(this.mode==='idle'||this.mode==='text'),yawn=this.yawn.sample(step,idle&&!this.watch.active),watch=this.watch.sample(step,false),look=this.idleLook.sample(step,idle&&!yawn.active&&!watch.active);
+    const idle=!speaking&&(this.mode==='idle'||this.mode==='text'),yawn=this.yawn.sample(step,idle&&!this.watch.active),watch=this.watch.sample(step,false);
+    // Head follows the pointer (fully when idle, partly while talking); eyes lead, the neck follows.
+    const followTarget=this.pointer.active&&!yawn.active?(speaking?.55:1):0;
+    this.follow+=(followTarget-this.follow)*(1-Math.exp(-step/.35));
+    this.followYaw+=(this.pointer.yaw-this.followYaw)*(1-Math.exp(-step/.14));this.followPitch+=(this.pointer.pitch-this.followPitch)*(1-Math.exp(-step/.14));
+    const fy=this.followYaw*this.follow,fp=this.followPitch*this.follow;
+    const look=this.idleLook.sample(step,idle&&!yawn.active&&!watch.active&&this.follow<.05);
+    // Hands gesture while explaining; nods land on stressed syllables.
+    const gesture=this.gesture.sample(step,speaking&&!yawn.active&&(preview||this.phrase>.18));
+    this.gestureLeft+=(gesture.left-this.gestureLeft)*(1-Math.exp(-step/.08));this.gestureRight+=(gesture.right-this.gestureRight)*(1-Math.exp(-step/.08));
+    this.slowAmp+=(this.amplitude-this.slowAmp)*(1-Math.exp(-step/.35));
+    const accent=speaking?clamp((this.amplitude-this.slowAmp)*2.2):0;
+    this.nod+=(accent-this.nod)*(1-Math.exp(-step/(accent>this.nod?.07:.22)));
     if(now>this.blinkAt+.18)this.blinkAt=now+3.1+Math.abs(Math.sin(now*1.7))*2.6;
     const phase=(now-this.blinkAt)/.18,blink=phase>=0&&phase<=1?Math.sin(phase*Math.PI):0;
     const emphasis=this.amplitude*(.6+.4*Math.sin(now*1.8+.4));
@@ -84,11 +124,12 @@ export class DoctorMotion {
     this.phrase+=(phraseTarget-this.phrase)*(1-Math.exp(-step/(phraseTarget>this.phrase?.22:.55)));
     this.presence+=(1-this.presence)*(1-Math.exp(-step/.38));
     const breath=this.presence*(.42+.3*Math.sin(now*1.37)+.06*Math.sin(now*.67+.8))+.12*yawn.face,phrase=this.phrase;
-    const targets={headYaw:watch.look*.30+look.headYaw+this.presence*(.004*Math.sin(now*.53)+phrase*.024*Math.sin(now*1.03+.6)),headPitch:watch.look*.38-.055*yawn.face+look.headPitch+this.presence*(.003*Math.sin(now*.71)-phrase*.022*(.5+.5*Math.sin(now*1.9))),headRoll:watch.look*.025-.012*yawn.face-look.headYaw*.06+this.presence*(.002*Math.sin(now*.41)+phrase*.009*Math.sin(now*.77+.7)),shoulderLeft:watch.raise*.06+this.presence*(.08*Math.sin(now*.57+.3)+phrase*.20*Math.sin(now*.79+.6))+(breath-this.presence*.42)*.11,shoulderRight:yawn.cover*.06+this.presence*(.065*Math.sin(now*.61+1.4)+phrase*.16*Math.sin(now*.73+1.9))+(breath-this.presence*.42)*.09,torsoTurn:watch.raise*-.008+yawn.cover*.008+this.presence*(.002*Math.sin(now*.38)+phrase*.009*Math.sin(now*.63+.5)),bodyShift:this.presence*(.0003*Math.sin(now*.57)+phrase*.0007*Math.sin(now*.71))};
+    const gl=this.gestureLeft,gr=this.gestureRight;
+    const targets={headYaw:watch.look*.30+look.headYaw+fy*.72+(gl-gr)*.05+this.presence*(.004*Math.sin(now*.53)+phrase*(.045*Math.sin(now*.83+.6)+.02*Math.sin(now*1.61))),headPitch:watch.look*.38-.055*yawn.face+look.headPitch+fp*.7+this.nod*.055+this.presence*(.003*Math.sin(now*.71)-phrase*.025*(.5+.5*Math.sin(now*1.9))),headRoll:watch.look*.025-.012*yawn.face-look.headYaw*.06-fy*.08+this.presence*(.002*Math.sin(now*.41)+phrase*.028*Math.sin(now*.67+.7)),shoulderLeft:watch.raise*.06+gl*.32+this.presence*(.08*Math.sin(now*.57+.3)+phrase*.42*Math.sin(now*.79+.6))+(breath-this.presence*.42)*.11,shoulderRight:yawn.cover*.06+gr*.32+this.presence*(.065*Math.sin(now*.61+1.4)+phrase*.36*Math.sin(now*.73+1.9))+(breath-this.presence*.42)*.09,torsoTurn:watch.raise*-.008+yawn.cover*.008+fy*.02+(gl-gr)*.006+this.presence*(.002*Math.sin(now*.38)+phrase*.012*Math.sin(now*.63+.5)),bodyShift:this.presence*(.0003*Math.sin(now*.57)+phrase*.0009*Math.sin(now*.71))};
     for(const key in targets){const settling=key.startsWith('shoulder')?.62:key==='torsoTurn'||key==='bodyShift'?.48:idle?.16:.26;this.posture[key]+=(targets[key]-this.posture[key])*(1-Math.exp(-step/settling));}
     // Eyes lead the turn, then settle relative to the actual head position.
     const gazeBlend=1-Math.exp(-step/.065);
-    this.gazeX+=(watch.look*.52+look.attentionYaw-this.posture.headYaw-this.gazeX)*gazeBlend;this.gazeY+=(watch.look*.66+look.attentionPitch-this.posture.headPitch-this.gazeY)*gazeBlend;
-    return {jaw:this.amplitude+(1-this.amplitude)*yawn.jaw,rounding:(1-this.articulation)*(1-yawn.face*.4),spread:this.articulation,press:this.press,fricative:this.amplitude*Math.max(0,this.articulation-.55)*.22,tongue:this.amplitude*this.articulation*.035,blink:Math.max(blink,yawn.face*.82),yaw:this.presence*Math.sin(now*.48)*.003,pitch:this.presence*Math.sin(now*.71)*.002,roll:this.presence*Math.sin(now*.34)*.002,breath,...this.posture,brow:emphasis*.08+yawn.face*.06,cheek:this.amplitude*.035+yawn.face*.03,squint:emphasis*.025+yawn.face*.45,gazeX:this.gazeX,gazeY:this.gazeY,idleLooking:idle&&!yawn.active&&!watch.active&&this.idleLook.phase!=='forward',yawning:yawn.active,yawnCover:yawn.cover,yawnPreview:yawn.preview,watchChecking:watch.active,watchRaise:watch.raise,watchPreview:watch.preview,preview,speaking};
+    this.gazeX+=(watch.look*.52+look.attentionYaw+this.followYaw*this.follow-this.posture.headYaw-this.gazeX)*gazeBlend;this.gazeY+=(watch.look*.66+look.attentionPitch+this.followPitch*this.follow-this.posture.headPitch-this.gazeY)*gazeBlend;
+    return {jaw:this.amplitude+(1-this.amplitude)*yawn.jaw,rounding:(1-this.articulation)*(1-yawn.face*.4),spread:this.articulation,press:this.press,fricative:this.amplitude*Math.max(0,this.articulation-.55)*.22,tongue:this.amplitude*this.articulation*.035,blink:Math.max(blink,yawn.face*.82),yaw:this.presence*Math.sin(now*.48)*.003,pitch:this.presence*Math.sin(now*.71)*.002,roll:this.presence*Math.sin(now*.34)*.002,breath,...this.posture,brow:emphasis*.08+yawn.face*.06,cheek:this.amplitude*.035+yawn.face*.03,squint:emphasis*.025+yawn.face*.45,gazeX:this.gazeX,gazeY:this.gazeY,idleLooking:idle&&!yawn.active&&!watch.active&&this.idleLook.phase!=='forward',yawning:yawn.active,yawnCover:yawn.cover,yawnPreview:yawn.preview,watchChecking:watch.active,watchRaise:watch.raise,watchPreview:watch.preview,gestureLeft:this.gestureLeft,gestureRight:this.gestureRight,gestureBeat:this.nod,following:this.follow>.05,preview,speaking};
   }
 }

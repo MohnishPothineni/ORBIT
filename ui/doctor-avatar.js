@@ -60,7 +60,7 @@ export async function mountDoctorAvatar({host,persona='male',getVolume=()=>0,onR
     if(wasYawn!==!!pose.yawning)onYawnStateChange();
     host.dataset.watchChecking=String(!!pose.watchChecking);host.dataset.watchRaise=(pose.watchRaise||0).toFixed(3);host.dataset.watchPreview=String(!!pose.watchPreview);
     if(wasWatch!==!!pose.watchChecking)onWatchStateChange();
-    host.dataset.jaw=pose.jaw.toFixed(3);host.dataset.speaking=String(pose.speaking);host.dataset.preview=String(pose.preview);
+    host.dataset.gestureLeft=(pose.gestureLeft||0).toFixed(3);host.dataset.gestureRight=(pose.gestureRight||0).toFixed(3);host.dataset.following=String(!!pose.following);host.dataset.jaw=pose.jaw.toFixed(3);host.dataset.speaking=String(pose.speaking);host.dataset.preview=String(pose.preview);
     if(wasPreview&&!pose.preview)onPreviewEnd();
   }
   function draw(now=performance.now()){
@@ -71,19 +71,31 @@ export async function mountDoctorAvatar({host,persona='male',getVolume=()=>0,onR
   }
   function tick(now){
     frame=null;if(!alive||!motion.visible)return;
-    const talking=motion.yawn.active||motion.watch.active||motion.mode==='speaking'||motion.amplitude>.001||now/1000<motion.previewUntil;
+    const talking=motion.yawn.active||motion.watch.active||motion.gesture.active||motion.follow>.01||motion.mode==='speaking'||motion.amplitude>.001||now/1000<motion.previewUntil;
     const preset=AVATAR_QUALITY[quality];
     const fps=renderer.isSoftwareRenderer?(talking?24:12):(talking?preset.activeFPS:preset.idleFPS);
     if(now-lastDraw>=1000/fps){draw(now);lastDraw=now;}
     if(!motion.paused)frame=requestAnimationFrame(tick);
   }
   function schedule(){if(alive&&motion.visible&&frame===null)frame=requestAnimationFrame(tick);}
-  function resize(){if(!alive||!host.clientWidth||!host.clientHeight)return;renderer.setSize(host.clientWidth,host.clientHeight,false);camera.aspect=host.clientWidth/host.clientHeight;const close=framing==='close',compact=host.clientWidth<160;const y=close?.215:compact?.17:.105,z=close?.67:compact?1.03:1.16;camera.position.set(0,y,z);camera.lookAt(0,y,.005);camera.updateProjectionMatrix();draw();}
+  function resize(){if(!alive||!host.clientWidth||!host.clientHeight)return;renderer.setSize(host.clientWidth,host.clientHeight,false);camera.aspect=host.clientWidth/host.clientHeight;const close=framing==='close',compact=host.clientWidth<160;const y=close?.215:compact?.17:.095,z=close?.67:compact?.92:1.02;camera.position.set(0,y,z);camera.lookAt(0,y,.005);camera.updateProjectionMatrix();draw();}
   const observer=new ResizeObserver(resize);observer.observe(host);
   const pointerDown=e=>{drag={x:e.clientX,y:e.clientY,yaw,pitch};view.setPointerCapture(e.pointerId);};
   const pointerMove=e=>{if(!drag)return;yaw=THREE.MathUtils.clamp(drag.yaw+(e.clientX-drag.x)*.009,-.65,.65);pitch=THREE.MathUtils.clamp(drag.pitch+(e.clientY-drag.y)*.004,-.15,.15);draw();};
   const pointerUp=()=>{drag=null;};
   const keys=e=>{let handled=true;if(e.key==='ArrowLeft')yaw=Math.max(-.65,yaw-.08);else if(e.key==='ArrowRight')yaw=Math.min(.65,yaw+.08);else if(e.key==='ArrowUp')pitch=Math.max(-.15,pitch-.04);else if(e.key==='ArrowDown')pitch=Math.min(.15,pitch+.04);else if(e.key==='Home'){yaw=0;pitch=0;}else handled=false;if(handled){e.preventDefault();draw();}};
+  /* The head turns toward the visitor's pointer anywhere on the page, then settles after a few idle seconds. */
+  const still=matchMedia('(prefers-reduced-motion: reduce)');let pointerTimer=0;
+  const follow=e=>{
+    if(e.pointerType==='touch'||drag||still.matches||!motion.visible)return;
+    const r=view.getBoundingClientRect();if(!r.width)return;
+    const cx=r.left+r.width/2,cy=r.top+r.height*.3;
+    const dx=(e.clientX-cx)/Math.max(320,innerWidth*.5),dy=(e.clientY-cy)/Math.max(320,innerHeight*.6);
+    motion.setPointer(Math.atan(dx*1.1)*.5,Math.atan(dy)*.24,true);schedule();
+    clearTimeout(pointerTimer);pointerTimer=setTimeout(()=>motion.setPointer(0,0,false),4000);
+  };
+  const unfollow=e=>{if(!e.relatedTarget){clearTimeout(pointerTimer);motion.setPointer(0,0,false);}};
+  window.addEventListener('pointermove',follow,{passive:true});document.addEventListener('pointerout',unfollow);
   view.addEventListener('pointerdown',pointerDown);view.addEventListener('pointermove',pointerMove);view.addEventListener('pointerup',pointerUp);view.addEventListener('pointercancel',pointerUp);view.addEventListener('keydown',keys);
   const api={
     setVisible(value){motion.setVisible(value&&!document.hidden);if(!motion.visible){if(frame!==null)cancelAnimationFrame(frame);frame=null;apply({jaw:0,blink:0,yaw:0,pitch:0,roll:0,brow:0,preview:false,speaking:false});}else{last=0;resize();schedule();}},
@@ -95,7 +107,7 @@ export async function mountDoctorAvatar({host,persona='male',getVolume=()=>0,onR
     reset(){yaw=0;pitch=0;if(motion.visible)draw();},
     setQuality(value){quality=value==='high'?'high':'balanced';host.dataset.quality=quality;renderer.setPixelRatio(renderer.isSoftwareRenderer?(quality==='high'?1:.85):Math.min(window.devicePixelRatio||1,AVATAR_QUALITY[quality].pixelRatio));studio.setQuality(quality);resize();},
     setFraming(value){framing=value==='close'?'close':'portrait';host.dataset.framing=framing;resize();},
-    destroy(){alive=false;if(frame!==null)cancelAnimationFrame(frame);observer.disconnect();for(const [name,fn]of [['pointerdown',pointerDown],['pointermove',pointerMove],['pointerup',pointerUp],['pointercancel',pointerUp],['keydown',keys]])view.removeEventListener(name,fn);const disposed=new Set();scene.traverse(o=>{if(o.isMesh&&o.geometry){if(!disposed.has(o.geometry)){o.geometry.dispose();disposed.add(o.geometry);}for(const m of(Array.isArray(o.material)?o.material:[o.material])){if(disposed.has(m))continue;for(const value of Object.values(m))if(value?.isTexture&&!disposed.has(value)){value.dispose();disposed.add(value);}m.dispose();disposed.add(m);}}});materials?.dispose();studio.dispose();renderer.dispose();view.remove();}
+    destroy(){alive=false;if(frame!==null)cancelAnimationFrame(frame);observer.disconnect();clearTimeout(pointerTimer);window.removeEventListener('pointermove',follow);document.removeEventListener('pointerout',unfollow);for(const [name,fn]of [['pointerdown',pointerDown],['pointermove',pointerMove],['pointerup',pointerUp],['pointercancel',pointerUp],['keydown',keys]])view.removeEventListener(name,fn);const disposed=new Set();scene.traverse(o=>{if(o.isMesh&&o.geometry){if(!disposed.has(o.geometry)){o.geometry.dispose();disposed.add(o.geometry);}for(const m of(Array.isArray(o.material)?o.material:[o.material])){if(disposed.has(m))continue;for(const value of Object.values(m))if(value?.isTexture&&!disposed.has(value)){value.dispose();disposed.add(value);}m.dispose();disposed.add(m);}}});materials?.dispose();studio.dispose();renderer.dispose();view.remove();}
   };
   try{
     const gltf=await new GLTFLoader().loadAsync(new URL(persona==='female'?'./models/doctor/space-doctor-female.glb':'./models/doctor/space-doctor.glb',import.meta.url).href);
