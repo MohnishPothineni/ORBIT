@@ -35,6 +35,13 @@ test("retained health screens render and removed routes and commands are unavail
     assert.ok(vm.runInContext(`${page}()`, context).includes("<"), page);
   }
   assert.ok(vm.runInContext("MissionLogic.reportSections(missionReportData()).length", context) > 0);
+  // Health log and Health trends are one page; #trends is kept as an alias.
+  const logHtml = vm.runInContext("logPage()", context);
+  assert.ok(logHtml.includes('id="health-trends"') && logHtml.includes('id="health-records"'));
+  assert.ok(logHtml.includes('id="trend-metric"') && logHtml.includes('id="log-search"'));
+  context.location.hash = "#trends";
+  assert.equal(vm.runInContext("currentPage()", context), "log");
+  assert.ok(!html.includes('data-nav="trends"'));
   vm.runInContext(await readFile(resolve(root, "condition-anatomy.js"), "utf8"), context);
   vm.runInContext(await readFile(resolve(root, "assistant-features.js"), "utf8"), context);
   vm.runInContext(await readFile(resolve(root, "assistant-actions.js"), "utf8"), context);

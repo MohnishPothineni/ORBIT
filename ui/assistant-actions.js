@@ -11,9 +11,8 @@ exercise:'Exercise',
 risks:'Mission health risks',
 research:'Evidence library',
 crew:'Astronauts',
-log:'Health log',
+log:'Health log & trends',
 care:'Health assessment',
-trends:'Health trends',
 anatomy:'Anatomy lab',
 routine:'Daily routine'};
   const sections=['assessment','inputs','measurements','mission'],methods=['manual','images','sensor','dataset'];
@@ -25,9 +24,8 @@ routine:'Daily routine'};
   const metricAliases={hr:['heart rate','resting heart rate','pulse'],sys:['blood pressure','pressure'],temp:['temperature','body temperature'],sleep:['sleep','sleep duration'],glucose:['glucose','blood sugar','blood glucose'],mood:['mood'],spo2:['oxygen saturation','spo2','oxygen'],rr:['respiratory rate','breathing rate'],fluids:['fluids','fluid intake','hydration'],exercise:['exercise','exercise duration']};
   const layerAliases={skeleton:['bones','skeleton','skeletal system'],cartilage:['cartilage','discs'],dental:['teeth','dental'],muscles:['muscles','muscular system'],connective:['tendons','ligaments','connective tissue'],heart:['heart','cardiovascular system'],arteries:['arteries'],veins:['veins'],nervous:['nerves','nervous system'],respiratory:['lungs','respiratory system'],digestive:['digestive organs','digestive system'],urinary:['kidneys','urinary system'],reproductive:['reproductive system'],integumentary:['skin'],lymphatic:['lymphatic system'],endocrine:['endocrine system'],sensory:['eyes','sensory structures']};
   const aliases={crew:['astronauts','astronaut dashboard','crew dashboard','crew roster','vitals dashboard'],
-log:['health log','log','logged vitals','health records','recorded vitals','vital records'],
+log:['health log','log','logged vitals','health records','recorded vitals','vital records','health log and trends','health trends','trends'],
 care:['health assessment','assessment'],
-trends:['health trends','trends'],
 anatomy:['anatomy','anatomy lab','3d anatomy','3d model'],
 routine:['routine','daily routine','checklist'],
 status:['home','overview','dashboard','crew status','crew health','crew health overview','status'],

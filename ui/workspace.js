@@ -3,7 +3,7 @@
 // Search this static tool directory, never private health records or images.
 const WORKSPACE_FEATURES = [
  {group:'Daily health',title:'Log a health check',description:'Enter vital signs, glucose, sleep, mood and daily totals.',icon:'plus',action:'log'},
- {group:'Daily health',title:'Health log',description:'Search saved readings, inspect a check and export records.',icon:'clipboard',page:'log'},
+ {group:'Daily health',title:'Health log & trends',description:'Search saved readings, chart any indicator and export records.',icon:'clipboard',page:'log'},
  {group:'Daily health',title:'Health assessment',description:'Record responsiveness, breathing, symptoms and next actions.',icon:'shield',page:'care',section:'assessment'},
  {group:'Daily health',title:'Health trends',description:'Compare any recorded indicator over 7, 14 or 30 days.',icon:'chart',page:'trends'},
  {group:'Daily health',title:'Trend alerts',description:'Find sustained changes in heart rate, sleep, mood and other indicators.',icon:'chart',page:'trends'},

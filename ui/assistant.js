@@ -459,8 +459,8 @@
       return siteReply('opened',OrbitSiteActions.pages[action.page]+(action.section?' / '+({assessment:'Crew assessment',inputs:'Health inputs',measurements:'Measurement guide',mission:'Mission readiness'}[action.section]):'')+(action.input?' / '+action.input:'')+' is open.',{page:action.page,section:action.section||'',input:action.input||''});
     }
     if(action.kind==='trends'){
-      chartMetric=action.metric;chartRange=action.days;await navigateSite('trends',null,null,true);
-      return siteReply('applied','Showing '+META[action.metric].label+' over '+action.days+' days.',{page:'trends',metric:action.metric,days:action.days});
+      chartMetric=action.metric;chartRange=action.days;await navigateSite('log',null,null,true);scrollToLogSection('health-trends');
+      return siteReply('applied','Showing '+META[action.metric].label+' over '+action.days+' days.',{page:'log',section:'trends',metric:action.metric,days:action.days});
     }
     if(action.kind==='body-system'){
       await navigateSite('anatomy',null,null,true);return siteReply('opened','Anatomy lab is open. Use the system layers to explore the reference.',{page:'anatomy'});
