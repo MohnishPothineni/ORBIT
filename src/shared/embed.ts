@@ -13,6 +13,15 @@ export const EMBEDDED: boolean = (() => {
   }
 })();
 
+/** The website's right-hand panel, not the full Crew voice tab. */
+export const DOCKED: boolean = (() => {
+  try {
+    return new URLSearchParams(window.location.search).has("dock");
+  } catch {
+    return false;
+  }
+})();
+
 /** This app's route → the website tab that shows it. */
 const WEBSITE_TAB: Record<string, string> = {
   crew: "crew",

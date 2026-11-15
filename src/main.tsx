@@ -12,6 +12,10 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 
+if (new URLSearchParams(window.location.search).has("dock")) {
+  document.documentElement.dataset.orbitDock = "true";
+}
+
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element");
 

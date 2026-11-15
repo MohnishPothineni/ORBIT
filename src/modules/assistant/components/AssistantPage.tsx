@@ -89,7 +89,8 @@ export function AssistantPage() {
     if (!path || BUSY_STATES.has(session.turnState)) return;
     const t = window.setTimeout(() => {
       consumeNavigation();
-      if (!path.startsWith("/assistant") && session.isActive) {
+      // The website dock keeps this frame mounted, so opening another tab does not end the session.
+      if (!EMBEDDED && !path.startsWith("/assistant") && session.isActive) {
         toast({ level: "standby", title: "Session ended — left the assistant", description: `Opened ${path}.` });
       }
       // Inside the website tab, open the website's own screen rather than this app's placeholder.

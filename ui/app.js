@@ -176,8 +176,13 @@ function render(){
  if(main.dataset.page!==p){const group=document.querySelector('.main-nav [data-nav="'+p+'"]')?.closest('details');if(group)group.open=true;}
  // Re-renders must not reload the embedded voice workspace (that would end a live session).
  const keepVoice=p==='voice'&&main.dataset.page==='voice'&&!!main.querySelector('#voice-frame');
+ const parkedVoice=document.getElementById('voice-frame');
+ const voiceOutside=parkedVoice&&!main.contains(parkedVoice);
  main.dataset.page=p;const scroll=window.scrollY;cleanupHealthInputs();disposeCrewViewer();
- if(!keepVoice)main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,wellbeing:missionWellbeingPage,exercise:missionExercisePage,risks:missionRisksPage,research:missionResearchPage,skin:skinPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,voice:voicePage,log:logPage,trends:trendsPage,routine:routinePage}[p])();
+ if(!keepVoice){
+  main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,wellbeing:missionWellbeingPage,exercise:missionExercisePage,risks:missionRisksPage,research:missionResearchPage,skin:skinPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,voice:voicePage,log:logPage,trends:trendsPage,routine:routinePage}[p])();
+  if(p==='voice'&&voiceOutside&&parkedVoice.isConnected){const slot=main.querySelector('#voice-slot');if(slot){parkedVoice.classList.remove('assistant-local-frame');parkedVoice.classList.add('voice-frame');slot.append(parkedVoice);}}
+ }
  $$('.main-nav a').forEach(a=>{a.classList.toggle('active',a.dataset.nav===p);if(a.dataset.nav===p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  $('#header-page').textContent=PAGE_NAMES[p];$('#data-mode').textContent=state.mode==='demo'?'DEMO MISSION':'MY HEALTH LOG';$('#rail-environment').textContent=state.settings.environment.toUpperCase();document.title=`${PAGE_NAMES[p]} | ORBIT`;
  syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();if(p==='skin')attachSkinPage();window.scrollTo(0,scroll);window.dispatchEvent(new Event('orbit:context-change'));
