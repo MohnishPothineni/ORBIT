@@ -122,6 +122,28 @@ function factsUnlocked(){return typeof HrpLinks==='undefined'?0:Math.min(HrpLink
 function factSource(f){return `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}<span class="sr-only"> (NASA page, opens in a new tab)</span></a> · NASA Human Research Program`;}
 function routineFacts(){const all=HrpLinks.facts(),n=factsUnlocked(),f=all[n-1];return `<div class="routine-facts"><div class="eyebrow">NASA FACTS · ${n} OF ${all.length}</div><div class="routine-facts-bar" role="img" aria-label="${n} of ${all.length} facts unlocked"><span style="width:${Math.round(n/all.length*100)}%"></span></div>${f?`<blockquote class="hrp-quote"><p>${esc(f.fact)}</p><footer>${factSource(f)}</footer></blockquote>`:'<p class="routine-facts-empty">Complete a daily task to unlock your first fact.</p>'}<p class="routine-facts-next">${n<all.length?'Each completed task unlocks the next fact from NASA’s risk pages.':`You have all ${all.length} facts.`}</p>${n?`<button class="text-button" data-facts="1">All your facts ${icon('arrowright')}</button>`:''}</div>`;}
 function factsModal(){const all=HrpLinks.facts(),n=factsUnlocked();modal('Your NASA facts',`${n} of ${all.length} unlocked · From the “Did you know?” sections of NASA’s risk pages`,`<ol class="facts-list">${all.map((f,i)=>i<n?`<li><span>${String(i+1).padStart(2,'0')}</span><div><p>${esc(f.fact)}</p><small>${factSource(f)}</small></div></li>`:'').join('')}</ol>${n<all.length?`<p class="form-help">${all.length-n} more to unlock. Each completed daily task opens the next one; unticking a task locks it again.</p>`:''}`);}
+/* Online / offline mode. Offline: the cloud assistant and external links are off, so nothing leaves this device. */
+const OFFLINE_MODE_KEY='orbit.offlineMode';
+let offlineMode=(()=>{try{return localStorage.getItem(OFFLINE_MODE_KEY)==='true';}catch{return false;}})();
+function orbitOnline(){return navigator.onLine&&!offlineMode;}
+function connectivityState(){return offlineMode?'offline-mode':navigator.onLine?'online':'no-internet';}
+function syncConnectivityUI(){
+ const state=connectivityState(),banner=$('#offline-banner');
+ document.body.dataset.connection=state;
+ $$('#connectivity-switch [data-connectivity]').forEach(b=>{const on=(b.dataset.connectivity==='offline')===offlineMode;b.setAttribute('aria-checked',String(on));b.tabIndex=on?0:-1;});
+ if(!banner)return;
+ banner.hidden=state==='online';
+ if(state==='offline-mode'){$('#offline-banner-title').textContent='Offline mode';$('#offline-banner-text').textContent='Nothing leaves this device. The cloud assistant and external links are off. Records keep saving in this browser, and the offline voice assistant still works.';$('#offline-banner-action').textContent='Go online';$('#offline-banner-action').hidden=false;}
+ else if(state==='no-internet'){$('#offline-banner-title').textContent='No internet connection';$('#offline-banner-text').textContent='The cloud assistant is unavailable. Records keep saving in this browser.';$('#offline-banner-action').textContent='Use offline mode';$('#offline-banner-action').hidden=false;}
+}
+function setOfflineMode(on,{announce=true}={}){
+ if(offlineMode===Boolean(on))return;
+ offlineMode=Boolean(on);
+ try{localStorage.setItem(OFFLINE_MODE_KEY,String(offlineMode));}catch{/* the mode still applies for this visit */}
+ syncConnectivityUI();
+ window.dispatchEvent(new Event('orbit:connectivity'));
+ if(announce)toast(offlineMode?'Offline mode is on. Nothing leaves this device.':(navigator.onLine?'Back online. The cloud assistant and external links are available.':'Online mode is on, but this device has no internet connection.'));
+}
 function toast(msg){$('#toast').textContent=msg;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3600);}
 /* Merged pages: old links open the page that now holds them (a section or a Health assessment tab). */
 const PAGE_ALIASES={trends:{page:'log',section:'health-trends'},wellbeing:{page:'care',tab:'wellbeing'},exercise:{page:'care',tab:'exercise'},skin:{page:'care',tab:'skin'}};
@@ -336,3 +358,11 @@ let lastDay=todayKey();setInterval(()=>{if(todayKey()!==lastDay){lastDay=todayKe
 OrbitNeuralLogic.validateModel(OrbitNeuralModel);
 OrbitNeural.connect(() => OrbitNeural.assessRecords({records:entries(),baseline:activeCrew().neuralBaseline,model:OrbitNeuralModel,allowed:canSeeWellbeing(),workspace:state.mode}));
 hydrateIcons();persist();render();if(storageNotice)toast(storageNotice);
+syncConnectivityUI();
+window.addEventListener('online',syncConnectivityUI);window.addEventListener('offline',syncConnectivityUI);
+/* On phones the switch shows only the current mode, so tapping it toggles. */
+$('#connectivity-switch')?.addEventListener('click',e=>{const b=e.target.closest('#connectivity-switch [data-connectivity]');if(!b)return;const compact=matchMedia('(max-width:620px)').matches;setOfflineMode(compact&&b.getAttribute('aria-checked')==='true'?!offlineMode:b.dataset.connectivity==='offline');});
+$('#connectivity-switch')?.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();setOfflineMode(!offlineMode);$(`#connectivity-switch [data-connectivity="${offlineMode?'offline':'online'}"]`)?.focus();});
+$('#offline-banner-action')?.addEventListener('click',()=>setOfflineMode(connectivityState()!=='offline-mode'));
+/* In offline mode, links to other websites stay closed so nothing is requested off the device. */
+document.addEventListener('click',e=>{if(!offlineMode)return;const a=e.target.closest('a[href]');if(!a)return;let url;try{url=new URL(a.href,location.href);}catch{return;}if(url.origin===location.origin||!/^https?:$/.test(url.protocol))return;e.preventDefault();e.stopPropagation();toast(`Offline mode: external links are off. Switch to Online to open ${url.hostname}.`);},true);
