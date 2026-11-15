@@ -15,7 +15,8 @@
     "lint": "node node_modules/eslint/bin/eslint.js .",
     "test": "npm run test:crew && node --experimental-vm-modules --test tests/*.test.mjs",
     "test:evidence": "node --experimental-vm-modules --test tests/evidence.test.mjs",
-    "test:crew": "vitest run src/modules/crew"
+    "test:crew": "vitest run src/modules/crew",
+    "dev:crew": "vite --host 127.0.0.1"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",
