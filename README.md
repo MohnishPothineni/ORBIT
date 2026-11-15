@@ -85,10 +85,11 @@ src/
   app/            route table and application shell (status bar, sidebar, crew selector)
   shared/         design tokens, UI kit, types, API client, mock mode, contexts
   modules/
+    anatomy/      Module 2 — Anatomy lab (built)
     assistant/    Module 3 — Crew assistant (built)
 ```
 
-Crew status, Anatomy lab and Evidence library show a placeholder until their modules are added. Modules never import from each other; they link through routes.
+Crew status and Evidence library show a placeholder until their modules are added. Modules never import from each other; they link through routes.
 
 ## Crew assistant (`/assistant`)
 
@@ -126,3 +127,24 @@ With `VITE_USE_MOCKS=true`, a `MockVoiceSession` plays a scripted conversation w
 3. Show the left knee, which navigates to the Anatomy lab.
 
 A **Demo controls** card can step the script, force any turn state, simulate errors, say the share approval phrase and cycle the status-bar states. Append `?state=loading|empty|error` to the URL in development to see those page states.
+
+## Anatomy lab (`/anatomy`)
+
+An anatomical reference workspace. Crew members inspect body systems, pin symptoms, injuries and observations to a region for one crew member, and cross-reference notes, health-log entries and Evidence library sources for that region.
+
+The model is a **generic adult reference** shared by every profile. Pins change markers and highlights only; they are not a scan, an image or a finding.
+
+| Route | Screen |
+|---|---|
+| `/anatomy` | Workspace for the active crew member |
+| `/anatomy?crew=c03&region=knee_left&pin=p12` | Deep link: selects the crew member in the status bar, frames the region, opens the Pins tab |
+| `/anatomy/pins` | All pins across the crew, filterable by crew, status and system |
+
+- **Layout:** Explorer (search, system layers, region tree) · Viewer · Inspector (Region · Pins · Notes & references). Below 1280px the inspector is a slide-over sheet.
+- **3D:** three + @react-three/fiber + drei, lazy-loaded so three.js only downloads when the 3D view is used. Loads `/models/anatomy/body.glb` (not committed). Draco decoders live in `public/models/anatomy/draco/`; Meshopt decoding is bundled. Nothing comes from a CDN.
+- **2D fallback:** front and back maps projected from the same reference shapes, used automatically when WebGL 2 is unavailable or the GLB is missing or fails to load. Pins work the same way.
+- **Placeholder body:** `VITE_ANATOMY_PLACEHOLDER=true npm run dev` renders a procedural body (capsules, spheres and rings named by region id) so the 3D path can be developed without the real asset.
+- **Keyboard:** the region tree is a full `role="tree"`. In the viewer, arrows rotate (3D) or pan (2D), `+`/`-` zoom, `0` resets, `F` frames the selection, `Esc` cancels pin placement.
+- **Driving the viewer from other modules:** dispatch `window.dispatchEvent(new CustomEvent("orbit:anatomy", { detail: { action: "selectRegion", payload: "knee_left" } }))`. Actions: `selectRegion`, `focusRegion`, `setPreset`, `toggleLayer`, `isolate`, `setSection`, `frameSelection`, `resetView`. The Crew assistant's flat snake_case form (`{ action: "focus_region", region: "knee_left" }`) is accepted too. See `modules/anatomy/public.ts`.
+- **API:** `GET /api/anatomy/regions`, `GET|POST /api/anatomy/pins`, `PATCH|DELETE /api/anatomy/pins/{id}`, `GET /api/anatomy/regions/{id}/references?crew=`.
+- **Dev overrides:** `?state=loading|empty|error`, and `?webgl=off` to force the 2D fallback.
