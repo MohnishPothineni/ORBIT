@@ -121,7 +121,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Prelaunch; Record type: reported_phase_value. Measurements: heart rate: 72 bpm (heart_rate_bpm); systolic bp: 113 mmHg (systolic_bp_mmHg); diastolic bp: 79 mmHg (diastolic_bp_mmHg); respiratory rate: 19 breaths/min (respiratory_rate_breaths_min). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma9",
+        "View in Gordon Cooper’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-002: Mercury-Atlas 9 — Orbital",
@@ -131,7 +134,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Orbital; Record type: reported_phase_value. Measurements: heart rate: 89 bpm (heart_rate_bpm); systolic bp: 119 mmHg (systolic_bp_mmHg); diastolic bp: 81 mmHg (diastolic_bp_mmHg); respiratory rate: 15 breaths/min (respiratory_rate_breaths_min). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma9",
+        "View in Gordon Cooper’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-003: Mercury-Atlas 9 — Postflight",
@@ -141,7 +147,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: supine; Relative time: 1–7 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 83 bpm (heart_rate_bpm); systolic bp: 89 mmHg (systolic_bp_mmHg); diastolic bp: 64 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma9",
+        "View in Gordon Cooper’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-004: Mercury-Atlas 9 — Postflight",
@@ -151,7 +160,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: erect; Relative time: 1–7 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 123 bpm (heart_rate_bpm); systolic bp: 90 mmHg (systolic_bp_mmHg); diastolic bp: 73 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma9",
+        "View in Gordon Cooper’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-005: Mercury-Atlas 9 — Postflight",
@@ -161,7 +173,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: supine; Relative time: 18 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 58 bpm (heart_rate_bpm); systolic bp: 98 mmHg (systolic_bp_mmHg); diastolic bp: 61 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma9",
+        "View in Gordon Cooper’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-006: Mercury-Atlas 9 — Postflight",
@@ -171,7 +186,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: erect; Relative time: 18 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 80 bpm (heart_rate_bpm); systolic bp: 94 mmHg (systolic_bp_mmHg); diastolic bp: 68 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma9",
+        "View in Gordon Cooper’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-007: Mercury-Atlas 9 — Postflight",
@@ -181,7 +199,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Record type: reported_temperature. Measurements: body temperature: 99.4 degF (body_temperature_f); body temperature: 37.44 degC (body_temperature_c). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: Oral temperature; table reports 310.6 K (99.4°F). Postflight timing unspecified. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma9",
+        "View in Gordon Cooper’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-008: Mercury-Atlas 7 — All preflight data",
@@ -191,7 +212,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: All preflight data; Record type: aggregate_mean. Measurements: heart rate: 57 bpm (heart_rate_bpm); heart rate min: 42 bpm (heart_rate_min_bpm); heart rate max: 84 bpm (heart_rate_max_bpm); heart rate sample count: 408 count (heart_rate_sample_count); respiratory rate: 15 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 5 breaths/min (respiratory_rate_min); respiratory rate max: 32 breaths/min (respiratory_rate_max); respiratory rate sample count: 354 count (respiratory_rate_sample_count); body temperature: 99.3 degF (body_temperature_f); body temperature: 37.39 degC (body_temperature_c); body temperature min: 98.3 degF (body_temp_min_f); body temperature max: 101.5 degF (body_temp_max_f); body temperature sample count: 128 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma7",
+        "View in Scott Carpenter’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-009: Mercury-Atlas 7 — Countdown",
@@ -201,7 +225,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Countdown; Record type: aggregate_mean. Measurements: heart rate: 62 bpm (heart_rate_bpm); heart rate min: 50 bpm (heart_rate_min_bpm); heart rate max: 84 bpm (heart_rate_max_bpm); heart rate sample count: 92 count (heart_rate_sample_count); respiratory rate: 15 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 6 breaths/min (respiratory_rate_min); respiratory rate max: 26 breaths/min (respiratory_rate_max); respiratory rate sample count: 75 count (respiratory_rate_sample_count); body temperature: 97.8 degF (body_temperature_f); body temperature: 36.56 degC (body_temperature_c); body temperature min: 96.8 degF (body_temp_min_f); body temperature max: 98.2 degF (body_temp_max_f); body temperature sample count: 57 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma7",
+        "View in Scott Carpenter’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-010: Mercury-Atlas 7 — Launch",
@@ -211,7 +238,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Launch; Record type: aggregate_mean. Measurements: heart rate: 87 bpm (heart_rate_bpm); heart rate min: 82 bpm (heart_rate_min_bpm); heart rate max: 96 bpm (heart_rate_max_bpm); heart rate sample count: 7 count (heart_rate_sample_count); respiratory rate: 16 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 10 breaths/min (respiratory_rate_min); respiratory rate max: 20 breaths/min (respiratory_rate_max); respiratory rate sample count: 5 count (respiratory_rate_sample_count); body temperature: 98 degF (body_temperature_f); body temperature: 36.67 degC (body_temperature_c); body temperature min: 98 degF (body_temp_min_f); body temperature max: 98 degF (body_temp_max_f); body temperature sample count: 4 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma7",
+        "View in Scott Carpenter’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-011: Mercury-Atlas 7 — Orbital",
@@ -221,7 +251,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Orbital; Record type: aggregate_mean. Measurements: heart rate: 70 bpm (heart_rate_bpm); heart rate min: 60 bpm (heart_rate_min_bpm); heart rate max: 94 bpm (heart_rate_max_bpm); heart rate sample count: 94 count (heart_rate_sample_count); respiratory rate: 14 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 10 breaths/min (respiratory_rate_min); respiratory rate max: 18 breaths/min (respiratory_rate_max); respiratory rate sample count: 83 count (respiratory_rate_sample_count); body temperature: 99.9 degF (body_temperature_f); body temperature: 37.72 degC (body_temperature_c); body temperature min: 98 degF (body_temp_min_f); body temperature max: 100.6 degF (body_temp_max_f); body temperature sample count: 60 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: Respiratory-rate estimates derived from ECG R-wave variation; approximate only. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma7",
+        "View in Scott Carpenter’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-012: Mercury-Atlas 7 — Reentry",
@@ -231,7 +264,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Reentry; Record type: aggregate_mean. Measurements: heart rate: 84 bpm (heart_rate_bpm); heart rate min: 72 bpm (heart_rate_min_bpm); heart rate max: 104 bpm (heart_rate_max_bpm); heart rate sample count: 15 count (heart_rate_sample_count); respiratory rate: 19 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 16 breaths/min (respiratory_rate_min); respiratory rate max: 24 breaths/min (respiratory_rate_max); respiratory rate sample count: 9 count (respiratory_rate_sample_count); body temperature: 100.4 degF (body_temperature_f); body temperature: 38.0 degC (body_temperature_c); body temperature min: 100.2 degF (body_temp_min_f); body temperature max: 100.5 degF (body_temp_max_f); body temperature sample count: 15 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: Respiratory-rate estimates derived from ECG R-wave variation; approximate only. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma7",
+        "View in Scott Carpenter’s health log"
+      ]
     },
     {
       "title": "NASA-VITAL-013: Mercury-Atlas 7 — Preflight transfer van",
@@ -241,7 +277,10 @@ const ResearchLibrary = (() => {
       ],
       "text": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Preflight transfer van; Relative time: ~50 minutes on launch day; Record type: aggregate_mean. Measurements: heart rate: 65 bpm (heart_rate_bpm); heart rate min: 56 bpm (heart_rate_min_bpm); heart rate max: 70 bpm (heart_rate_max_bpm); respiratory rate: 14 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 8 breaths/min (respiratory_rate_min); respiratory rate max: 20 breaths/min (respiratory_rate_max). Source reference: More nasa data 2.pdf, page 64, Narrative. Quality notes: Narrative preflight transfer-van period; no blood pressure or body temperature recorded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
       "watch": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
-      "track": null
+      "track": [
+        "log?crew=hist-ma7",
+        "View in Scott Carpenter’s health log"
+      ]
     },
     {
       "title": "SKYLAB4-COMMANDER-REST-PREFLIGHT: Skylab 4 — Preflight",
@@ -518,13 +557,8 @@ const ResearchLibrary = (() => {
   // END GENERATED HISTORICAL EVIDENCE
   const allItems = () => Object.entries(TOPICS).flatMap(([topic, t]) => t.items.map(item => ({ ...item, topic, topicTitle: t.title })));
   function search(query, topic = 'all') {
-    const atlas9 = /\batlas[\s–—-]*(?:9|ix|nine)\b/i;
-    const scoped = atlas9.test(String(query || ''));
-    const text = scoped ? String(query).replace(/\bmercury[\s–—-]*/gi, '').replace(new RegExp(atlas9.source, 'gi'), '') : String(query || '');
-    const filler = new Set(['what','was','were','the','for','and','with','does','this','that','show','tell','me','about','during','mission','data','of','in','on','is']);
-    const terms = scoped ? (text.toLowerCase().match(/[a-z0-9]+/g) || []).filter(w => !filler.has(w)) : text.toLowerCase().split(/\s+/).filter(Boolean);
+    const terms = String(query || '').toLowerCase().split(/\s+/).filter(Boolean);
     return allItems().filter(item => {
-      if (scoped && !/\bMission:\s*Mercury[\s–—-]+Atlas[\s–—-]+9\b/i.test(item.text)) return false;
       if (topic !== 'all' && item.topic !== topic) return false;
       const words = [item.title, item.text, item.watch, item.topicTitle, ...item.sources.map(id => `${SOURCES[id].cite} ${SOURCES[id].title}`)].join(' ').toLowerCase();
       return terms.every(term => words.includes(term));

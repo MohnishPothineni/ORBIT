@@ -84,7 +84,7 @@ function missionEmptyStores() { return { riskRecords: [], workouts: [], emergenc
 const missionPlan = () => db().mission;
 const missionStamp = at => `${dayLabel(at)} · ${new Date(at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
 const missionTile = (label, value, sub) => `<div class="stat-box"><span class="eyebrow">${label}</span><strong>${value}</strong><small>${sub}</small></div>`;
-const missionPill = (level, text) => `<span class="mission-pill ${level}">${icon({ urgent: 'alert', review: 'info', due: 'clock', clear: 'check' }[level])}${esc(text)}</span>`;
+const missionPill = (level, text) => `<span class="mission-pill ${level}">${icon({ urgent: 'alert', review: 'info', due: 'clock', clear: 'check', historical: 'document' }[level])}${esc(text)}</span>`;
 const missionField = (label, name, attrs = '', help = '') => `<label class="field"><span>${label}${help ? ` <small>(${help})</small>` : ''}</span><input class="field-input" name="${name}" ${attrs}></label>`;
 const missionNumber = value => String(value ?? '').trim() === '' ? null : Number(value);
 function missionFormError(message) { const el = $('#mission-form-error'); if (el) el.textContent = message; }
@@ -103,7 +103,7 @@ function missionCrewView(profile) {
   const openRuns = db().emergencyRuns.filter(r => r.crewId === profile.id && !r.closedAt).map(r => ({ ...r, title: MissionLogic.CHECKLISTS[r.checklist]?.short || 'Emergency' }));
   const risks = missionRiskSummaries(profile), fullWellbeing = MissionLogic.wellbeingSummary(raw, { sleepTarget: state.settings.sleepTarget });
   const wellbeing = open ? fullWellbeing : AccessLogic.hideSummary(fullWellbeing);
-  const status = MissionLogic.crewStatus({ records: raw, alerts: allAlerts, assessments, openRuns, riskFlags: MissionLogic.riskFlags(risks), extraReasons: SkinLogic.crewReasons(db().skinChecks.filter(c => c.crewId === profile.id), db().wounds.filter(w => w.crewId === profile.id)), supportSuggested: fullWellbeing.supportSuggested });
+  const status = MissionLogic.crewStatus({ records: raw, alerts: allAlerts, assessments, openRuns, riskFlags: MissionLogic.riskFlags(risks), extraReasons: SkinLogic.crewReasons(db().skinChecks.filter(c => c.crewId === profile.id), db().wounds.filter(w => w.crewId === profile.id)), supportSuggested: fullWellbeing.supportSuggested, historical: profile.historical ? profile.mission || 'a past mission' : null });
   const exercise = MissionLogic.exerciseSummary(db().workouts.filter(w => w.crewId === profile.id), { target: profile.carePlan?.exerciseTarget });
   return { profile, records, alerts, openRuns, risks, wellbeing, status, exercise };
 }
@@ -115,9 +115,9 @@ function missionCrewCard(view) {
   const { profile: p, status, wellbeing, exercise } = view, hr = crewLatest(p.id, 'hr'), bp = crewLatest(p.id, 'sys');
   const reasons = status.reasons.slice(0, 3);
   return `<article class="panel mission-crew-card ${status.level}"><div class="mission-crew-top"><span class="roster-avatar">${esc(crewInitial(p))}</span><div><h3>${esc(p.name)}</h3><p>${esc(p.role)}</p></div>${missionPill(status.level, status.label)}</div>
-    <div class="mission-crew-values"><span>HR<b>${hr ? formatNum(hr.hr) : '—'}</b></span><span>BP<b>${bp ? `${formatNum(bp.sys)}/${formatNum(bp.dia)}` : '—'}</b></span><span>Exercise<b>${exercise.metDays === null ? `${exercise.activeDays}/7` : `${exercise.metDays}/7`}</b><small>${exercise.metDays === null ? 'days' : 'days on target'}</small></span></div>
+    <div class="mission-crew-values"><span>HR<b>${hr ? formatNum(hr.hr) : '—'}</b></span><span>BP<b>${bp ? `${formatNum(bp.sys)}/${formatNum(bp.dia)}` : '—'}</b></span><span>Exercise<b>${p.historical ? '—' : exercise.metDays === null ? `${exercise.activeDays}/7` : `${exercise.metDays}/7`}</b><small>${p.historical ? 'not recorded' : exercise.metDays === null ? 'days' : 'days on target'}</small></span></div>
     ${reasons.length ? `<ul class="mission-reasons">${reasons.map(r => `<li>${esc(r.text)}</li>`).join('')}</ul>${status.reasons.length > 3 ? `<p class="mission-more">${status.reasons.length - 3} more in the report</p>` : ''}` : '<p class="mission-clear-note">Nothing flagged from the saved records.</p>'}
-    <div class="mission-crew-foot"><small>${status.lastVitals ? `Vitals ${missionStamp(status.lastVitals)}` : 'No vitals yet'} · Check-in ${wellbeing.overdue ? 'overdue' : 'current'}</small><div><button class="text-button" data-action="mission-crew-report" data-id="${esc(p.id)}">Report</button><button class="text-button" data-action="mission-crew-open" data-id="${esc(p.id)}">Open record ${icon('arrowright')}</button></div></div></article>`;
+    <div class="mission-crew-foot"><small>${p.historical ? `${esc(p.mission || 'Past mission')} · ${esc((p.missionDate || '').slice(0, 4))}` : `${status.lastVitals ? `Vitals ${missionStamp(status.lastVitals)}` : 'No vitals yet'} · Check-in ${wellbeing.overdue ? 'overdue' : 'current'}`}</small><div><button class="text-button" data-action="mission-crew-report" data-id="${esc(p.id)}">Report</button><button class="text-button" data-action="mission-crew-open" data-id="${esc(p.id)}">Open record ${icon('arrowright')}</button></div></div></article>`;
 }
 function missionStatusPage() {
   const views = crewProfiles().map(missionCrewView).sort((a, b) => a.status.rank - b.status.rank);
@@ -126,7 +126,7 @@ function missionStatusPage() {
   const topReason = top?.status.reasons[0];
   return `${pageHeading('Crew status', 'Who needs attention first, across the whole crew.', button('<span class="export-label">Flight surgeon report</span>', 'mission-report', '', 'document'))}${demoNotice()}
     ${topReason && top.status.rank <= MissionLogic.STATUS.review.rank ? `<section class="mission-priority ${top.status.level}">${icon('alert')}<div><span class="eyebrow">MOST URGENT</span><strong>${esc(top.profile.name)}: ${esc(topReason.text)}</strong></div><button class="button small" data-action="mission-crew-open" data-id="${esc(top.profile.id)}">Open record</button></section>` : ''}
-    <div class="stat-strip mission-tiles">${missionTile('NEED ATTENTION', attention.length, `of ${views.length} crew members`)}${missionTile('CHECKS OVERDUE', overdue.length, 'no vitals in 36 hours')}${missionTile('CREW TRACKED', views.length, 'local crew profiles')}</div>
+    <div class="stat-strip mission-tiles">${missionTile('NEED ATTENTION', attention.length, `of ${views.filter(v => !v.profile.historical).length} crew members`)}${missionTile('CHECKS OVERDUE', overdue.length, 'no vitals in 36 hours')}${missionTile('CREW TRACKED', views.length, 'local crew profiles')}</div>
     <div class="section-label"><h2>Crew, most urgent first</h2></div>
     <div class="mission-crew-grid">${views.map(missionCrewCard).join('')}</div>
     <div class="notice">${icon('lock')}<p>Status comes from records saved in this browser, not live telemetry. “No flags” does not mean a crew member is well. Wellbeing scores stay out of this shared view; only a neutral prompt appears.</p></div>`;
@@ -378,7 +378,7 @@ function missionResearchResults(topic) {
 function missionResearchStatus(topic) {
   const query = missionResearchQuery.trim(), count = ResearchLibrary.search(query, topic).length;
   const area = topic === 'all' ? 'All topics' : ResearchLibrary.TOPICS[topic].title;
-  return `${count} ${count === 1 ? 'entry' : 'entries'}${/\batlas[\s–—-]*(?:9|ix|nine)\b/i.test(query) ? ' · Mercury-Atlas 9 only' : ''}${query ? ` matching “${query}”` : ''} · ${area}`;
+  return `${count} ${count === 1 ? 'entry' : 'entries'}${query ? ` matching “${query}”` : ''} · ${area}`;
 }
 function missionResearchRefresh() {
   const topic = missionResearchTopic(), list = $('#research-results');

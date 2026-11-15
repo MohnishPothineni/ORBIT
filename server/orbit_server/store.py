@@ -141,13 +141,22 @@ class Store:
         terms = {_stem(w) for w in _WORD.findall(query.lower()) if (len(w) > 2 or w.isdigit()) and w not in stop}
         if not terms:
             return []
-        # Mission identity is a filter, never merely a keyword boost. Check passage
-        # metadata text, not shared document keywords (the CSV contains many missions).
-        atlas9 = bool(re.search(r"\batlas[\s–—-]*(?:9|ix|nine)\b", query, re.IGNORECASE))
+        q = query.lower()
+        # Historical records name a crew role. Longest first, so "pilot" never means "Scientist Pilot".
+        asked_role = next((r for r in ("scientist pilot", "commander", "pilot") if re.search(rf"\b{r}\b", q)), None)
+        # What was measured. A record that measures what is asked outranks one that only shares
+        # context words (e.g. "after landing" heart rates for a body temperature question).
+        measure_words = {
+            "heart": ("heart rate",), "pulse": ("heart rate",),
+            "temperature": ("body temperature",), "fever": ("body temperature",),
+            "respiratory": ("respiratory rate",), "breathing": ("respiratory rate",), "breaths": ("respiratory rate",),
+            "systolic": ("systolic bp",), "diastolic": ("diastolic bp",), "blood pressure": ("systolic bp", "diastolic bp"),
+            "ventilation": ("minute ventilation",), "oxygen": ("oxygen consumption",),
+            "co2": ("co2 production",), "carbon dioxide": ("co2 production",),
+        }
+        asked_measures = {m for word, names in measure_words.items() if re.search(rf"\b{word}\b", q) for m in names}
         scored = []
         for chunk in self.evidence:
-            if atlas9 and not re.search(r"\bMission:\s*Mercury[\s–—-]+Atlas[\s–—-]+9\b", chunk["excerpt"], re.IGNORECASE):
-                continue
             words = {_stem(w) for w in _WORD.findall(f"{chunk['title']} {chunk['excerpt']}".lower())}
             words |= {_stem(w) for w in chunk.get("keywords", [])}
             hits = len(terms & words)
@@ -155,7 +164,18 @@ class Store:
                 # Exact record ids outrank incidental word matches in other records.
                 record_ids = re.findall(r"\b(?:NASA-VITAL-\d+|SKYLAB[\w-]+)\b", query, re.IGNORECASE)
                 exact = any(record_id.lower() in chunk["title"].lower() for record_id in record_ids)
-                scored.append((hits / len(terms) + (1 if exact else 0), chunk))
+                score = hits / len(terms) + (1 if exact else 0)
+                role = re.search(r"Crew role: ([^;.]+)", chunk["excerpt"])
+                if asked_role and role:
+                    score += 0.5 if role.group(1).strip().lower() == asked_role else -0.5
+                measured = re.search(r"Measurements: (.*?)(?:\. Source|$)", chunk["excerpt"])
+                if asked_measures and measured:
+                    names = [n.strip() for n in re.findall(r"([a-z0-9 ]+?): [\d.]+", measured.group(1))]
+                    # A bonus only: a record of the right person and phase that lacks the measure
+                    # must still reach the model, so it can say the measure was not recorded.
+                    if any(n == a or n.startswith(a + " ") for n in names for a in asked_measures):
+                        score += 0.5
+                scored.append((score, chunk))
         scored.sort(key=lambda s: s[0], reverse=True)
         return [
             {k_: c[k_] for k_ in ("documentId", "chunkId", "title", "excerpt")} | {"score": round(score, 2)}
