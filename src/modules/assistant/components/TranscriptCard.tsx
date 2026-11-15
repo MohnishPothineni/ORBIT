@@ -35,6 +35,18 @@ function messageScroller(el: HTMLElement): HTMLElement {
   return (el.closest(".orbit-main--embedded") as HTMLElement | null) ?? el;
 }
 
+/** Scroll position that puts the end of the transcript at the bottom of the scroller. */
+function endOfTranscript(el: HTMLElement, scroller: HTMLElement): number {
+  if (scroller === el) return el.scrollHeight;
+  // Docked: the whole panel scrolls, and cards below the transcript must not count as its end.
+  return scroller.scrollTop + el.getBoundingClientRect().bottom - scroller.getBoundingClientRect().bottom;
+}
+
+/** How far the end of the transcript is below the bottom of the scroller. */
+function belowEnd(el: HTMLElement, scroller: HTMLElement): number {
+  return endOfTranscript(el, scroller) - scroller.scrollTop - (scroller === el ? el.clientHeight : 0);
+}
+
 export function TranscriptCard({
   state,
   userLabel,
@@ -61,17 +73,20 @@ export function TranscriptCard({
     const el = scrollRef.current;
     if (!el) return;
     const scroller = messageScroller(el);
-    if (stick.current) scroller.scrollTop = scroller.scrollHeight;
-    else setShowJump(true);
+    if (!stick.current) setShowJump(true);
+    else if (scroller === el) el.scrollTop = el.scrollHeight;
+    // Docked and empty: keep the voice controls in view instead of scrolling past them.
+    else if (state.items.length > 0 && belowEnd(el, scroller) > 0) scroller.scrollTop = endOfTranscript(el, scroller);
   }, [state]);
 
   useEffect(() => {
     if (!DOCKED) return;
     const el = scrollRef.current;
-    const scroller = el ? messageScroller(el) : null;
-    if (!scroller || scroller === el) return;
+    if (!el) return;
+    const scroller = messageScroller(el);
+    if (scroller === el) return;
     const onScroll = () => {
-      const atBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < STICK_PX;
+      const atBottom = belowEnd(el, scroller) < STICK_PX;
       stick.current = atBottom;
       if (atBottom) setShowJump(false);
     };
@@ -92,7 +107,7 @@ export function TranscriptCard({
     if (!el) return;
     const scroller = messageScroller(el);
     stick.current = true;
-    scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
+    scroller.scrollTo({ top: endOfTranscript(el, scroller), behavior: "smooth" });
     setShowJump(false);
   };
 
