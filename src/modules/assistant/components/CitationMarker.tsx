@@ -1,5 +1,9 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { EMBEDDED, websiteHref } from "../../../shared/embed";
+
+const LINK_CLASS =
+  "inline-flex min-h-11 items-center gap-1.5 self-start rounded-md text-sm font-medium text-accent hover:text-accent-hover";
 import { ICON_STROKE } from "../../../shared/ui/cn";
 import { Popover } from "../../../shared/ui/Popover";
 import type { Citation } from "../types";
@@ -37,13 +41,18 @@ export function CitationMarker({ citation }: { citation: Citation }) {
           <p className="font-mono text-xs text-ink-3">
             {citation.documentId} · {citation.chunkId}
           </p>
-          <Link
-            to={evidenceHref(citation)}
-            className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-md text-sm font-medium text-accent hover:text-accent-hover"
-          >
-            Open in Evidence library
-            <ArrowRight size={16} strokeWidth={ICON_STROKE} aria-hidden="true" />
-          </Link>
+          {EMBEDDED ? (
+            // In the website tab, open the website's Evidence library, not this app's placeholder.
+            <a href={websiteHref(evidenceHref(citation))} target="_top" className={LINK_CLASS}>
+              Open in Evidence library
+              <ArrowRight size={16} strokeWidth={ICON_STROKE} aria-hidden="true" />
+            </a>
+          ) : (
+            <Link to={evidenceHref(citation)} className={LINK_CLASS}>
+              Open in Evidence library
+              <ArrowRight size={16} strokeWidth={ICON_STROKE} aria-hidden="true" />
+            </Link>
+          )}
         </div>
       )}
     </Popover>

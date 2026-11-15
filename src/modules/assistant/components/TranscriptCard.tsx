@@ -7,6 +7,7 @@ import { Dialog } from "../../../shared/ui/Dialog";
 import { EmptyState } from "../../../shared/ui/EmptyState";
 import { Skeleton, SkeletonGroup } from "../../../shared/ui/Skeleton";
 import { useToast } from "../../../shared/ui/Toast";
+import { DOCKED } from "../../../shared/embed";
 import { transcript, transcriptToText, type TranscriptState } from "../hooks/transcriptStore";
 import type { Confirmation, DecisionVia } from "../hooks/useToolRegistry";
 import { Composer } from "./Composer";
@@ -28,6 +29,23 @@ export interface TranscriptCardProps {
 }
 
 const STICK_PX = 48;
+
+function messageScroller(el: HTMLElement): HTMLElement {
+  if (!DOCKED) return el;
+  return (el.closest(".orbit-main--embedded") as HTMLElement | null) ?? el;
+}
+
+/** Scroll position that puts the end of the transcript at the bottom of the scroller. */
+function endOfTranscript(el: HTMLElement, scroller: HTMLElement): number {
+  if (scroller === el) return el.scrollHeight;
+  // Docked: the whole panel scrolls, and cards below the transcript must not count as its end.
+  return scroller.scrollTop + el.getBoundingClientRect().bottom - scroller.getBoundingClientRect().bottom;
+}
+
+/** How far the end of the transcript is below the bottom of the scroller. */
+function belowEnd(el: HTMLElement, scroller: HTMLElement): number {
+  return endOfTranscript(el, scroller) - scroller.scrollTop - (scroller === el ? el.clientHeight : 0);
+}
 
 export function TranscriptCard({
   state,
@@ -54,13 +72,31 @@ export function TranscriptCard({
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    if (stick.current) el.scrollTop = el.scrollHeight;
-    else setShowJump(true);
+    const scroller = messageScroller(el);
+    if (!stick.current) setShowJump(true);
+    else if (scroller === el) el.scrollTop = el.scrollHeight;
+    // Docked and empty: keep the voice controls in view instead of scrolling past them.
+    else if (state.items.length > 0 && belowEnd(el, scroller) > 0) scroller.scrollTop = endOfTranscript(el, scroller);
   }, [state]);
+
+  useEffect(() => {
+    if (!DOCKED) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const scroller = messageScroller(el);
+    if (scroller === el) return;
+    const onScroll = () => {
+      const atBottom = belowEnd(el, scroller) < STICK_PX;
+      stick.current = atBottom;
+      if (atBottom) setShowJump(false);
+    };
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => scroller.removeEventListener("scroll", onScroll);
+  }, []);
 
   const onScroll = () => {
     const el = scrollRef.current;
-    if (!el) return;
+    if (!el || DOCKED) return;
     const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < STICK_PX;
     stick.current = atBottom;
     if (atBottom) setShowJump(false);
@@ -69,8 +105,9 @@ export function TranscriptCard({
   const jump = () => {
     const el = scrollRef.current;
     if (!el) return;
+    const scroller = messageScroller(el);
     stick.current = true;
-    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    scroller.scrollTo({ top: endOfTranscript(el, scroller), behavior: "smooth" });
     setShowJump(false);
   };
 
@@ -127,7 +164,7 @@ export function TranscriptCard({
         }
       />
       <div className="relative flex min-h-[240px] flex-1 flex-col">
-      <div ref={scrollRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+      <div ref={scrollRef} onScroll={onScroll} className={DOCKED ? "orbit-transcript-scroll px-5 py-4" : "min-h-0 flex-1 overflow-y-auto px-5 py-4"}>
         {loading ? (
           <SkeletonGroup label="Loading transcript" className="flex flex-col gap-3">
             <Skeleton className="h-16 w-2/3" />

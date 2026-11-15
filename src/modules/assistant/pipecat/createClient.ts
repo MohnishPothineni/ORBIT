@@ -12,6 +12,8 @@ export interface CreatedClient {
   media: LocalMediaManager;
   /** The transport's current RTCPeerConnection (not part of its public typings). */
   peerConnection(): RTCPeerConnection | null;
+  /** The server's id for this WebRTC session (pc_id from the SDP answer). */
+  sessionId(): string | null;
 }
 
 /**
@@ -46,5 +48,7 @@ export function createClient(callbacks: RTVIEventCallbacks = {}): CreatedClient 
     if (sender) await sender.replaceTrack(track);
   };
 
-  return { client, transport, media, peerConnection };
+  const sessionId = () => (transport as unknown as { pc_id: string | null }).pc_id ?? null;
+
+  return { client, transport, media, peerConnection, sessionId };
 }

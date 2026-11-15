@@ -8,3 +8,10 @@ dist-ssr
 Thumbs.db
 .env.*.local
 coverage
+
+# local server
+__pycache__/
+server/.env
+server/certs/
+server/data/runtime/
+.venv/

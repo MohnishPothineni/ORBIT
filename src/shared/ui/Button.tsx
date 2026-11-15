@@ -10,14 +10,14 @@ const BASE =
   "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors duration-150 ease-[var(--ease-standard)] disabled:cursor-not-allowed select-none";
 
 const SIZE: Record<ButtonSize, string> = {
-  sm: "h-9 px-3 text-sm",
-  md: "h-11 px-4 text-base",
+  sm: "h-9 px-3 text-xs",
+  md: "h-10 px-4 text-sm",
   lg: "h-13 px-5 text-md",
 };
 
 export const VARIANT: Record<ButtonVariant, string> = {
   primary: "bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-press disabled:bg-raised disabled:text-ink-disabled",
-  secondary: "bg-raised text-ink border border-line-strong hover:bg-overlay hover:border-control disabled:text-ink-disabled",
+  secondary: "bg-panel text-ink border border-line-strong hover:bg-raised hover:border-control disabled:text-ink-disabled",
   ghost: "bg-transparent text-ink-2 hover:bg-raised hover:text-ink disabled:text-ink-disabled",
   danger: "bg-critical-solid text-white hover:bg-critical-solid-hover disabled:bg-raised disabled:text-ink-disabled",
 };

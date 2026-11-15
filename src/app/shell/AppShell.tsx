@@ -1,34 +1,37 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { MOCK_MODE } from "../../shared/api/mockMode";
+import { EMBEDDED } from "../../shared/embed";
 import { SyntheticDataBanner } from "../../shared/ui/SyntheticDataBanner";
 import { Sidebar } from "./Sidebar";
 import { StatusBar } from "./StatusBar";
-import { TABLET, useMediaQuery, WIDE } from "./useMediaQuery";
 
 export function AppShell() {
-  const wide = useMediaQuery(WIDE);
-  const tablet = useMediaQuery(TABLET);
-  const mode = wide ? "full" : tablet ? "rail" : "drawer";
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
+  const [navigationOpen, setNavigationOpen] = useState(false);
+  if (EMBEDDED) {
+    // Inside the website's "Crew voice AI assistant" tab: the website draws the
+    // sidebar, top bar and footer, so render only the page content.
+    return (
+      <div className="orbit-embedded">
+        {MOCK_MODE && <SyntheticDataBanner />}
+        <main id="main" tabIndex={-1} className="orbit-main orbit-main--embedded"><Outlet /></main>
+      </div>
+    );
+  }
   return (
-    <div className="grid h-dvh grid-rows-[48px_auto_1fr] grid-cols-[auto_1fr] bg-canvas">
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-2 focus:z-[80] focus:rounded-md focus:bg-accent focus:px-4 focus:py-3 focus:text-sm focus:font-medium focus:text-on-accent"
-      >
-        Skip to content
-      </a>
-      <StatusBar showNavButton={mode === "drawer"} onOpenNav={() => setDrawerOpen(true)} />
-      <div className="col-span-2">{MOCK_MODE && <SyntheticDataBanner />}</div>
-      {mode === "drawer" ? (
-        <Sidebar mode="drawer" drawerOpen={drawerOpen} onDrawerClose={() => setDrawerOpen(false)} />
-      ) : null}
-      {mode !== "drawer" && <Sidebar mode={mode} drawerOpen={false} onDrawerClose={() => {}} />}
-      <main id="main" tabIndex={-1} className={mode === "drawer" ? "relative col-span-2 overflow-y-auto min-h-0 focus-visible:outline-none" : "relative overflow-y-auto min-h-0 min-w-0 focus-visible:outline-none"}>
-        <Outlet />
-      </main>
+    <div className="orbit-shell">
+      <a href="#main" className="orbit-skip">Skip to content</a>
+      <Sidebar open={navigationOpen} onClose={() => setNavigationOpen(false)} />
+      {navigationOpen && <button className="orbit-scrim" aria-label="Close navigation" onClick={() => setNavigationOpen(false)} />}
+      <div className="orbit-workspace">
+        <StatusBar navigationOpen={navigationOpen} onToggleNav={() => setNavigationOpen((open) => !open)} />
+        {MOCK_MODE && <SyntheticDataBanner />}
+        <main id="main" tabIndex={-1} className="orbit-main"><Outlet /></main>
+        <footer className="orbit-footer">
+          <span>ORBIT <span aria-hidden="true">/</span> Human exploration, human health.</span>
+          <a href="/#research">Research prototype · Evidence & sources</a>
+        </footer>
+      </div>
     </div>
   );
 }

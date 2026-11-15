@@ -7,7 +7,7 @@ import { cn, ICON_STROKE } from "../../shared/ui/cn";
 import { Popover } from "../../shared/ui/Popover";
 import { STATUS_CLASSES } from "../../shared/ui/StatusBadge";
 import { Tooltip } from "../../shared/ui/Tooltip";
-import { useMediaQuery, WIDE } from "./useMediaQuery";
+import { useMediaQuery, WIDE } from "../../shared/hooks/useMediaQuery";
 
 export interface StatusChipProps {
   level: StatusLevel;

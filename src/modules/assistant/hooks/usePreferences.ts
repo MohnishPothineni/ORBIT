@@ -1,26 +1,13 @@
+import { useMediaQuery, WIDE } from "../../../shared/hooks/useMediaQuery";
 import { useSyncExternalStore } from "react";
 import { useLocation } from "react-router-dom";
 
-function mediaStore(query: string) {
-  return {
-    subscribe(cb: () => void) {
-      const mql = window.matchMedia(query);
-      mql.addEventListener("change", cb);
-      return () => mql.removeEventListener("change", cb);
-    },
-    get: () => window.matchMedia(query).matches,
-  };
-}
-
-const reduced = mediaStore("(prefers-reduced-motion: reduce)");
-const wide = mediaStore("(min-width: 1280px)");
-
 export function useReducedMotion(): boolean {
-  return useSyncExternalStore(reduced.subscribe, reduced.get, () => false);
+  return useMediaQuery("(prefers-reduced-motion: reduce)");
 }
 
 export function useIsWide(): boolean {
-  return useSyncExternalStore(wide.subscribe, wide.get, () => true);
+  return useMediaQuery(WIDE);
 }
 
 function subscribeVisibility(cb: () => void) {

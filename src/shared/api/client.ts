@@ -49,13 +49,13 @@ function linkSignal(signal: AbortSignal | undefined, timeoutMs: number) {
   return {
     signal: ctrl.signal,
     timedOut: () => timedOut,
-    /** Stop the timeout but keep the caller's abort linked (open streams). */
+    /** Stop the timeout but keep the caller's abort linked (used by apiStream once a stream is open). */
     clearTimer: () => {
-      if (timer !== undefined) window.clearTimeout(timer);
+      window.clearTimeout(timer);
       timer = undefined;
     },
     cleanup: () => {
-      if (timer !== undefined) window.clearTimeout(timer);
+      window.clearTimeout(timer);
       timer = undefined;
       signal?.removeEventListener("abort", onAbort);
     },
@@ -89,11 +89,12 @@ async function request<T>(method: string, path: string, body: unknown, opts: Req
   const link = linkSignal(opts.signal, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   try {
     const headers: Record<string, string> = { Accept: "application/json", ...opts.headers };
-    if (body !== undefined) headers["Content-Type"] = "application/json";
+    if (body !== undefined && !(body instanceof FormData)) headers["Content-Type"] = "application/json";
     const res = await fetch(`${API_BASE}${path}`, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      // Module 4: multipart document imports retain the browser-generated boundary.
+      body: body instanceof FormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
       signal: link.signal,
       credentials: "same-origin",
     });
@@ -123,6 +124,17 @@ export function apiSend<T>(
   return request<T>(method, path, body, opts);
 }
 
+/*
+ * DO NOT DELETE apiStream, even if nothing imports it yet.
+ *
+ * It is part of the shared API contract that every ORBIT module is built
+ * against (Shared Foundation, section J: "apiGet, apiSend, apiStream"). The
+ * four modules are built separately and expect this file to match that spec;
+ * removing it breaks modules that are not in this repo yet, notably the
+ * Evidence library, which streams model answers over Server-Sent Events.
+ * "Unused" here means "not built yet", not "dead code".
+ */
+
 export interface StreamEvent {
   event: string;
   data: string;
@@ -137,14 +149,14 @@ export async function apiStream(
   path: string,
   body: unknown,
   onEvent: (e: StreamEvent) => void,
-  opts: RequestOptions = {},
+  opts: RequestOptions & { method?: "GET" | "POST" } = {},
 ): Promise<void> {
   const link = linkSignal(opts.signal, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   try {
     const res = await fetch(`${API_BASE}${path}`, {
-      method: "POST",
+      method: opts.method ?? "POST",
       headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
-      body: JSON.stringify(body ?? {}),
+      body: opts.method === "GET" ? undefined : JSON.stringify(body ?? {}),
       signal: link.signal,
       credentials: "same-origin",
     });
