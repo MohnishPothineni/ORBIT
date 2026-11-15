@@ -25,6 +25,21 @@ VITAL_META: dict[str, dict[str, Any]] = {
 _WORD = re.compile(r"[a-z0-9]+")
 
 
+def _library_passage(p: dict[str, Any]) -> dict[str, Any]:
+    """One Evidence library entry as a searchable passage.
+
+    The excerpt carries the evidence type and tracking guidance so the model can
+    say how strong the finding is; keywords add the topic and the papers' titles."""
+    words = " ".join([p["topic"], *(f"{s['cite']} {s['title']}" for s in p["sources"])])
+    return {
+        "documentId": p["documentId"],
+        "chunkId": p["chunkId"],
+        "title": p["title"],
+        "excerpt": f"{p['excerpt']} Evidence type: {p['evidence']}. Tracking guidance: {p['tracking']}",
+        "keywords": _WORD.findall(words.lower()),
+    }
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
@@ -40,9 +55,18 @@ class Store:
         seed = json.loads((DATA_DIR / "seed.json").read_text(encoding="utf-8"))
         self.crew: list[dict[str, Any]] = seed["crew"]
         self.summaries: dict[str, dict[str, Any]] = seed["summaries"]
-        self.evidence: list[dict[str, Any]] = seed["evidence"]
+        # The website's Evidence library (ui/research-library.js, exported by
+        # scripts/export-research.mjs), so the assistant cites what the website shows.
+        # seed.json's synthetic passages are only a fallback if the export is missing.
+        library = DATA_DIR / "research-library.json"
+        evidence_file = library if library.exists() else DATA_DIR / "seed.json"
+        self.evidence: list[dict[str, Any]] = (
+            [_library_passage(p) for p in json.loads(library.read_text(encoding="utf-8"))["passages"]]
+            if library.exists()
+            else seed["evidence"]
+        )
         self.evidence_updated_at = datetime.fromtimestamp(
-            (DATA_DIR / "seed.json").stat().st_mtime, timezone.utc
+            evidence_file.stat().st_mtime, timezone.utc
         ).isoformat(timespec="seconds").replace("+00:00", "Z")
         # Records a person approved for one voice session, keyed by its WebRTC pc_id.
         # Never global: one session's records must not reach another session's prompt.
