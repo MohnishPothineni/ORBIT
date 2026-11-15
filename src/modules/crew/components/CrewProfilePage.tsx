@@ -312,7 +312,11 @@ function Profile({ id }: { id: string }) {
         </Tabs>
       )}
       {logging && !loading && !error && (
-        <LogReadingDialog id={id} bands={bands.data ?? []} />
+        <LogReadingDialog
+          key={activeCrew?.id}
+          id={id}
+          bands={bands.data ?? []}
+        />
       )}
     </div>
   );
