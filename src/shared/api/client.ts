@@ -6,6 +6,7 @@ const DEFAULT_TIMEOUT_MS = 8000;
 export interface RequestOptions {
   signal?: AbortSignal;
   timeoutMs?: number;
+  headers?: Record<string, string>;
 }
 
 export function isApiError(e: unknown): e is ApiError {
@@ -87,7 +88,7 @@ function rethrow(e: unknown, timedOut: boolean): never {
 async function request<T>(method: string, path: string, body: unknown, opts: RequestOptions): Promise<T> {
   const link = linkSignal(opts.signal, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   try {
-    const headers: Record<string, string> = { Accept: "application/json" };
+    const headers: Record<string, string> = { Accept: "application/json", ...opts.headers };
     if (body !== undefined) headers["Content-Type"] = "application/json";
     const res = await fetch(`${API_BASE}${path}`, {
       method,
