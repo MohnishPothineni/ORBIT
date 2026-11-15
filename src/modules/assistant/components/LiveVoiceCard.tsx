@@ -94,7 +94,7 @@ export function LiveVoiceCard({ session, activeToolName, errorMessage, onRetryMi
       onKeyUp={onKeyUp}
       className="flex flex-col overflow-hidden focus-visible:outline-2 focus-visible:outline-focus"
     >
-      <div className="min-h-[220px] bg-sunken border-b border-line p-4">
+      <div className="min-h-[220px] bg-panel border-b border-line p-4">
         {micBlocked ? (
           <MicBlocked unavailable={session.micPermission === "unavailable"} onRetry={onRetryMic} />
         ) : (
