@@ -41,7 +41,7 @@ SCHEMAS = [
     FunctionSchema(
         name="log_vital",
         description=(
-            "Draft a vital-sign reading for a crew member. The person presses Save on screen before it is stored; "
+            "Draft a vital-sign reading for a crew member. The person presses Save on screen, or says \"confirm save\", before it is stored; "
             "this tool returns only after they decide, and the result says whether it was saved. "
             "Saved readings also appear in the website's Health log."
         ),

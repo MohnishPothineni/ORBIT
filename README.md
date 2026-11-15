@@ -102,7 +102,7 @@ A real-time voice and text assistant on the local network. The target pipeline i
 - **Adapter boundary:** all Pipecat API use lives in `modules/assistant/pipecat/`. The rest of the module only talks to the `VoiceSession` interface (`session/VoiceSession.ts`).
 - **Signaling:** SDP offer to `POST /api/voice/offer`, `iceServers: []` (host candidates only).
 - **No CDN:** the transport's default media manager wraps daily-js, which loads code from Daily's CDN. ORBIT uses its own `getUserMedia` media manager instead, and `vite.config.ts` aliases daily-js to a stub so that code isn't bundled.
-- **Human confirmation:** `log_vital` waits for a person to press **Save**. `share_record_with_assistant` waits for the review dialog's **Share** button, or for the exact spoken phrase "Confirm share". Model output and typed text can never approve.
+- **Human confirmation:** `log_vital` waits for a person to press **Save**, or for the exact spoken phrase "Confirm save" (one reading per phrase). `share_record_with_assistant` waits for the review dialog's **Share** button, or for the exact spoken phrase "Confirm share". Model output and typed text can never approve.
 - **Session rules:**
   - The session ends when the active crew member changes or when you leave the page.
   - Hiding the tab mutes the microphone; returning does not unmute it.

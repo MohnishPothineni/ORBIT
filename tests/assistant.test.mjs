@@ -271,3 +271,13 @@ test("the first reply keeps its ending when spoken sentences take over from the 
   cb.onBotOutput({ text: "Which region would you like?", output_type: "sentence" });
   assert.equal(text, "The lab is open. Which region would you like?");
 });
+
+test("only the exact spoken phrases approve a save or a share", async () => {
+  const { isVoiceSaveApproval, isVoiceShareApproval } = await server.ssrLoadModule("/src/modules/assistant/tools/definitions.ts");
+  for (const said of ["Confirm save", "confirm save.", "Confirm, save!", "  CONFIRM SAVE  "]) assert.ok(isVoiceSaveApproval(said), said);
+  for (const said of ["save", "confirm", "please confirm save", "confirm save the reading", "don't confirm save", "Confirm share"]) {
+    assert.ok(!isVoiceSaveApproval(said), said);
+  }
+  assert.ok(isVoiceShareApproval("Confirm, share."));
+  assert.ok(!isVoiceShareApproval("Confirm save"));
+});
