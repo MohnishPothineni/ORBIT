@@ -10,6 +10,11 @@ Edit `ui/` directly to change the shared design. `DESIGN.md` records the origina
 design system before the feature reduction; third party notices and font licenses are retained here, with
 model and library notices next to the corresponding assets in `ui/`.
 
+`ui/design-tokens.css` provides the shared light palette for both the main site
+and the React voice assistant. The voice shell uses the same brand, navigation,
+spacing, and Public Sans typography; `src/styles/tokens.css` maps those shared
+colors to its controls, cards, dialogs, transcript, and status indicators.
+
 Run `npm ci`, then `npm run dev` to open this interface at http://localhost:5173.
 `npm run build` copies it to `dist/` and builds the React voice workspace at
 `dist/voice/`. `npm run preview` serves both outputs. The FastAPI server also

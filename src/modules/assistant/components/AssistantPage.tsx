@@ -98,14 +98,11 @@ export function AssistantPage() {
   const transcriptState = override === "empty" ? EMPTY_TRANSCRIPT : session.transcript;
 
   return (
-    <div className="mx-auto flex min-h-full max-w-[1600px] flex-col px-6 py-5">
+    <div className="flex min-h-full flex-col">
       <SectionHeader
         title="Crew assistant"
-        subtitle={
-          <>
-            Local voice and text · <span className="font-mono">qwen3:8b</span> · Kokoro
-          </>
-        }
+        className="orbit-assistant-heading"
+        subtitle="Talk to ORBIT, review the conversation, and choose what to share."
         actions={
           <>
             <Button variant="secondary" icon={Settings2} onClick={() => setSettingsOpen(true)}>
