@@ -31,6 +31,26 @@ test("retained health screens render and removed routes and commands are unavail
     vm.runInContext(source, context, { filename: name });
     if (name === "app.js") break;
   }
+  // Fresh and saved demo workspaces contain only the two historical profiles.
+  assert.deepEqual(Array.from(vm.runInContext("state.data.demo.crew.map(p=>p.name).sort()", context)), ['Gordon Cooper','Scott Carpenter']);
+  assert.equal(vm.runInContext("state.data.demo.entries.length", context), 13);
+  const personalBefore = vm.runInContext("JSON.stringify(state.data.personal)", context);
+  vm.runInContext("state.data.demo.crew.push({id:'crew-03',name:'Fictional crew',sample:true});state.data.demo.entries.push({id:'old-sample',crewId:'crew-03',hr:72});state.data.demo.activeCrewId='crew-03';initCrewData();initCrewData();", context);
+  assert.equal(vm.runInContext("state.data.demo.crew.length", context), 2);
+  assert.equal(vm.runInContext("state.data.demo.entries.length", context), 13);
+  assert.ok(vm.runInContext("state.data.demo.activeCrewId.startsWith('hist-')", context));
+  assert.equal(vm.runInContext("JSON.stringify(state.data.personal)", context), personalBefore);
+  assert.ok(vm.runInContext("demoNotice()", context).includes('Show sample crew'));
+  // Clustered historical readings get evenly spaced axis ticks, not one date per point.
+  for (const width of [360, 920]) {
+    const chart = vm.runInContext(`chartSVG(true, ${width})`, context);
+    assert.ok(chart.includes(`viewBox="0 0 ${width} 280"`));
+    assert.ok(chart.includes('preserveAspectRatio="xMidYMid meet"'));
+    const ticks = [...chart.matchAll(/class="chart-axis-tick" x="([\d.]+)"/g)].map(m=>Number(m[1]));
+    assert.ok(ticks.length >= 2 && ticks.length <= 5);
+    for(let i=1;i<ticks.length;i++) assert.ok(ticks[i]-ticks[i-1]>=100);
+    assert.equal((chart.match(/class="point-hit"/g)||[]).length, vm.runInContext('chartData().length',context));
+  }
   for (const page of ["missionStatusPage", "crewDashboardPage", "logPage", "trendsPage", "routinePage", "carePage", "missionWellbeingPage", "missionExercisePage", "skinPage", "missionRisksPage", "anatomyLabPage", "missionResearchPage", "voicePage"]) {
     assert.ok(vm.runInContext(`${page}()`, context).includes("<"), page);
   }

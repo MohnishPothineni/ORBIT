@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 import { AppShell } from "./shell/AppShell";
 import { ModuleSkeleton, NotFound } from "./shell/ModulePlaceholder";
-import { SharedWorkspace } from "./shell/SharedWorkspace";
+const CrewModule = lazy(() => import("../modules/crew/components/CrewModule"));
 
 const EvidenceModule = lazy(() => import("../modules/evidence/components/EvidenceModule"));
 const AnatomyModule = lazy(() => import("../modules/anatomy/components/AnatomyModule"));
@@ -11,7 +11,7 @@ const AssistantModule = lazy(() => import("../modules/assistant/components/Assis
 export const moduleRoutes: RouteObject[] = [
   {
     path: "crew/*",
-    element: <SharedWorkspace page="status" />,
+    element: <Suspense fallback={<ModuleSkeleton />}><CrewModule /></Suspense>,
   },
   {
     path: "anatomy/*",

@@ -66,13 +66,7 @@ const ROUTINES=[
  {id:'mood',title:'Wellbeing check-in',short:'Mood, workload & crew connection',description:'Record your mood, make time for a crew check-in, and note any concerns for medical review.',time:'18:00',icon:'brain'},
  {id:'sleep',title:'Sleep preparation',short:'Protect your planned rest period',description:'Review tomorrow’s schedule, follow your light routine, and prepare your sleep environment.',time:'21:00',icon:'moon'}
 ];
-function seedDemo(){
- const hr=[65,63,64,66,62,65,64,63,65,67,64,63,65,66,64,65,63,64,66,65,64,63,65,67,66,64,65,64];
- const sleeps=[7.9,8.1,7.8,8.2,7.6,8.0,7.7,7.8,8.0,7.6,8.1,7.9,8.0,7.7,7.9,7.8,8.1,8.0,7.5,7.8,8.0,7.3,7.8,7.5,7.2,6.8,6.6,6.5];
- const entries=hr.map((h,i)=>{const d=new Date();d.setDate(d.getDate()-(27-i));d.setHours(7,0,0,0);if(d>new Date())d.setTime(Date.now()-60000);return {id:'sample-'+i,at:d.toISOString(),hr:h,sys:116+(i%5),dia:74+(i%4),temp:[36.6,36.7,36.8,36.7][i%4],sleep:sleeps[i],glucose:[89,92,94,91,90][i%5],glucoseContext:'Before meal',mood:i===27?3:4,notes:i===27?'Slept less after a schedule change. No symptoms reported.':'Routine morning check. No symptoms reported.'};});
- return {entries,checks:{[todayKey()]:['vitals','exercise','nutrition']}};
-}
-function defaultState(){return {version:1,mode:'demo',data:{demo:seedDemo(),personal:{entries:[],checks:{}}},settings:{mission:'Exploration 01',environment:'Lunar transit',sleepTarget:8},reminderDismissed:false};}
+function defaultState(){return {version:1,mode:'demo',data:{demo:{entries:[],checks:{}},personal:{entries:[],checks:{}}},settings:{mission:'Exploration 01',environment:'Lunar transit',sleepTarget:8},reminderDismissed:false};}
 let state,storageNotice='',storageLocked=false;
 function loadState(){
  let raw=null;try{raw=localStorage.getItem(KEY);}catch{return defaultState();}
@@ -141,7 +135,7 @@ function button(text,action,type='',ic=''){return `<button class="button ${type}
 /* Page heading, or a section heading when the page is shown as a Health assessment tab. */
 function sectionHeading(embedded,title,sub,actions=''){return embedded?`<div class="care-section-head"><div><h2>${title}</h2><p>${sub}</p></div><div class="heading-actions">${actions}</div></div>`:pageHeading(title,sub,actions)+demoNotice();}
 function pageHeading(title,sub,actions=''){return `<div class="page-heading"><div><div class="eyebrow">${esc(state.settings.mission).toUpperCase()} / ${esc(activeCrew().name).toUpperCase()}</div><h1>${title}</h1><p>${sub}</p></div><div class="heading-actions">${actions}</div></div>`;}
-function demoNotice(){return state.mode==='demo'?`<div class="mode-notice"><span>Sample crew data. Explore the tools or start your own health log.</span><button class="text-button" data-action="personal">Use my own data ${icon('arrowright')}</button></div>`:'';}
+function demoNotice(){return state.mode==='demo'?`<div class="mode-notice"><span>Historical showcase · Gordon Cooper and Scott Carpenter.</span><button class="text-button" data-action="show-sample-crew">Show sample crew</button><button class="text-button" data-action="personal">Use my own data ${icon('arrowright')}</button></div>`:`<div class="mode-notice"><span>Explore Gordon Cooper and Scott Carpenter’s historical records. Your personal workspace stays separate.</span><button class="text-button" data-action="show-sample-crew">Show sample crew</button></div>`;}
 function safetyNotice(){return `<div class="notice">${icon('info')}<p>Research prototype. Trend notes support review; they do not diagnose conditions or establish fitness for duty. Follow your crew medical officer’s instructions and mission procedures.</p></div>`;}
 function sparkline(key){const v=entries().filter(e=>Number.isFinite(e[key])).slice(-12).map(e=>e[key]);if(v.length<2)return '';let min=Math.min(...v),max=Math.max(...v);if(max===min){min-=1;max+=1;}return `<svg class="sparkline" viewBox="0 0 80 28" aria-hidden="true"><path d="${v.map((n,i)=>`${i?'L':'M'}${(i*78/(v.length-1)+1).toFixed(1)},${(24-(n-min)/(max-min)*20).toFixed(1)}`).join(' ')}" fill="none" stroke="${key==='sleep'?'#ad8544':'#5d8fc1'}" stroke-width="1.4"/></svg>`;}
 function metricCard(key){const m=META[key],e=latest(key),val=e?.[key];const attention=key==='sleep'&&Number.isFinite(val)&&val<state.settings.sleepTarget;const v=key==='sys'&&e?`${formatNum(e.sys)}/${formatNum(e.dia)}`:formatNum(val,m.digits);const sub=e?(key==='sleep'?`${state.settings.sleepTarget} hr planned rest target`:`Last recorded ${new Date(e.at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`):'Add your first measurement';return `<article class="metric-card"><div class="metric-top">${icon(m.icon)}<span>${m.short}</span><span class="metric-status ${attention?'attention':''}">${e?(attention?'REVIEW':'RECORDED'):'NO DATA'}</span></div><div class="metric-value ${key==='sys'?'bp':''}">${v}<small>${m.unit}</small></div><div class="metric-sub ${attention?'attention':''}">${attention?icon('clock'):''}${sub}</div>${sparkline(key)}</article>`;}
@@ -149,18 +143,23 @@ function metricCard(key){const m=META[key],e=latest(key),val=e?.[key];const atte
 const historicalView=()=>!!activeCrew()?.historical;
 function chartData(){return historicalView()?entries().filter(e=>Number.isFinite(e[chartMetric])):previousValues(chartMetric,chartRange);}
 const chartPeriod=()=>historicalView()?'across the mission':`in the selected ${chartRange} day period`;
-function chartSVG(large=false){
+function chartSVG(large=false,width=600){
  const e=chartData(),m=META[chartMetric];if(chartMetric==='mood'&&!canSeeWellbeing())return '<div class="busy-empty">Mood is hidden. Only this crew member, the crew leader and the medical officer can see it. To change who is using ORBIT, use Viewing as at the top of the screen.</div>';if(!e.length)return '<div class="busy-empty">'+(historicalView()?'This historical record has no readings of this indicator.':'No readings in this period. Log a health check to start a trend.')+'</div>';
- const w=600,h=large?280:175,p={l:42,r:22,t:20,b:30};let min=Math.min(...e.map(x=>x[chartMetric])),max=Math.max(...e.map(x=>x[chartMetric]));let pad=Math.max((max-min)*.6,chartMetric==='temp'?.3:chartMetric==='sleep'?.5:chartMetric==='mood'?1:4);min=Math.max(chartMetric==='temp'?30:0,min-pad);max+=pad;if(chartMetric==='mood'){min=1;max=5;}
+ const w=Math.max(240,Math.round(width)),h=large?280:200,p={l:48,r:20,t:16,b:54};let min=Math.min(...e.map(x=>x[chartMetric])),max=Math.max(...e.map(x=>x[chartMetric]));let pad=Math.max((max-min)*.6,chartMetric==='temp'?.3:chartMetric==='sleep'?.5:chartMetric==='mood'?1:4);min=Math.max(chartMetric==='temp'?30:0,min-pad);max+=pad;if(chartMetric==='mood'){min=1;max=5;}
  const first=Date.parse(e[0].at),last=Date.parse(e.at(-1).at),start=last>first?first:first-86400000,end=last>first?last:first+86400000;
  const x=d=>p.l+(Date.parse(d)-start)/(end-start)*(w-p.l-p.r),y=v=>p.t+(1-(v-min)/(max-min))*(h-p.t-p.b);
  const path=e.map((d,i)=>`${i?'L':'M'}${x(d.at).toFixed(2)},${y(d[chartMetric]).toFixed(2)}`).join(' ');
  let grid='';for(let i=0;i<4;i++){const yy=p.t+i*(h-p.t-p.b)/3,v=max-i*(max-min)/3;grid+=`<line class="gridline" x1="${p.l}" y1="${yy}" x2="${w-p.r}" y2="${yy}"/><text x="${p.l-12}" y="${yy+3}" text-anchor="end">${formatNum(v,m.digits)}</text>`;}
- const indices=[...new Set(e.length>5?[0,Math.floor((e.length-1)/4),Math.floor((e.length-1)/2),Math.floor(3*(e.length-1)/4),e.length-1]:e.map((_,i)=>i))];
- const labels=indices.map(i=>`<text x="${x(e[i].at)}" y="${h-8}" text-anchor="middle">${dayLabel(e[i].at)}</text>`).join('');
- return `<svg class="chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="${m.label}: ${e.length} readings ${historicalView()?'across the mission':'over the past '+chartRange+' days'}, ranging from ${formatNum(Math.min(...e.map(d=>d[chartMetric])),m.digits)} to ${formatNum(Math.max(...e.map(d=>d[chartMetric])),m.digits)} ${m.unit}">${grid}<path class="plot-area" d="${path} L${x(e.at(-1).at)},${h-p.b} L${x(e[0].at)},${h-p.b} Z"/><path class="plot-line" d="${path}"/>${e.map((d,i)=>`<circle cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="3.3"/><circle class="point-hit" data-point="${i}" cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="12"><title>${dayLabel(d.at)}: ${d[chartMetric]} ${m.unit}</title></circle>`).join('')}${labels}</svg>`;
+ const ticks=Math.max(2,Math.min(5,Math.floor((w-p.l-p.r)/110)+1));
+ const labels=Array.from({length:ticks},(_,i)=>{
+  const at=new Date(start+(end-start)*i/(ticks-1)),xx=p.l+(w-p.l-p.r)*i/(ticks-1);
+  const date=at.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
+  const time=at.toISOString().slice(11,16);
+  return `<text class="chart-axis-tick" x="${xx}" y="${h-30}" text-anchor="${i===0?'start':i===ticks-1?'end':'middle'}"><tspan x="${xx}">${date}</tspan>${historicalView()?`<tspan x="${xx}" dy="16">${time}</tspan>`:''}</text>`;
+ }).join('');
+ return `<svg class="chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${m.label}: ${e.length} readings ${historicalView()?'across the mission':'over the past '+chartRange+' days'}, ranging from ${formatNum(Math.min(...e.map(d=>d[chartMetric])),m.digits)} to ${formatNum(Math.max(...e.map(d=>d[chartMetric])),m.digits)} ${m.unit}">${grid}<path class="plot-area" d="${path} L${x(e.at(-1).at)},${h-p.b} L${x(e[0].at)},${h-p.b} Z"/><path class="plot-line" d="${path}"/>${e.map((d,i)=>`<circle cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="3.3"/><circle class="point-hit" data-point="${i}" cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="12"><title>${dayLabel(d.at)}: ${d[chartMetric]} ${m.unit}</title></circle>`).join('')}${labels}</svg>`;
 }
-function chartPanel(large=false){const d=chartData(),m=META[chartMetric],avg=d.length?d.reduce((a,e)=>a+e[chartMetric],0)/d.length:null;return `<section class="panel chart-card ${large?'large-chart':''}"><div class="panel-head"><div><h2>${large?m.label:'Health trends'}</h2><p>${large?'Recorded values over time':'Your indicators over the past '+chartRange+' days'}</p></div>${rangeButtons()}</div>${!large?`<div class="chart-metric-tabs" role="group" aria-label="Trend indicator">${['hr','sleep','temp'].map(k=>`<button data-chart="${k}" class="${chartMetric===k?'active':''}" aria-pressed="${chartMetric===k}">${META[k].short}</button>`).join('')}</div>`:''}<div class="chart-summary"><strong>${d.length?formatNum(d.at(-1)[chartMetric],m.digits):'—'}</strong><span>${m.unit}</span><span class="chart-average">AVG ${avg===null?'—':formatNum(avg,m.digits)} ${m.unit}</span></div><div class="chart-area">${chartSVG(large)}<div class="chart-tooltip"></div></div><div class="chart-foot"><span></span>${esc(m.label)}${large?`<button class="text-button chart-foot-link" data-action="jump-records">View source readings →</button>`:`<a href="#trends">View all trends →</a>`}</div></section>`;}
+function chartPanel(large=false){const d=chartData(),m=META[chartMetric],avg=d.length?d.reduce((a,e)=>a+e[chartMetric],0)/d.length:null;return `<section class="panel chart-card ${large?'large-chart':''}"><div class="panel-head"><div><h2>${large?m.label:'Health trends'}</h2><p>${large?'Recorded values over time':'Your indicators over the past '+chartRange+' days'}</p></div>${rangeButtons()}</div>${!large?`<div class="chart-metric-tabs" role="group" aria-label="Trend indicator">${['hr','sleep','temp'].map(k=>`<button data-chart="${k}" class="${chartMetric===k?'active':''}" aria-pressed="${chartMetric===k}">${META[k].short}</button>`).join('')}</div>`:''}<div class="chart-summary"><strong>${d.length?formatNum(d.at(-1)[chartMetric],m.digits):'—'}</strong><span>${m.unit}</span><span class="chart-average">AVG ${avg===null?'—':formatNum(avg,m.digits)} ${m.unit}</span></div><div class="chart-area"><div class="chart-plot" data-large="${large}">${chartSVG(large)}</div><div class="chart-tooltip"></div></div>${historicalView()?`<p class="chart-time-note">${new Date(d[0]?.at||activeCrew().missionDate).getUTCFullYear()} · Approximate mission times (UTC)</p>`:''}<div class="chart-foot"><span></span>${esc(m.label)}${large?`<button class="text-button chart-foot-link" data-action="jump-records">View source readings →</button>`:`<a href="#trends">View all trends →</a>`}</div></section>`;}
 function rangeButtons(){if(historicalView())return `<span class="eyebrow">WHOLE MISSION</span>`;return `<div class="segmented" role="group" aria-label="Chart time range">${[7,14,30].map(d=>`<button data-range="${d}" class="${chartRange===d?'active':''}" aria-pressed="${chartRange===d}">${d}D</button>`).join('')}</div>`;}
 
 
@@ -237,7 +236,26 @@ function render(){
  const alias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(alias){history.replaceState(null,'','#'+alias.page);if(alias.section)requestAnimationFrame(()=>scrollToLogSection(alias.section));}
  window.dispatchEvent(new Event('orbit:context-change'));
 }
-function bindChart(){const tip=$('.chart-tooltip');if(!tip)return;$$('[data-point]').forEach(el=>{el.addEventListener('pointerenter',()=>{const d=chartData()[+el.dataset.point];tip.textContent=`${dayLabel(d.at)} · ${formatNum(d[chartMetric],META[chartMetric].digits)} ${META[chartMetric].unit}`;tip.classList.add('visible');});el.addEventListener('pointerleave',()=>tip.classList.remove('visible'));});}
+let chartResizeObserver;
+function bindChart(){
+ chartResizeObserver?.disconnect();
+ const plot=$('.chart-plot'),tip=$('.chart-tooltip');if(!plot||!tip)return;
+ const draw=width=>{
+  if(width<=0)return;
+  plot.innerHTML=chartSVG(plot.dataset.large==='true',width);
+  plot.querySelectorAll('[data-point]').forEach(el=>{
+   const show=()=>{const d=chartData()[+el.dataset.point];if(!d)return;tip.textContent=`${new Date(d.at).toISOString().slice(0,16).replace('T',' ')} UTC · ${formatNum(d[chartMetric],META[chartMetric].digits)} ${META[chartMetric].unit}`;tip.classList.add('visible');};
+   el.setAttribute('tabindex','0');el.addEventListener('pointerenter',show);el.addEventListener('focus',show);
+   el.addEventListener('pointerleave',()=>tip.classList.remove('visible'));el.addEventListener('blur',()=>tip.classList.remove('visible'));
+  });
+ };
+ draw(plot.clientWidth);
+ if(typeof ResizeObserver!=='undefined'){
+  let previous=plot.clientWidth;
+  chartResizeObserver=new ResizeObserver(items=>{const width=items[0]?.contentRect.width;if(width&&Math.abs(width-previous)>=1){previous=width;draw(width);}});
+  chartResizeObserver.observe(plot);
+ }
+}
 function modal(title,subtitle,body,footer=''){disposeInputModal();const d=$('#modal');d.innerHTML=`<div class="modal-head"><div><h2 id="modal-title">${title}</h2>${subtitle?`<p>${subtitle}</p>`:''}</div><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></div><div class="modal-body">${body}</div>${footer?`<div class="modal-foot">${footer}</div>`:''}`;hydrateIcons(d);if(!d.open)d.showModal();d.scrollTop=0;window.dispatchEvent(new Event('orbit:modal-open'));}
 function announceFormSaved(form,node,persistent=storageAvailable){window.dispatchEvent(new CustomEvent('orbit:form-saved',{detail:{form,save_id:node?.dataset.assistantSaveId||'',persistent,workspace:state.mode,crewId:activeCrewId()}}));}
 function closeModal(){disposeInputModal();$('#modal').close();}
