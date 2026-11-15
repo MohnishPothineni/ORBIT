@@ -1,10 +1,10 @@
 /* Caches public application assets only. Medical records remain in localStorage. */
-const CACHE = 'orbit-assets-shared-design-v47';
+const CACHE = 'orbit-assets-shared-design-v48';
 const SHELL = [
   './', './index.html', './studio.css', './assistant-dock.css', './doctor-appearance.mjs', './doctor-materials.js', './assets/avatar/skin-microdetail.png', './style.css', './crew.css', './anatomy-lab.css', './anatomy-workspace.css', './voice.css', './voice.js', './care.css', './theme-scale.css', './design-tokens.css', './theme.css', './mission.css', './touch.css',
 
   './neural-model.js', './neural-logic.js', './neural-adapter.js', './models/neural-health.json',
-  './app.js', './crew.js', './anatomy-lab.js', './care.js', './care-logic.js',
+  './app.js', './historical-crew.js', './crew.js', './anatomy-lab.js', './care.js', './care-logic.js',
   './doctor-headset.mjs', './doctor-body.mjs', './doctor-arm.mjs', './doctor-yawn.mjs', './doctor-watch.mjs', './doctor-avatar.js', './doctor-motion.mjs', './doctor-software3d.js', './vendor/GLTFLoader.js', './vendor/BufferGeometryUtils.js',
   './models/doctor/space-doctor-female.glb',
   './models/doctor/space-doctor.glb', './models/doctor/ATTRIBUTION.md', './models/doctor/VALID-LICENSE.txt',

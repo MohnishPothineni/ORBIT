@@ -6,6 +6,7 @@
 .mission-pill.review{background:var(--review-tint);color:var(--review-text)}
 .mission-pill.due{background:var(--paper);color:var(--muted)}
 .mission-pill.clear{background:var(--clear-tint);color:var(--clear-text)}
+.mission-pill.historical{background:var(--paper);color:var(--muted)}
 
 .mission-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
 .mission-tiles .stat-box strong{display:block;font-size:24px;line-height:1.25;overflow-wrap:anywhere}
@@ -31,6 +32,7 @@
 .mission-crew-card{display:flex;flex-direction:column;gap:12px;padding:16px;border-left-width:3px}
 .mission-crew-card.urgent{border-left-color:#c23a2e}
 .mission-crew-card.review{border-left-color:#b9791f}
+.mission-crew-card.historical{border-left-style:dashed}
 .mission-crew-top{display:flex;align-items:center;gap:10px}
 .mission-crew-top>div{flex:1;min-width:0}
 .mission-crew-top h3{margin:0;font-size:15px}

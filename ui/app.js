@@ -52,7 +52,8 @@ const esc=(x)=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':
 const KEY='orbit-crew-health-v1';
 const todayKey=()=>new Date().toLocaleDateString('en-CA');
 const localInput=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-const dayLabel=(d)=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+/* The year is shown only for other years, such as historical mission records. */
+const dayLabel=(d)=>{const t=new Date(d);return t.toLocaleDateString('en-US',t.getFullYear()===new Date().getFullYear()?{month:'short',day:'numeric'}:{month:'short',day:'numeric',year:'numeric'});};
 const formatNum=(n,d=0)=>Number.isFinite(n)?Number(n).toFixed(d):'—';
 let storageAvailable=true,toastTimer,chartMetric='hr',chartRange=7,filterQuery='',logLimit=20;
 const META={hr:{label:'Resting heart rate',short:'Heart rate',unit:'bpm',digits:0,icon:'heart',color:'#276bb4'},sys:{label:'Systolic blood pressure',short:'Blood pressure',unit:'mmHg',digits:0,icon:'pressure'},temp:{label:'Body temperature',short:'Temperature',unit:'°C',digits:1,icon:'temp'},sleep:{label:'Sleep duration',short:'Sleep',unit:'hrs',digits:1,icon:'moon'},glucose:{label:'Blood glucose',short:'Glucose',unit:'mg/dL',digits:0,icon:'drop'},mood:{label:'Mood check-in',short:'Mood',unit:'/ 5',digits:0,icon:'face'}};
@@ -193,7 +194,16 @@ function hrpStudiesLine(riskId){const list=HrpLinks.studiesFor(riskId);return li
 
 
 
+/* A link such as #log?crew=hist-ma9 opens the page for that crew member. The parameter is then removed, so a later choice in the crew selector is not undone on the next render. */
+function applyCrewFromHash(){
+ const [page,query='']=location.hash.slice(1).split('?'),params=new URLSearchParams(query),id=params.get('crew');
+ if(!id)return;
+ if(crewProfiles().some(p=>p.id===id)&&db().activeCrewId!==id){db().activeCrewId=id;focusedConditionId=null;filterQuery='';logLimit=20;persist();}
+ params.delete('crew');const rest=params.toString();
+ history.replaceState(null,'',`#${page}${rest?'?'+rest:''}`);
+}
 function render(){
+ applyCrewFromHash();
  window.dispatchEvent(new Event('orbit:scope-check'));
  anatomyLastSelection=null;anatomyLastState=null;
  const pendingAlias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(pendingAlias?.tab)careTab=pendingAlias.tab;
