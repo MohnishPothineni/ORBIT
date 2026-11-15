@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import { request as httpsRequest } from "node:https";
 import { extname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { handlePhotoRequest } from "./photo-analysis.mjs";
 
 const built = process.argv.includes("--built");
 const root = await realpath(fileURLToPath(new URL(built ? "../dist/" : "../ui/", import.meta.url)));
@@ -28,6 +29,8 @@ const server = createServer(async (request, response) => {
   response.setHeader("X-Content-Type-Options", "nosniff");
   response.setHeader("Cache-Control", "no-cache");
   const url = new URL(request.url, "http://localhost");
+  // SCOPE photo check (Gemini) is answered here; the API key never reaches the browser.
+  if (url.pathname.startsWith("/api/scope/") && await handlePhotoRequest(request, response, url.pathname)) return;
   if (url.pathname.startsWith("/api/")) {
     const upstream = httpsRequest(`https://localhost:8443${url.pathname}${url.search}`, {
       method: request.method, headers: { ...request.headers, host: "localhost:8443" },
