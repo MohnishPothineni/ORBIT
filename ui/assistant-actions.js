@@ -5,9 +5,9 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(inputs,conditionAnatomy,features){
   'use strict';
   const pages={status:'Crew status',
-wellbeing:'Sleep & wellbeing',
-skin:'Skin & wounds',
-exercise:'Exercise',
+wellbeing:'Health assessment / Sleep & wellbeing',
+skin:'Health assessment / Skin & wounds',
+exercise:'Health assessment / Exercise',
 risks:'Mission health risks',
 research:'Evidence library',
 crew:'Astronauts',
@@ -15,7 +15,7 @@ log:'Health log & trends',
 care:'Health assessment',
 anatomy:'Anatomy lab',
 routine:'Daily routine'};
-  const sections=['assessment','inputs','measurements','mission'],methods=['manual','images','sensor','dataset'];
+  const sections=['assessment','wellbeing','exercise','skin','inputs','measurements','mission'],methods=['manual','images','sensor','dataset'];
   const layers=['skeleton','cartilage','dental','muscles','connective','heart','arteries','veins','nervous','respiratory','digestive','urinary','reproductive','integumentary','lymphatic','endocrine','sensory'];
   const regions=['all','head-neck','thorax','abdomen','pelvis','upper','lower'];
   const panels=['health-entry','medical-response','medical-plan','condition-note','crew-profile','crew-selector','mission-settings','photo-record','export-summary','export-csv','summary-review','image-review'];

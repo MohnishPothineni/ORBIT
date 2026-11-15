@@ -103,22 +103,21 @@ function factSource(f){return `<a href="${esc(f.url)}" target="_blank" rel="noop
 function routineFacts(){const all=HrpLinks.facts(),n=factsUnlocked(),f=all[n-1];return `<div class="routine-facts"><div class="eyebrow">NASA FACTS · ${n} OF ${all.length}</div><div class="routine-facts-bar" role="img" aria-label="${n} of ${all.length} facts unlocked"><span style="width:${Math.round(n/all.length*100)}%"></span></div>${f?`<blockquote class="hrp-quote"><p>${esc(f.fact)}</p><footer>${factSource(f)}</footer></blockquote>`:'<p class="routine-facts-empty">Complete a daily task to unlock your first fact.</p>'}<p class="routine-facts-next">${n<all.length?'Each completed task unlocks the next fact from NASA’s risk pages.':`You have all ${all.length} facts.`}</p>${n?`<button class="text-button" data-facts="1">All your facts ${icon('arrowright')}</button>`:''}</div>`;}
 function factsModal(){const all=HrpLinks.facts(),n=factsUnlocked();modal('Your NASA facts',`${n} of ${all.length} unlocked · From the “Did you know?” sections of NASA’s risk pages`,`<ol class="facts-list">${all.map((f,i)=>i<n?`<li><span>${String(i+1).padStart(2,'0')}</span><div><p>${esc(f.fact)}</p><small>${factSource(f)}</small></div></li>`:'').join('')}</ol>${n<all.length?`<p class="form-help">${all.length-n} more to unlock. Each completed daily task opens the next one; unticking a task locks it again.</p>`:''}`);}
 function toast(msg){$('#toast').textContent=msg;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3600);}
-/* Old #trends links open the combined health log page at its Trends section. */
-const PAGE_ALIASES={trends:{page:'log',section:'health-trends'}};
+/* Merged pages: old links open the page that now holds them (a section or a Health assessment tab). */
+const PAGE_ALIASES={trends:{page:'log',section:'health-trends'},wellbeing:{page:'care',tab:'wellbeing'},exercise:{page:'care',tab:'exercise'},skin:{page:'care',tab:'skin'}};
 function currentPage(){const name=location.hash.slice(1).split('?')[0];if(Object.hasOwn(PAGE_ALIASES,name))return PAGE_ALIASES[name].page;return Object.hasOwn(PAGE_NAMES,name)?name:'status';}
 function scrollToLogSection(id){const el=document.getElementById(id);if(!el)return;el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});const h=el.querySelector('h2');if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}}
 const PAGE_NAMES={status:'Crew status',
-wellbeing:'Sleep & wellbeing',
-exercise:'Exercise',
 risks:'Mission health risks',
 research:'Evidence library',
-skin:'Skin & wounds',
 care:'Health assessment',
 crew:'Astronauts',
 anatomy:'Anatomy lab',
 log:'Health log & trends',
 routine:'Daily routine'};
 function button(text,action,type='',ic=''){return `<button class="button ${type}" data-action="${action}">${ic?icon(ic):''}${text}</button>`;}
+/* Page heading, or a section heading when the page is shown as a Health assessment tab. */
+function sectionHeading(embedded,title,sub,actions=''){return embedded?`<div class="care-section-head"><div><h2>${title}</h2><p>${sub}</p></div><div class="heading-actions">${actions}</div></div>`:pageHeading(title,sub,actions)+demoNotice();}
 function pageHeading(title,sub,actions=''){return `<div class="page-heading"><div><div class="eyebrow">${esc(state.settings.mission).toUpperCase()} / ${esc(activeCrew().name).toUpperCase()}</div><h1>${title}</h1><p>${sub}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function demoNotice(){return state.mode==='demo'?`<div class="mode-notice"><span>Sample crew data. Explore the tools or start your own health log.</span><button class="text-button" data-action="personal">Use my own data ${icon('arrowright')}</button></div>`:'';}
 function safetyNotice(){return `<div class="notice">${icon('info')}<p>Research prototype. Trend notes support review; they do not diagnose conditions or establish fitness for duty. Follow your crew medical officer’s instructions and mission procedures.</p></div>`;}
@@ -174,14 +173,15 @@ function hrpStudiesLine(riskId){const list=HrpLinks.studiesFor(riskId);return li
 function render(){
  window.dispatchEvent(new Event('orbit:scope-check'));
  anatomyLastSelection=null;anatomyLastState=null;
+ const pendingAlias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(pendingAlias?.tab)careTab=pendingAlias.tab;
  const p=currentPage(),main=$('#main');
  if(main.dataset.page!==p){const group=document.querySelector('.main-nav [data-nav="'+p+'"]')?.closest('details');if(group)group.open=true;}
  main.dataset.page=p;const scroll=window.scrollY;cleanupHealthInputs();disposeCrewViewer();
- main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,wellbeing:missionWellbeingPage,exercise:missionExercisePage,risks:missionRisksPage,research:missionResearchPage,skin:skinPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,log:logPage,routine:routinePage}[p])();
+ main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,risks:missionRisksPage,research:missionResearchPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,log:logPage,routine:routinePage}[p])();
  $$('.main-nav a').forEach(a=>{a.classList.toggle('active',a.dataset.nav===p);if(a.dataset.nav===p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  $('#header-page').textContent=PAGE_NAMES[p];$('#data-mode').textContent=state.mode==='demo'?'DEMO MISSION':'MY HEALTH LOG';$('#rail-environment').textContent=state.settings.environment.toUpperCase();document.title=`${PAGE_NAMES[p]} | ORBIT`;
- syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();if(p==='skin')attachSkinPage();window.scrollTo(0,scroll);
- const alias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(alias){history.replaceState(null,'','#'+alias.page);requestAnimationFrame(()=>scrollToLogSection(alias.section));}
+ syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();window.scrollTo(0,scroll);
+ const alias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(alias){history.replaceState(null,'','#'+alias.page);if(alias.section)requestAnimationFrame(()=>scrollToLogSection(alias.section));}
  window.dispatchEvent(new Event('orbit:context-change'));
 }
 function bindChart(){const tip=$('.chart-tooltip');if(!tip)return;$$('[data-point]').forEach(el=>{el.addEventListener('pointerenter',()=>{const d=chartData()[+el.dataset.point];tip.textContent=`${dayLabel(d.at)} · ${formatNum(d[chartMetric],META[chartMetric].digits)} ${META[chartMetric].unit}`;tip.classList.add('visible');});el.addEventListener('pointerleave',()=>tip.classList.remove('visible'));});}

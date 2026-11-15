@@ -41,3 +41,16 @@ main{container:content / inline-size;max-width:1500px;padding:30px 28px 40px;min
 .log-section .mission-panel{margin-top:20px}
 .chart-foot-link{font-size:inherit}
 .log-section .trends-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+
+/* Health assessment: seven tabs in two labelled groups (wellbeing, exercise and skin were separate pages) */
+.care-tab-groups{display:grid;gap:14px;margin:22px 0}
+.care-tab-group{display:grid;gap:7px}
+.care-tab-group-label{font-size:10px}
+.care-tab-groups .care-tabs{margin:0}
+.care-tab-groups .care-tabs-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.care-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:6px 0 18px}
+.care-section-head h2{margin:0;font-size:20px}
+.care-section-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.care-tab-groups .care-tabs-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.care-tab-groups .care-tabs button{min-height:0;padding:10px 12px}
+@container content (max-width:600px){.care-tab-groups .care-tabs-4,.care-tab-groups .care-tabs-3{grid-template-columns:1fr 1fr}}

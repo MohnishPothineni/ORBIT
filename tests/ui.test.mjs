@@ -42,6 +42,16 @@ test("retained health screens render and removed routes and commands are unavail
   context.location.hash = "#trends";
   assert.equal(vm.runInContext("currentPage()", context), "log");
   assert.ok(!html.includes('data-nav="trends"'));
+  // Sleep & wellbeing, Exercise and Skin & wounds are Health assessment tabs now.
+  for (const tab of ["wellbeing", "exercise", "skin"]) {
+    assert.ok(!html.includes(`data-nav="${tab}"`), tab);
+    context.location.hash = `#${tab}`;
+    assert.equal(vm.runInContext("currentPage()", context), "care", tab);
+    vm.runInContext(`careTab = "${tab}"`, context);
+    const careHtml = vm.runInContext("carePage()", context);
+    assert.ok(careHtml.includes(`data-care-tab="${tab}"`) && careHtml.includes('class="care-section-head"'), tab);
+  }
+  vm.runInContext('careTab = "assessment"', context);
   vm.runInContext(await readFile(resolve(root, "condition-anatomy.js"), "utf8"), context);
   vm.runInContext(await readFile(resolve(root, "assistant-features.js"), "utf8"), context);
   vm.runInContext(await readFile(resolve(root, "assistant-actions.js"), "utf8"), context);

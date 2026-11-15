@@ -53,11 +53,11 @@ function skinWoundCard(w) {
     <div class="table-wrap" tabindex="0" aria-label="Wound updates"><table class="data-table"><thead><tr><th>DATE</th><th>SIZE</th><th>SIGNS</th><th>NOTES</th></tr></thead><tbody>${rows.map(u => `<tr><td>${dayLabel(u.at)}</td><td>${esc(SkinLogic.size(u))}</td><td>${(u.signs || []).map(x => esc(SkinLogic.WOUND_SIGNS[x] || x)).join(', ') || '—'}</td><td class="log-note">${esc(u.notes) || '—'}</td></tr>`).join('')}</tbody></table></div>
     <div class="mission-wound-actions"><button class="button small primary" data-action="skin-wound-update" data-id="${esc(w.id)}">Add update</button><button class="button small" data-action="skin-wound-photo" data-id="${esc(w.id)}">Add photo</button><button class="text-button" data-action="skin-wound-close" data-id="${esc(w.id)}">Mark healed</button></div></article>`;
 }
-function skinPage() {
+function skinPage(embedded = false) {
   const checks = skinChecks(), wounds = skinWounds(), s = SkinLogic.skinSummary(checks), active = wounds.filter(w => !w.closedAt), healed = wounds.filter(w => w.closedAt);
   const recent = [...checks].filter(c => c.findings.length).sort((a, b) => Date.parse(b.at) - Date.parse(a.at)).slice(0, 6);
   skinEpoch++;
-  return `${pageHeading('Skin & wounds', 'A quick daily skin check, with wounds tracked until they heal.', button('After spacewalk check', 'skin-eva') + button('Add wound', 'skin-wound-add', 'primary', 'plus'))}${demoNotice()}
+  return `${sectionHeading(embedded, 'Skin & wounds', 'A quick daily skin check, with wounds tracked until they heal.', button('After spacewalk check', 'skin-eva') + button('Add wound', 'skin-wound-add', 'primary', 'plus'))}
     ${s.persistent.length ? `<section class="mission-priority review">${icon('alert')}<div><span class="eyebrow">PERSISTENT SYMPTOMS</span><strong>${esc(s.persistent.map(f => `${f.label} on ${f.days} of the last 7 days`).join('. '))}.</strong><p>Ask your crew medical officer to take a look.</p></div></section>` : ''}
     ${skinDailyPanel(s)}
     <div class="section-label"><h2>Active wounds</h2><span>${active.length} ACTIVE</span></div>${active.length ? `<div class="mission-wound-grid">${active.map(skinWoundCard).join('')}</div>` : '<p class="mission-clear-note">No active wounds. Add one to track its size and warning signs until it heals.</p>'}
