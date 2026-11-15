@@ -156,3 +156,15 @@ body[data-assistant-closed=true] .assistant-reopen:not([hidden]) { display: bloc
   #assistant-panel .companion-portrait { height: clamp(200px, 40vw, 300px); }
   .app-footer { padding-bottom: 26px; }
 }
+
+/* Streamlined panel: no tabs; the avatar toggle sits on the portrait. */
+.companion-dock-top, .companion-appearance { display: none !important; }
+#assistant-panel .companion-head { padding-top: 12px; }
+#assistant-panel .companion-avatar-choice { position: absolute; top: 12px; right: 0; z-index: 2; margin: 0; padding: 0; border: 0; }
+#assistant-panel .companion-personas { margin: 0; background: #ffffffd9; backdrop-filter: blur(6px); }
+#assistant-panel .companion-personas label span { min-height: 32px; padding: 4px 12px; font-size: 12px; }
+#assistant-panel .companion-connect { display: flex; justify-content: flex-start; padding: 12px 0 4px; border: 0; }
+#assistant-panel .companion-connect[hidden], #assistant-panel .companion-connect:has(#assistant-text[hidden]) { display: none; }
+#assistant-panel .assistant-sharing[hidden] { display: none; }
+#assistant-panel .assistant-empty { padding: 14px 0 6px; border: 0; }
+#assistant-panel .assistant-foot { justify-content: flex-end; }
