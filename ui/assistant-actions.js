@@ -15,6 +15,7 @@ log:'Health log',
 care:'Health assessment',
 trends:'Health trends',
 anatomy:'Anatomy lab',
+voice:'Crew voice AI assistant',
 routine:'Daily routine'};
   const sections=['assessment','inputs','measurements','mission'],methods=['manual','images','sensor','dataset'];
   const layers=['skeleton','cartilage','dental','muscles','connective','heart','arteries','veins','nervous','respiratory','digestive','urinary','reproductive','integumentary','lymphatic','endocrine','sensory'];

@@ -2,6 +2,8 @@ import "@fontsource/public-sans/400.css";
 import "@fontsource/public-sans/500.css";
 import "@fontsource/public-sans/600.css";
 import "@fontsource/public-sans/700.css";
+// The website's colors (--paper, --ink, --blue, --line, ...): one source for both apps.
+import "../ui/design-tokens.css";
 import "./styles/tokens.css";
 import "./styles/shell.css";
 

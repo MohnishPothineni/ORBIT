@@ -31,7 +31,7 @@ test("retained health screens render and removed routes and commands are unavail
     vm.runInContext(source, context, { filename: name });
     if (name === "app.js") break;
   }
-  for (const page of ["missionStatusPage", "crewDashboardPage", "logPage", "trendsPage", "routinePage", "carePage", "missionWellbeingPage", "missionExercisePage", "skinPage", "missionRisksPage", "anatomyLabPage", "missionResearchPage"]) {
+  for (const page of ["missionStatusPage", "crewDashboardPage", "logPage", "trendsPage", "routinePage", "carePage", "missionWellbeingPage", "missionExercisePage", "skinPage", "missionRisksPage", "anatomyLabPage", "missionResearchPage", "voicePage"]) {
     assert.ok(vm.runInContext(`${page}()`, context).includes("<"), page);
   }
   assert.ok(vm.runInContext("MissionLogic.reportSections(missionReportData()).length", context) > 0);

@@ -7,6 +7,7 @@ import { useSystemStatus } from "../../../shared/context/SystemStatusContext";
 import { Button } from "../../../shared/ui/Button";
 import { ICON_STROKE } from "../../../shared/ui/cn";
 import { SectionHeader } from "../../../shared/ui/SectionHeader";
+import { EMBEDDED, openInWebsite } from "../../../shared/embed";
 import { useToast } from "../../../shared/ui/Toast";
 import type { TranscriptState } from "../hooks/transcriptStore";
 import { usePageStateOverride } from "../hooks/usePreferences";
@@ -50,8 +51,10 @@ export function AssistantPage() {
   // Session availability.
   const disabledReason = useMemo(() => {
     if (!status) return "Checking the local model…";
-    if (status.network.mode === "unreachable") return "Local server unreachable — see the status bar";
-    if (status.ollama.state !== "ready") return "Model not ready — see the status bar";
+    // Embedded in the website there is no React status bar to point at.
+    const seeStatus = EMBEDDED ? "" : " — see the status bar";
+    if (status.network.mode === "unreachable") return `Local server unreachable${seeStatus}`;
+    if (status.ollama.state !== "ready") return `Model not ready${seeStatus}`;
     return null;
   }, [status]);
 
@@ -89,35 +92,44 @@ export function AssistantPage() {
       if (!path.startsWith("/assistant") && session.isActive) {
         toast({ level: "standby", title: "Session ended — left the assistant", description: `Opened ${path}.` });
       }
-      navigate(path);
+      // Inside the website tab, open the website's own screen rather than this app's placeholder.
+      if (EMBEDDED) openInWebsite(path);
+      else navigate(path);
     }, 700);
     return () => window.clearTimeout(t);
   }, [pendingNavigation, consumeNavigation, session.turnState, session.isActive, navigate, toast]);
+
+  const headerActions = (
+    <>
+      <Button variant="secondary" icon={Settings2} onClick={() => setSettingsOpen(true)}>
+        Voice settings
+      </Button>
+      <SessionButton
+        isActive={session.isActive}
+        connecting={session.connectionState === "connecting"}
+        disabledReason={session.isActive ? null : disabledReason}
+        onStart={() => void session.connect()}
+        onEnd={() => void session.disconnect()}
+      />
+    </>
+  );
 
   const connected = session.connectionState === "connected";
   const transcriptState = override === "empty" ? EMPTY_TRANSCRIPT : session.transcript;
 
   return (
     <div className="flex min-h-full flex-col">
-      <SectionHeader
-        title="Crew assistant"
-        className="orbit-assistant-heading"
-        subtitle="Talk to ORBIT, review the conversation, and choose what to share."
-        actions={
-          <>
-            <Button variant="secondary" icon={Settings2} onClick={() => setSettingsOpen(true)}>
-              Voice settings
-            </Button>
-            <SessionButton
-              isActive={session.isActive}
-              connecting={session.connectionState === "connecting"}
-              disabledReason={session.isActive ? null : disabledReason}
-              onStart={() => void session.connect()}
-              onEnd={() => void session.disconnect()}
-            />
-          </>
-        }
-      />
+      {EMBEDDED ? (
+        // The website tab already shows the page title; keep only the actions.
+        <div className="orbit-embedded-actions">{headerActions}</div>
+      ) : (
+        <SectionHeader
+          title="Crew assistant"
+          className="orbit-assistant-heading"
+          subtitle="Talk to ORBIT, review the conversation, and choose what to share."
+          actions={headerActions}
+        />
+      )}
 
       {status?.network.mode === "unreachable" && (
         <div role="alert" className="mb-4 flex items-start gap-2 rounded-lg border border-critical-line bg-critical-tint px-4 py-3 text-sm text-ink">

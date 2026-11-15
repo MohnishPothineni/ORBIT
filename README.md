@@ -15,6 +15,11 @@ See [UI setup and provenance](docs/ui-reference/README.md) and the retained
 [design system](docs/ui-reference/DESIGN.md).
 
 The existing React/Pipecat workspace is preserved at `/voice/` after building.
+The website's **Crew voice AI assistant** tab (`#voice`, `ui/voice.js`) embeds it as
+`/voice/assistant?embed=1`, so it shares the website's sidebar, top bar, page heading
+and colors (`ui/design-tokens.css` is imported by both apps). In that mode the
+workspace hides its own shell, and its links open the website's tabs. Re-renders keep
+the frame, so a live voice session is not interrupted.
 The local FastAPI server implements the React voice workspace's API. The
 floating avatar assistant uses ElevenLabs and requires internet access.
 
