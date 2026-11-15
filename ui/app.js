@@ -395,7 +395,20 @@ document.addEventListener('change',e=>{if(e.target.id==='trend-metric'){chartMet
 document.addEventListener('input',e=>{if(e.target.id==='log-search'){const pos=e.target.selectionStart;filterQuery=e.target.value;render();const input=$('#log-search');input.focus();input.setSelectionRange(pos,pos);}});
 $('#modal').addEventListener('click',e=>{if(e.target===$('#modal')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
 $('.mobile-scrim').addEventListener('click',navClose);
-window.addEventListener('hashchange',()=>{navClose();render();window.scrollTo(0,0);});
+/* Changing tabs: the old page slides out to the right and the new one slides in from the left (quick, and off with reduced motion). */
+function pageTransition(update){
+ const main=$('#main'),from=main?.dataset.page,to=currentPage();
+ const still=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!main||!from||from===to||still){update();return;}
+ if(document.startViewTransition){
+  main.style.viewTransitionName='orbit-page';
+  const t=document.startViewTransition(update);
+  t.finished.finally(()=>{main.style.viewTransitionName='';});
+  return;
+ }
+ update();main.classList.remove('page-enter');void main.offsetWidth;main.classList.add('page-enter');
+}
+window.addEventListener('hashchange',()=>{navClose();pageTransition(()=>{render();window.scrollTo(0,0);});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')navClose();});
 let lastDay=todayKey();setInterval(()=>{if(todayKey()!==lastDay){lastDay=todayKey();render();}careTick();},30000);
 OrbitNeuralLogic.validateModel(OrbitNeuralModel);
