@@ -781,6 +781,686 @@
      "url": "https://pubmed.ncbi.nlm.nih.gov/17511294/"
     }
    ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-001-mercury-atlas-9-prelaunch",
+   "title": "NASA-VITAL-001: Mercury-Atlas 9 — Prelaunch (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Prelaunch; Record type: reported_phase_value. Measurements: heart rate: 72 bpm (heart_rate_bpm); systolic bp: 113 mmHg (systolic_bp_mmHg); diastolic bp: 79 mmHg (diastolic_bp_mmHg); respiratory rate: 19 breaths/min (respiratory_rate_breaths_min). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-002-mercury-atlas-9-orbital",
+   "title": "NASA-VITAL-002: Mercury-Atlas 9 — Orbital (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Orbital; Record type: reported_phase_value. Measurements: heart rate: 89 bpm (heart_rate_bpm); systolic bp: 119 mmHg (systolic_bp_mmHg); diastolic bp: 81 mmHg (diastolic_bp_mmHg); respiratory rate: 15 breaths/min (respiratory_rate_breaths_min). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-003-mercury-atlas-9-postflight",
+   "title": "NASA-VITAL-003: Mercury-Atlas 9 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: supine; Relative time: 1–7 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 83 bpm (heart_rate_bpm); systolic bp: 89 mmHg (systolic_bp_mmHg); diastolic bp: 64 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-004-mercury-atlas-9-postflight",
+   "title": "NASA-VITAL-004: Mercury-Atlas 9 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: erect; Relative time: 1–7 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 123 bpm (heart_rate_bpm); systolic bp: 90 mmHg (systolic_bp_mmHg); diastolic bp: 73 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-005-mercury-atlas-9-postflight",
+   "title": "NASA-VITAL-005: Mercury-Atlas 9 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: supine; Relative time: 18 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 58 bpm (heart_rate_bpm); systolic bp: 98 mmHg (systolic_bp_mmHg); diastolic bp: 61 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-006-mercury-atlas-9-postflight",
+   "title": "NASA-VITAL-006: Mercury-Atlas 9 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Posture: erect; Relative time: 18 hours after landing; Record type: reported_phase_value. Measurements: heart rate: 80 bpm (heart_rate_bpm); systolic bp: 94 mmHg (systolic_bp_mmHg); diastolic bp: 68 mmHg (diastolic_bp_mmHg). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-007-mercury-atlas-9-postflight",
+   "title": "NASA-VITAL-007: Mercury-Atlas 9 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 9; Subject: Gordon Cooper; Mission phase: Postflight; Record type: reported_temperature. Measurements: body temperature: 99.4 degF (body_temperature_f); body temperature: 37.44 degC (body_temperature_c). Source reference: 19770026836.pdf, page 420, Table 40-III. Quality notes: Oral temperature; table reports 310.6 K (99.4°F). Postflight timing unspecified. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-008-mercury-atlas-7-all-preflight-data",
+   "title": "NASA-VITAL-008: Mercury-Atlas 7 — All preflight data (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: All preflight data; Record type: aggregate_mean. Measurements: heart rate: 57 bpm (heart_rate_bpm); heart rate min: 42 bpm (heart_rate_min_bpm); heart rate max: 84 bpm (heart_rate_max_bpm); heart rate sample count: 408 count (heart_rate_sample_count); respiratory rate: 15 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 5 breaths/min (respiratory_rate_min); respiratory rate max: 32 breaths/min (respiratory_rate_max); respiratory rate sample count: 354 count (respiratory_rate_sample_count); body temperature: 99.3 degF (body_temperature_f); body temperature: 37.39 degC (body_temperature_c); body temperature min: 98.3 degF (body_temp_min_f); body temperature max: 101.5 degF (body_temp_max_f); body temperature sample count: 128 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-009-mercury-atlas-7-countdown",
+   "title": "NASA-VITAL-009: Mercury-Atlas 7 — Countdown (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Countdown; Record type: aggregate_mean. Measurements: heart rate: 62 bpm (heart_rate_bpm); heart rate min: 50 bpm (heart_rate_min_bpm); heart rate max: 84 bpm (heart_rate_max_bpm); heart rate sample count: 92 count (heart_rate_sample_count); respiratory rate: 15 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 6 breaths/min (respiratory_rate_min); respiratory rate max: 26 breaths/min (respiratory_rate_max); respiratory rate sample count: 75 count (respiratory_rate_sample_count); body temperature: 97.8 degF (body_temperature_f); body temperature: 36.56 degC (body_temperature_c); body temperature min: 96.8 degF (body_temp_min_f); body temperature max: 98.2 degF (body_temp_max_f); body temperature sample count: 57 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-010-mercury-atlas-7-launch",
+   "title": "NASA-VITAL-010: Mercury-Atlas 7 — Launch (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Launch; Record type: aggregate_mean. Measurements: heart rate: 87 bpm (heart_rate_bpm); heart rate min: 82 bpm (heart_rate_min_bpm); heart rate max: 96 bpm (heart_rate_max_bpm); heart rate sample count: 7 count (heart_rate_sample_count); respiratory rate: 16 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 10 breaths/min (respiratory_rate_min); respiratory rate max: 20 breaths/min (respiratory_rate_max); respiratory rate sample count: 5 count (respiratory_rate_sample_count); body temperature: 98 degF (body_temperature_f); body temperature: 36.67 degC (body_temperature_c); body temperature min: 98 degF (body_temp_min_f); body temperature max: 98 degF (body_temp_max_f); body temperature sample count: 4 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: No quality note supplied. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-011-mercury-atlas-7-orbital",
+   "title": "NASA-VITAL-011: Mercury-Atlas 7 — Orbital (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Orbital; Record type: aggregate_mean. Measurements: heart rate: 70 bpm (heart_rate_bpm); heart rate min: 60 bpm (heart_rate_min_bpm); heart rate max: 94 bpm (heart_rate_max_bpm); heart rate sample count: 94 count (heart_rate_sample_count); respiratory rate: 14 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 10 breaths/min (respiratory_rate_min); respiratory rate max: 18 breaths/min (respiratory_rate_max); respiratory rate sample count: 83 count (respiratory_rate_sample_count); body temperature: 99.9 degF (body_temperature_f); body temperature: 37.72 degC (body_temperature_c); body temperature min: 98 degF (body_temp_min_f); body temperature max: 100.6 degF (body_temp_max_f); body temperature sample count: 60 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: Respiratory-rate estimates derived from ECG R-wave variation; approximate only. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-012-mercury-atlas-7-reentry",
+   "title": "NASA-VITAL-012: Mercury-Atlas 7 — Reentry (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Reentry; Record type: aggregate_mean. Measurements: heart rate: 84 bpm (heart_rate_bpm); heart rate min: 72 bpm (heart_rate_min_bpm); heart rate max: 104 bpm (heart_rate_max_bpm); heart rate sample count: 15 count (heart_rate_sample_count); respiratory rate: 19 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 16 breaths/min (respiratory_rate_min); respiratory rate max: 24 breaths/min (respiratory_rate_max); respiratory rate sample count: 9 count (respiratory_rate_sample_count); body temperature: 100.4 degF (body_temperature_f); body temperature: 38.0 degC (body_temperature_c); body temperature min: 100.2 degF (body_temp_min_f); body temperature max: 100.5 degF (body_temp_max_f); body temperature sample count: 15 count (body_temp_sample_count). Source reference: More nasa data 2.pdf, page 66, Table 5-XII. Quality notes: Respiratory-rate estimates derived from ECG R-wave variation; approximate only. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "nasa-vital-013-mercury-atlas-7-preflight-transfer-van",
+   "title": "NASA-VITAL-013: Mercury-Atlas 7 — Preflight transfer van (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Mercury-Atlas 7; Subject: Scott Carpenter; Mission phase: Preflight transfer van; Relative time: ~50 minutes on launch day; Record type: aggregate_mean. Measurements: heart rate: 65 bpm (heart_rate_bpm); heart rate min: 56 bpm (heart_rate_min_bpm); heart rate max: 70 bpm (heart_rate_max_bpm); respiratory rate: 14 breaths/min (respiratory_rate_breaths_min); respiratory rate min: 8 breaths/min (respiratory_rate_min); respiratory rate max: 20 breaths/min (respiratory_rate_max). Source reference: More nasa data 2.pdf, page 64, Narrative. Quality notes: Narrative preflight transfer-van period; no blood pressure or body temperature recorded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-rest-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-COMMANDER-REST-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: Preflight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 66 bpm (heart_rate_bpm); systolic bp: 96 mmHg (systolic_bp_mmHg); diastolic bp: 67 mmHg (diastolic_bp_mmHg); minute ventilation: 8.9 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.237 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.234 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-rest-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-COMMANDER-REST-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: In-flight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 66 bpm (heart_rate_bpm); systolic bp: 97 mmHg (systolic_bp_mmHg); diastolic bp: 59 mmHg (diastolic_bp_mmHg); minute ventilation: 11.79 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.283 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.301 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-rest-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-COMMANDER-REST-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: Postflight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 76 bpm (heart_rate_bpm); systolic bp: 106 mmHg (systolic_bp_mmHg); diastolic bp: 72 mmHg (diastolic_bp_mmHg); minute ventilation: 9.27 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.203 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.187 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-level3-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-COMMANDER-LEVEL3-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: Preflight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 157 bpm (heart_rate_bpm); systolic bp: 192 mmHg (systolic_bp_mmHg); diastolic bp: 71 mmHg (diastolic_bp_mmHg); minute ventilation: 64.43 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 2.26 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.14 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-level3-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-COMMANDER-LEVEL3-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: In-flight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 152 bpm (heart_rate_bpm); systolic bp: 195 mmHg (systolic_bp_mmHg); diastolic bp: 56 mmHg (diastolic_bp_mmHg); minute ventilation: 62.04 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 2.2 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.13 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-level3-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-COMMANDER-LEVEL3-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: Postflight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 163 bpm (heart_rate_bpm); systolic bp: 195 mmHg (systolic_bp_mmHg); diastolic bp: 67 mmHg (diastolic_bp_mmHg); minute ventilation: 60.04 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 2.14 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.05 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-recovery-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-COMMANDER-RECOVERY-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: Preflight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 112 bpm (heart_rate_bpm); systolic bp: 149 mmHg (systolic_bp_mmHg); diastolic bp: 66 mmHg (diastolic_bp_mmHg); minute ventilation: 25.98 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.603 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.721 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-recovery-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-COMMANDER-RECOVERY-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: In-flight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 87 bpm (heart_rate_bpm); systolic bp: 131 mmHg (systolic_bp_mmHg); diastolic bp: 61 mmHg (diastolic_bp_mmHg); minute ventilation: 24.65 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.632 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.776 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-commander-recovery-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-COMMANDER-RECOVERY-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Commander; Mission phase: Postflight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 109 bpm (heart_rate_bpm); systolic bp: 170 mmHg (systolic_bp_mmHg); diastolic bp: 78 mmHg (diastolic_bp_mmHg); minute ventilation: 29.18 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.717 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.839 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-rest-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-SCIENTISTPILOT-REST-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: Preflight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 64 bpm (heart_rate_bpm); systolic bp: 127 mmHg (systolic_bp_mmHg); diastolic bp: 84 mmHg (diastolic_bp_mmHg); minute ventilation: 7.51 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.269 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.255 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-rest-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-SCIENTISTPILOT-REST-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: In-flight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 62 bpm (heart_rate_bpm); systolic bp: 119 mmHg (systolic_bp_mmHg); diastolic bp: 74 mmHg (diastolic_bp_mmHg); minute ventilation: 9.98 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.289 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.279 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-rest-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-SCIENTISTPILOT-REST-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: Postflight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 74 bpm (heart_rate_bpm); systolic bp: 123 mmHg (systolic_bp_mmHg); diastolic bp: 78 mmHg (diastolic_bp_mmHg); minute ventilation: 10.33 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.263 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.221 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-level3-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-SCIENTISTPILOT-LEVEL3-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: Preflight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 164 bpm (heart_rate_bpm); systolic bp: 204 mmHg (systolic_bp_mmHg); diastolic bp: 55 mmHg (diastolic_bp_mmHg); minute ventilation: 84.18 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 3.07 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.88 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-level3-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-SCIENTISTPILOT-LEVEL3-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: In-flight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 166 bpm (heart_rate_bpm); systolic bp: 200 mmHg (systolic_bp_mmHg); diastolic bp: 52 mmHg (diastolic_bp_mmHg); minute ventilation: 97.24 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 3.01 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 3.03 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-level3-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-SCIENTISTPILOT-LEVEL3-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: Postflight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 167 bpm (heart_rate_bpm); systolic bp: 198 mmHg (systolic_bp_mmHg); diastolic bp: 51 mmHg (diastolic_bp_mmHg); minute ventilation: 102.69 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 3.0 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.91 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-recovery-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-SCIENTISTPILOT-RECOVERY-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: Preflight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 104 bpm (heart_rate_bpm); systolic bp: 186 mmHg (systolic_bp_mmHg); diastolic bp: 66 mmHg (diastolic_bp_mmHg); minute ventilation: 24.6 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.676 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.791 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-recovery-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-SCIENTISTPILOT-RECOVERY-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: In-flight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 92 bpm (heart_rate_bpm); systolic bp: 174 mmHg (systolic_bp_mmHg); diastolic bp: 61 mmHg (diastolic_bp_mmHg); minute ventilation: 31.44 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.745 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.982 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-scientistpilot-recovery-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-SCIENTISTPILOT-RECOVERY-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Scientist Pilot; Mission phase: Postflight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 102 bpm (heart_rate_bpm); systolic bp: 189 mmHg (systolic_bp_mmHg); diastolic bp: 63 mmHg (diastolic_bp_mmHg); minute ventilation: 34.07 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.763 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.893 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-rest-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-PILOT-REST-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: Preflight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 54 bpm (heart_rate_bpm); systolic bp: 115 mmHg (systolic_bp_mmHg); diastolic bp: 72 mmHg (diastolic_bp_mmHg); minute ventilation: 6.69 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.238 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.216 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-rest-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-PILOT-REST-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: In-flight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 53 bpm (heart_rate_bpm); systolic bp: 115 mmHg (systolic_bp_mmHg); diastolic bp: 64 mmHg (diastolic_bp_mmHg); minute ventilation: 8.47 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.283 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.247 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-rest-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-PILOT-REST-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: Postflight; Exercise state: Rest; Record type: grouped_protocol_mean. Measurements: heart rate: 65 bpm (heart_rate_bpm); systolic bp: 125 mmHg (systolic_bp_mmHg); diastolic bp: 74 mmHg (diastolic_bp_mmHg); minute ventilation: 10.73 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.253 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 0.222 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-level3-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-PILOT-LEVEL3-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: Preflight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 147 bpm (heart_rate_bpm); systolic bp: 204 mmHg (systolic_bp_mmHg); diastolic bp: 60 mmHg (diastolic_bp_mmHg); minute ventilation: 98.51 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 2.86 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.72 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-level3-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-PILOT-LEVEL3-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: In-flight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 147 bpm (heart_rate_bpm); systolic bp: 200 mmHg (systolic_bp_mmHg); diastolic bp: 51 mmHg (diastolic_bp_mmHg); minute ventilation: 90.61 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 2.59 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.65 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-level3-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-PILOT-LEVEL3-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: Postflight; Exercise state: Level 3; Record type: grouped_protocol_mean. Measurements: heart rate: 156 bpm (heart_rate_bpm); systolic bp: 213 mmHg (systolic_bp_mmHg); diastolic bp: 59 mmHg (diastolic_bp_mmHg); minute ventilation: 95.12 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 2.63 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 2.68 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-recovery-preflight-skylab-4-preflight",
+   "title": "SKYLAB4-PILOT-RECOVERY-PREFLIGHT: Skylab 4 — Preflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: Preflight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 114 bpm (heart_rate_bpm); systolic bp: 188 mmHg (systolic_bp_mmHg); diastolic bp: 65 mmHg (diastolic_bp_mmHg); minute ventilation: 40.97 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.849 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 1.22 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-recovery-in-flight-skylab-4-in-flight",
+   "title": "SKYLAB4-PILOT-RECOVERY-IN-FLIGHT: Skylab 4 — In-flight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: In-flight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 91 bpm (heart_rate_bpm); systolic bp: 186 mmHg (systolic_bp_mmHg); diastolic bp: 60 mmHg (diastolic_bp_mmHg); minute ventilation: 34.77 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.754 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 1.08 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
+  },
+  {
+   "documentId": "historical",
+   "chunkId": "skylab4-pilot-recovery-postflight-skylab-4-postflight",
+   "title": "SKYLAB4-PILOT-RECOVERY-POSTFLIGHT: Skylab 4 — Postflight (User-supplied historical metrics CSV)",
+   "excerpt": "Mission: Skylab 4; Crew role: Pilot; Mission phase: Postflight; Exercise state: Recovery; Record type: grouped_protocol_mean. Measurements: heart rate: 118 bpm (heart_rate_bpm); systolic bp: 204 mmHg (systolic_bp_mmHg); diastolic bp: 69 mmHg (diastolic_bp_mmHg); minute ventilation: 45.02 L/min BTPS (minute_ventilation_l_min_BTPS); oxygen consumption: 0.849 L/min STPD (oxygen_consumption_l_min_STPD); co2 production: 1.08 L/min STPD (co2_production_l_min_STPD). Source reference: 19770026836.pdf, page 387, Table 36-III. Quality notes: Mean values by crew role, phase, and exercise state; not simultaneous continuous telemetry. Minute ventilation is NOT breaths/min. Superscript significance markers not encoded. Original PDFs were not supplied; these user-supplied transcriptions have not been independently verified.",
+   "evidence": "Historical mission data (supplied transcription)",
+   "topic": "Historical mission measurements",
+   "tracking": "Historical observations for reference. Values are not clinical thresholds or current crew readings. Group means, ranges and sample counts retain their original meaning.",
+   "sources": [
+    {
+     "cite": "User-supplied historical metrics CSV",
+     "title": "ALL_NUMERIC_METRICS_LONG.csv — PDF/page/table references retained in each entry",
+     "journal": "Original PDFs not supplied; transcription unverified",
+     "url": "./assets/ALL_NUMERIC_METRICS_LONG.csv"
+    }
+   ]
   }
  ]
 }
