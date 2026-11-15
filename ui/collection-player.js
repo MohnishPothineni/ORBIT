@@ -3,6 +3,10 @@ const CollectionPlayer=(()=>{
   const rootURL='assets/collection/';
   const playIcon='<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4 2.6v10.8L13 8z"/></svg>';
   const pauseIcon='<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M3.5 3h3v10h-3zm6 0h3v10h-3z"/></svg>';
+  const expandIcon='<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg>';
+  const shrinkIcon='<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5"/></svg>';
+  const fullscreenOK=()=>Boolean(document.fullscreenEnabled||document.webkitFullscreenEnabled);
+  const fullscreenEl=()=>document.fullscreenElement||document.webkitFullscreenElement||null;
   const formatTime=s=>'0:'+String(Math.floor(Math.max(0,s)+.0001)).padStart(2,'0');
   function visual(m,detail=false){
     const model=detail?`<button type="button" class="cl-model-toggle" data-model-toggle aria-expanded="false">Explore person in 3D</button>
@@ -14,7 +18,7 @@ const CollectionPlayer=(()=>{
       <img class="cl-poster" src="${rootURL+m.id}.webp" alt="${m.title} on the 3D crew demonstration model" decoding="async">
       <div class="cl-stage-status"><span class="cl-sim-dot"></span><span data-mode-label>Simulation</span></div>${model}
       <div class="cl-player"><button type="button" data-play aria-label="Play ${m.title} animation" aria-pressed="false">${playIcon}<span>Play 3D</span></button>
-      <div class="cl-track" aria-hidden="true"><span></span></div><span class="cl-time">${formatTime(m.seconds)}</span><output class="cl-rate" title="60 frames per second source" aria-label="Animation frame rate" aria-live="off">60 fps</output></div>
+      <div class="cl-track" aria-hidden="true"><span></span></div><span class="cl-time">${formatTime(m.seconds)}</span><output class="cl-rate" title="60 frames per second source" aria-label="Animation frame rate" aria-live="off">60 fps</output><button type="button" class="cl-fullscreen" data-fullscreen aria-label="Full screen ${m.title} animation" title="Full screen">${expandIcon}</button></div>
       <span class="cl-player-notice" role="status" hidden></span></div>`;
   }
   function bind(root,signal){
@@ -108,6 +112,24 @@ const CollectionPlayer=(()=>{
       try{const mod=await import('./crew-viewer.mjs');if(!ctl.signal.aborted)await mod.openCrewViewer(stage,p.m.id,ctl.signal);}
       catch{if(!ctl.signal.aborted)stage.querySelector('[data-model-hint]').textContent='The model could not load. Select Back to procedure to return.';}
     }
+    /* Full screen: the whole demo (video, captions and controls) fills the screen and plays.
+       iPhone Safari has no element full screen, so it falls back to the native video player. */
+    async function fullscreen(p){
+      if(fullscreenEl()===p.el){(document.exitFullscreen||document.webkitExitFullscreen)?.call(document);return;}
+      if(p.controller)leaveModel(p);
+      if(fullscreenOK()){
+        try{await (p.el.requestFullscreen||p.el.webkitRequestFullscreen).call(p.el);}catch{return;}
+        if(active===p)trigger='manual';else play(p,'manual');
+        return;
+      }
+      ensureSource(p);
+      if(p.video.webkitEnterFullscreen){if(active!==p)await play(p,'manual');try{p.video.webkitEnterFullscreen();}catch{}}
+    }
+    function syncFullscreen(){
+      for(const p of players){const b=p.el.querySelector('[data-fullscreen]');if(!b)continue;const on=fullscreenEl()===p.el;
+        b.innerHTML=on?shrinkIcon:expandIcon;b.setAttribute('aria-label',(on?'Exit full screen':'Full screen ')+(on?'':p.m.title+' animation'));b.title=on?'Exit full screen':'Full screen';p.el.classList.toggle('cl-fullscreen-on',on);}
+    }
+    listen(document,'fullscreenchange',syncFullscreen);listen(document,'webkitfullscreenchange',syncFullscreen);
     const visible=new IntersectionObserver(list=>{
       for(const item of list){const p=players.find(s=>s.el===item.target);
         if(item.isIntersecting){ensureSource(p);if(matchMedia('(hover: hover)').matches&&p.el.closest('[data-previewable]')?.matches(':hover'))play(p,'hover');}
@@ -117,7 +139,9 @@ const CollectionPlayer=(()=>{
     for(const p of players){
       const area=p.el.closest('[data-previewable]')||p.el;visible.observe(p.el);sync(p,0);
       listen(area,'pointerenter',e=>{if(e.pointerType==='mouse'||e.pointerType==='pen')play(p,'hover');});
-      listen(area,'pointerleave',()=>{if(active===p&&trigger==='hover')stop(p,true);});
+      listen(area,'pointerleave',()=>{if(active===p&&trigger==='hover'&&fullscreenEl()!==p.el)stop(p,true);});
+      const full=p.el.querySelector('[data-fullscreen]');
+      if(full)listen(full,'click',e=>{e.stopPropagation();fullscreen(p);});
       listen(p.button,'click',()=>{if(active===p)stop(p);else play(p,'manual');});
       listen(p.video,'loadedmetadata',()=>{if(p.seek!==null)seek(p,p.seek);});
       listen(p.video,'playing',()=>{if(active===p){p.el.classList.add('cl-show-video');clock(p);}});
@@ -137,7 +161,7 @@ const CollectionPlayer=(()=>{
     });
     listen(document,'visibilitychange',()=>{if(document.hidden)stop(active);});listen(window,'pagehide',()=>stop(active));
     listen(reduced,'change',()=>{if(reduced.matches)stop(active);});
-    return ()=>{visible.disconnect();for(const p of players){p.controller?.abort();p.controller=null;stop(p);p.video.removeAttribute('src');p.video.load();}};
+    return ()=>{if(players.some(p=>fullscreenEl()===p.el))(document.exitFullscreen||document.webkitExitFullscreen)?.call(document);visible.disconnect();for(const p of players){p.controller?.abort();p.controller=null;stop(p);p.video.removeAttribute('src');p.video.load();}};
   }
   return {visual,bind};
 })();

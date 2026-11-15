@@ -94,3 +94,14 @@
 .cl-sim-note{display:flex;gap:8px;align-items:flex-start;margin:18px 0 0;max-width:76ch;font:400 12px/1.55 var(--sans);color:var(--cl-muted)}
 .cl-sim-note i{flex:none;margin-top:1px}
 @container content (max-width:650px){.cl-detail-solo{grid-template-columns:minmax(0,1fr)}.cl-guide-side{position:static}}
+
+/* Full screen demos */
+.cl-player .cl-fullscreen{margin-left:auto;padding:5px;min-width:28px}
+.cl-player .cl-fullscreen svg{width:14px;height:14px}
+.cl-visual:fullscreen{aspect-ratio:auto;width:100vw;height:100vh;min-height:0;background:#050d17}
+.cl-visual:-webkit-full-screen{aspect-ratio:auto;width:100vw;height:100vh;min-height:0;background:#050d17}
+.cl-fullscreen-on .cl-player{padding:28px 24px 18px;gap:14px}
+.cl-fullscreen-on .cl-player button{min-height:40px;padding-inline:12px;font-size:13px}
+.cl-fullscreen-on .cl-player button svg{width:16px;height:16px}
+.cl-fullscreen-on .cl-time,.cl-fullscreen-on .cl-rate{font-size:13px}
+.cl-fullscreen-on .cl-stage-status{top:20px;left:20px}
