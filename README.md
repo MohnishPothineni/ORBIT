@@ -26,10 +26,11 @@ src/
   app/            route table and application shell (status bar, sidebar, crew selector)
   shared/         design tokens, UI kit, types, API client, mock mode, contexts
   modules/
+    crew/         Module 1 — Crew status and health tracking (built)
     assistant/    Module 3 — Crew assistant (built)
 ```
 
-Crew status, Anatomy lab and Evidence library show a placeholder until their modules are added. Modules never import from each other; they link through routes.
+Anatomy lab and Evidence library show a placeholder until their modules are added. Modules never import from each other; they link through routes.
 
 ## Crew assistant (`/assistant`)
 
@@ -67,3 +68,17 @@ With `VITE_USE_MOCKS=true`, a `MockVoiceSession` plays a scripted conversation w
 3. Show the left knee, which navigates to the Anatomy lab.
 
 A **Demo controls** card can step the script, force any turn state, simulate errors, say the share approval phrase and cycle the status-bar states. Append `?state=loading|empty|error` to the URL in development to see those page states.
+
+
+## Crew status (`/crew`)
+
+The ranked roster opens profiles with latest vitals, 24-hour sparklines, live telemetry, Recharts trends, a searchable health log, and editable crew review bands. Deep links: `/crew/:id/log` and `/crew/:id/bands`. Overview logging defaults to the active viewer; logging from another profile requires explicitly choosing the subject. Paired blood-pressure readings share a `pairId`; partial failures can retry the remaining reading.
+
+- **Product rules:** inclusive min/max bands; readings outside by at most 10% of the span are caution, beyond that critical. Stale values become no-data. Wellbeing never drives ranking. Alerts require the configured consecutive count. Trend comparisons use daily means over 7 versus 21 days.
+- **Visibility:** stress, fatigue and sleep quality are filtered in mock services and at rendering boundaries. Viewer changes clear old query results. There is no sign-in on this device. Visibility rules control what the screen shows; they are not security. The server must enforce the same visibility and write policies.
+- **API:** services use the brief's `/api/crew/*` and `/api/alerts/*` contracts, with `X-Orbit-Viewer` on JSON requests. Native EventSource cannot set headers, so `/api/telemetry/stream` receives `crew` and `viewer` query parameters. Reconnection backs off from 1 to 30 seconds. No third-party hosts are contacted.
+- **Synthetic mode:** 30 days of seeded data, relative to page-load time. TALON is critical, HALO caution, IRIS stale, VEGA nominal. HALO's demo SpO₂ band is 91.8–100: the brief's example 94–100 band would make 91–92 critical under its specified formula. These are synthetic product settings, never clinical guidance. Mock writes are session-memory only and reset on reload; persistent real records belong to the backend.
+- **Development states:** append `?state=loading`, `?state=empty`, or `?state=error` to overview or profile routes. Browser offline mode pauses the demo wearable; locally loaded mock screens remain usable. This module does not install a service worker or guarantee a cold offline page load.
+- **Checks:** `npm test` covers status boundaries, missing/stale readings, wellbeing exclusion, sustained trends, scenario ranking, privacy, and acknowledgements. Run `npm run typecheck`, `npm run build`, and `npm run lint` before integrating.
+
+Backend integration is required to validate real writes, permission enforcement and wearable SSE. Profile queries follow pagination cursors with cancellation and repeated-cursor protection.
