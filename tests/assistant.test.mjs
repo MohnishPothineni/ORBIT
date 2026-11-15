@@ -281,3 +281,14 @@ test("only the exact spoken phrases approve a save or a share", async () => {
   assert.ok(isVoiceShareApproval("Confirm, share."));
   assert.ok(!isVoiceShareApproval("Confirm save"));
 });
+
+test("assistant links open the website's crew record by id, callsign or name", async () => {
+  const { websiteHref } = await server.ssrLoadModule("/src/shared/embed.ts");
+  assert.equal(websiteHref("/crew?crew=c02"), "/#crew?crew=crew-02");
+  assert.equal(websiteHref("/crew?crew=HALO"), "/#crew?crew=crew-02");
+  assert.equal(websiteHref("/log?crew=vega"), "/#log?crew=crew-01");
+  // Names and historical ids are matched by the website itself.
+  assert.equal(websiteHref("/crew?crew=Gordon Cooper"), "/#crew?crew=Gordon+Cooper");
+  assert.equal(websiteHref("/log?crew=hist-ma7"), "/#log?crew=hist-ma7");
+  assert.equal(websiteHref("/evidence"), "/#research");
+});

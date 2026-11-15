@@ -68,6 +68,10 @@ SCHEMAS = [
             "Website pages: /status (crew status), /log (health log and trends), /trends (the trends section of /log), "
             "/care (health assessment), /wellbeing, /exercise and /skin (tabs inside health assessment), "
             "/routine (daily routine), /risks (health risk readings). "
+            "To open a crew member's record on the main screen, use /crew?crew=<their name or callsign, as the "
+            "person said it>, or /log?crew=<name> for their health log. Examples: /crew?crew=Gordon Cooper, "
+            "/log?crew=Scott Carpenter, /crew?crew=HALO. Gordon Cooper (Mercury-Atlas 9) and Scott Carpenter "
+            "(Mercury-Atlas 7) are historical profiles from past missions, not current crew. "
             "The result names the screen that opened."
         ),
         properties={"path": {"type": "string", "description": "A path starting with /."}},
@@ -100,7 +104,8 @@ SCHEMAS = [
     FunctionSchema(
         name="share_record_with_assistant",
         description=(
-            "Ask to see parts of a crew member's record. A person reviews exactly what will be shared and must "
+            "Ask to see parts of a crew member's record yourself, only when the person asks you to read or share it. "
+            "To show someone a record, use navigate instead. A person reviews exactly what will be shared and must "
             "approve it on screen or by saying \"confirm share\". Never claim it was shared before the result says so."
         ),
         properties={

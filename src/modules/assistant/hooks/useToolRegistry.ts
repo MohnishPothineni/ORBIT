@@ -207,7 +207,8 @@ export function useToolRegistry() {
           update({ status: "running" });
           setPendingNavigation(path);
           // Name the screen that actually opens, so the reply cannot claim a different one.
-          const label = EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path;
+          const crewAsked = new URLSearchParams(path.split("?")[1] ?? "").get("crew");
+          const label = (EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path) + (crewAsked ? ` for ${crewAsked}` : "");
           return ok(`Opening ${label}`, { path, screen: label });
         }
 

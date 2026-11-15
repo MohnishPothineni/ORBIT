@@ -198,10 +198,20 @@ function hrpStudiesLine(riskId){const list=HrpLinks.studiesFor(riskId);return li
 
 
 /* A link such as #log?crew=hist-ma9 opens the page for that crew member. The parameter is then removed, so a later choice in the crew selector is not undone on the next render. */
+/* The voice assistant may name the person instead ("Gordon Cooper", "Cooper", "Atlas 9"): match the id, then the full name, then one profile whose name or mission contains it. */
+function crewFromLink(text){
+ const all=crewProfiles(),t=String(text||'').trim().toLowerCase().replace(/\s+/g,' ');
+ if(!t)return null;
+ const exact=all.find(p=>p.id.toLowerCase()===t||p.name.toLowerCase()===t);if(exact)return exact;
+ const partial=all.filter(p=>`${p.name} ${p.mission||''}`.toLowerCase().includes(t));
+ return partial.length===1?partial[0]:null;
+}
 function applyCrewFromHash(){
- const [page,query='']=location.hash.slice(1).split('?'),params=new URLSearchParams(query),id=params.get('crew');
- if(!id)return;
- if(crewProfiles().some(p=>p.id===id)&&db().activeCrewId!==id){db().activeCrewId=id;focusedConditionId=null;filterQuery='';logLimit=20;persist();}
+ const [page,query='']=location.hash.slice(1).split('?'),params=new URLSearchParams(query),asked=params.get('crew');
+ if(!asked)return;
+ const id=crewFromLink(asked)?.id;
+ if(!id)toast(`No crew profile matches “${asked}”.`);
+ else if(db().activeCrewId!==id){db().activeCrewId=id;focusedConditionId=null;filterQuery='';logLimit=20;persist();}
  params.delete('crew');const rest=params.toString();
  history.replaceState(null,'',`#${page}${rest?'?'+rest:''}`);
 }
