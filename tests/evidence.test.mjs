@@ -219,7 +219,7 @@ test("historical references preserve metric count, source pages and missing valu
   assert.equal(rows[0].posture, "");
 });
 test("production worker precaches shell and fonts and keeps APIs NetworkOnly", async () => {
-  const source = await fs.readFile("dist/sw.js", "utf8");
+  const source = await fs.readFile("dist/voice/sw.js", "utf8");
   assert.match(source, /NetworkOnly/);
   assert.match(source, /woff2/);
   assert.match(source, /index\.html/);
@@ -307,7 +307,7 @@ test("generated worker routes exclude APIs from navigation fallback and cache on
     CacheableResponsePlugin: class {},
   };
   const define = (_deps, factory) => factory(workbox);
-  vm.runInNewContext(await fs.readFile("dist/sw.js", "utf8"), {
+  vm.runInNewContext(await fs.readFile("dist/voice/sw.js", "utf8"), {
     define,
     self: { define, addEventListener() {} },
   });

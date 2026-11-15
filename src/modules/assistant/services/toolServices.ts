@@ -81,6 +81,8 @@ export function searchEvidence(query: string, k = 3, signal?: AbortSignal): Prom
 }
 
 export interface SharePayload {
+  /** The voice session the record is shared with; the server forgets it when that session ends. */
+  sessionId: string;
   crewId: string;
   sections: string[];
   content: Record<string, unknown>;
@@ -96,10 +98,10 @@ export function shareRecordWithAssistant(payload: SharePayload, signal?: AbortSi
   );
 }
 
-/** Removes any shared record context from the local assistant (crew changed or session ended). */
-export function clearAssistantContext(signal?: AbortSignal): Promise<void> {
+/** Removes the records shared with one voice session (crew changed or session ended). */
+export function clearAssistantContext(sessionId: string, signal?: AbortSignal): Promise<void> {
   return withMock(
-    () => apiSend<void>("DELETE", "/api/assistant/context", undefined, { signal }),
+    () => apiSend<void>("DELETE", `/api/assistant/context?sessionId=${encodeURIComponent(sessionId)}`, undefined, { signal }),
     () => undefined,
     100,
     signal,

@@ -22,11 +22,11 @@ export default defineConfig({
         display: "standalone",
         background_color: "#0A0F17",
         theme_color: "#0A0F17",
-        start_url: "/evidence",
-        scope: "/",
+        start_url: "./evidence",
+        scope: "./",
         icons: [
           {
-            src: "/orbit-icon.svg",
+            src: "orbit-icon.svg",
             sizes: "any",
             type: "image/svg+xml",
             purpose: "any",
@@ -36,7 +36,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2,csv}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-        navigateFallback: "/index.html",
+        navigateFallback: "index.html",
         navigateFallbackDenylist: [/^\/api(?:\/|$)/, /^\/models\//],
         cleanupOutdatedCaches: true,
         runtimeCaching: [

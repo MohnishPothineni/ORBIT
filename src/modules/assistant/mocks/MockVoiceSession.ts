@@ -47,7 +47,8 @@ export class MockVoiceSession implements VoiceSession, MockControls {
   private speech: AbortController | null = null;
   private busy = false;
   private turnSeq = 0;
-  private callSeq = 0;
+  /** Stands in for the server's WebRTC pc_id so shared records are scoped the same way. */
+  private readonly sessionId = `mock-${crypto.randomUUID()}`;
   private metrics: PipelineMetrics | null = null;
   private errorTimer: number | undefined;
   private autoTimer: number | undefined;
@@ -85,15 +86,19 @@ export class MockVoiceSession implements VoiceSession, MockControls {
   async connect(): Promise<void> {
     if (this.run) return;
     this.run = new AbortController();
+    const run = this.run;
     this.tracker.update({ error: false });
     this.setConnection("connecting");
     this.audio = new MockAudio();
-    await this.audio.resume();
-    const hasMic = await this.audio.attachMic(null);
+    const audio = this.audio;
+    await audio.resume();
+    if (run.signal.aborted) return;
+    const hasMic = await audio.attachMic(null);
+    if (run.signal.aborted) return;
     this.em.emit("micPermission", hasMic ? "granted" : "denied");
-    this.mic = hasMic;
-    this.em.emit("micEnabled", hasMic);
-    this.tracker.update({ micEnabled: hasMic });
+    this.mic = hasMic && this.mic;
+    this.em.emit("micEnabled", this.mic);
+    this.tracker.update({ micEnabled: this.mic });
     this.em.emit("tracksChanged");
     this.em.emit("pipelineHealth", { stt: "ready", llm: "ready", tts: "ready", vad: "ready", turn: "ready" });
     try {
@@ -405,7 +410,7 @@ export class MockVoiceSession implements VoiceSession, MockControls {
   private async tool(name: string, args: Record<string, unknown>): Promise<ToolOutcome> {
     const signal = this.run?.signal;
     if (!signal) throw new Cancelled();
-    let call: ToolCallEvent = { id: `mock-call-${++this.callSeq}`, name, permission: toolPermission(name), args, status: "requested", startedAt: nowIso() };
+    let call: ToolCallEvent = { id: crypto.randomUUID(), name, permission: toolPermission(name), args, status: "requested", startedAt: nowIso() };
     const emit = () => {
       this.em.emit("toolCall", { ...call });
       const active = call.status === "requested" || call.status === "running" || call.status === "awaiting_confirmation";
@@ -425,6 +430,7 @@ export class MockVoiceSession implements VoiceSession, MockControls {
           emit();
         },
         ctrl.signal,
+        { sessionId: this.sessionId },
       );
       call = { ...call, status: outcome.status, resultSummary: outcome.resultSummary, error: outcome.error, finishedAt: nowIso() };
       emit();

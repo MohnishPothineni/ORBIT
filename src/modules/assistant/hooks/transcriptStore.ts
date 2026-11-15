@@ -98,9 +98,10 @@ export const transcript = {
     set({ ...state, items: [...state.items, { kind: "tool", id: c.id }], calls: { ...state.calls, [c.id]: c } });
   },
 
-  /** Close any open turns (session ended). */
+  /** Close unfinished transcript entries when the session ends. */
   closeAll() {
     const turns = { ...state.turns };
+    const calls = { ...state.calls };
     let changed = false;
     for (const id of Object.keys(turns)) {
       if (!turns[id].final) {
@@ -108,7 +109,13 @@ export const transcript = {
         changed = true;
       }
     }
-    if (changed) set({ ...state, turns });
+    for (const [id, call] of Object.entries(calls)) {
+      if (["requested", "running", "awaiting_confirmation"].includes(call.status)) {
+        calls[id] = { ...call, status: "declined", error: "Session ended", finishedAt: new Date().toISOString() };
+        changed = true;
+      }
+    }
+    if (changed) set({ ...state, turns, calls });
     pendingCitations = [];
   },
 

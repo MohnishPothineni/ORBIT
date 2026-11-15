@@ -28,6 +28,7 @@ export const MOCK_VOICE_CONFIG: VoiceConfig = {
     sttModel: "faster-whisper small.en",
     llmModel: "qwen3:8b",
     ttsModel: "Kokoro-82M",
+    turnDetection: "Smart Turn v3",
   },
   pipelineHealth: { stt: "ready", llm: "ready", tts: "ready", vad: "ready", turn: "ready" },
 };

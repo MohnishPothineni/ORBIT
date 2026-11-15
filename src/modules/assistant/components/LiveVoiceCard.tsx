@@ -6,6 +6,7 @@ import { ICON_STROKE } from "../../../shared/ui/cn";
 import { useAudioAnalyser } from "../hooks/useAudioAnalyser";
 import { useDocumentVisible, useReducedMotion } from "../hooks/usePreferences";
 import type { VoiceSessionState } from "../hooks/useVoiceSession";
+import { DOCKED } from "../../../shared/embed";
 import { turnStateMeta, TurnStateIndicator } from "./TurnStateIndicator";
 import { VadLane } from "./VadLane";
 import { VoiceControls } from "./VoiceControls";
@@ -94,13 +95,13 @@ export function LiveVoiceCard({ session, activeToolName, errorMessage, onRetryMi
       onKeyUp={onKeyUp}
       className="flex flex-col overflow-hidden focus-visible:outline-2 focus-visible:outline-focus"
     >
-      <div className="h-[220px] bg-sunken border-b border-line p-4">
+      <div className={DOCKED ? "bg-panel border-b border-line p-4" : "min-h-[220px] bg-panel border-b border-line p-4"}>
         {micBlocked ? (
           <MicBlocked unavailable={session.micPermission === "unavailable"} onRetry={onRetryMic} />
         ) : (
-          <div className="grid h-full grid-cols-[minmax(160px,220px)_1fr] gap-4">
-            <TurnStateIndicator state={session.turnState} toolName={activeToolName} errorMessage={errorMessage} />
-            <div className="flex min-w-0 flex-col justify-between gap-2">
+          <div className={DOCKED ? "flex flex-col items-center gap-3" : "grid h-full grid-cols-[minmax(160px,220px)_1fr] gap-4"}>
+            <TurnStateIndicator centered={DOCKED} state={session.turnState} toolName={activeToolName} errorMessage={errorMessage} />
+            <div className={DOCKED ? "flex w-full min-w-0 flex-col gap-2" : "flex min-w-0 flex-col justify-between gap-2"}>
               <WaveformCanvas
                 analyser={userAnalyser}
                 colorVar="--color-series-2"

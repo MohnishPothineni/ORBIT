@@ -100,7 +100,7 @@ export function SessionPipelineCard({ connectionState, metrics, history, config,
               <Model name="Silero" health={health.vad} />
             </Row>
             <Row label="Turn detection">
-              <Model name="Smart Turn v3" health={health.turn} />
+              <Model name={config?.capabilities.turnDetection ?? "—"} health={health.turn} />
             </Row>
           </dl>
         )}

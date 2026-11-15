@@ -43,7 +43,8 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
   const { activeCrew } = useCrew();
   const { toast } = useToast();
   const sessionRef = useRef<VoiceSession | null>(null);
-  const unsubs = useRef<Array<() => void>>([]);
+  const subscriptions = useRef<Array<() => void>>([]);
+  const ending = useRef<Promise<void> | null>(null);
 
   const [connectionState, setConnectionState] = useState<ConnectionState>("idle");
   const [turnState, setTurnState] = useState<TurnState>("idle");
@@ -56,7 +57,7 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
   const [lastError, setLastError] = useState<SessionError | null>(null);
   const [tracks, setTracks] = useState<{ local: MediaStreamTrack | null; bot: MediaStreamTrack | null }>({ local: null, bot: null });
   const [mock, setMock] = useState<MockControls | null>(null);
-  const [mockTick, setMockTick] = useState(0);
+  const [, refreshMock] = useState(0);
   const [hasSession, setHasSession] = useState(false);
 
   const state = useTranscript();
@@ -83,8 +84,8 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
   };
 
   const detach = () => {
-    unsubs.current.forEach((u) => u());
-    unsubs.current = [];
+    subscriptions.current.forEach((u) => u());
+    subscriptions.current = [];
   };
 
   const build = useCallback((): VoiceSession => {
@@ -93,10 +94,10 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
       clientTools: CLIENT_TOOL_NAMES,
       settings: live.current.settings,
     };
-    const s: VoiceSession = MOCK_MODE ? new MockVoiceSession(opts) : createPipecatSession(opts);
-    const refreshTracks = () => setTracks({ local: s.getLocalAudioTrack(), bot: s.getBotAudioTrack() });
-    unsubs.current = [
-      s.on("connectionState", (c) => {
+    const session: VoiceSession = MOCK_MODE ? new MockVoiceSession(opts) : createPipecatSession(opts);
+    const refreshTracks = () => setTracks({ local: session.getLocalAudioTrack(), bot: session.getBotAudioTrack() });
+    subscriptions.current = [
+      session.on("connectionState", (c) => {
         setConnectionState(c);
         refreshTracks();
         if (c === "idle" || c === "disconnected" || c === "error") {
@@ -105,18 +106,18 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
           openSegment("bot", false);
         }
       }),
-      s.on("turnState", setTurnState),
-      s.on("userSpeaking", (v) => openSegment("user", v)),
-      s.on("botSpeaking", (v) => openSegment("bot", v)),
-      s.on("userTranscript", (t) => {
+      session.on("turnState", setTurnState),
+      session.on("userSpeaking", (v) => openSegment("user", v)),
+      session.on("botSpeaking", (v) => openSegment("bot", v)),
+      session.on("userTranscript", (t) => {
         transcript.user(t.text, t.final, t.at, t.method);
-        // Voice approval of a share: only the person's own final spoken words.
-        if (t.final && t.method === "voice") live.current.registry.approveShareByVoice(t.text);
+        // Voice approval of a share or a save: only the person's own final spoken words.
+        if (t.final && t.method === "voice") live.current.registry.approveByVoice(t.text);
       }),
-      s.on("botTranscript", (t) => transcript.assistant(t.text, t.final, t.at)),
-      s.on("toolCall", (c) => transcript.call(c)),
-      s.on("citations", (c) => transcript.citations(c)),
-      s.on("metrics", (m) =>
+      session.on("botTranscript", (t) => transcript.assistant(t.text, t.final, t.at)),
+      session.on("toolCall", (c) => transcript.call(c)),
+      session.on("citations", (c) => transcript.citations(c)),
+      session.on("metrics", (m) =>
         setMetricsHistory((list) => {
           const i = list.findIndex((x) => x.turnId === m.turnId);
           if (i >= 0) {
@@ -127,44 +128,64 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
           return [...list, m].slice(-HISTORY);
         }),
       ),
-      s.on("error", (e) => setLastError({ ...e, at: Date.now() })),
-      s.on("endOfTurn", setEndOfTurn),
-      s.on("pipelineHealth", (h) => setPipelineHealth((cur) => ({ ...cur, ...h }))),
-      s.on("micPermission", setMicPermission),
-      s.on("micEnabled", setMicEnabledState),
-      s.on("tracksChanged", refreshTracks),
+      session.on("error", (e) => setLastError({ ...e, at: Date.now() })),
+      session.on("endOfTurn", setEndOfTurn),
+      session.on("pipelineHealth", (h) => setPipelineHealth((cur) => ({ ...cur, ...h }))),
+      session.on("micPermission", setMicPermission),
+      session.on("micEnabled", setMicEnabledState),
+      session.on("tracksChanged", refreshTracks),
     ];
-    setMock(s instanceof MockVoiceSession ? s : null);
-    return s;
+    setMock(session instanceof MockVoiceSession ? session : null);
+    return session;
   }, []);
 
   const connect = useCallback(async () => {
-    if (sessionRef.current) return;
+    if (sessionRef.current || ending.current) return;
     setLastError(null);
-    const s = build();
-    sessionRef.current = s;
+    setMetricsHistory([]);
+    setPipelineHealth({});
+    setSegments([]);
+    const session = build();
+    sessionRef.current = session;
     setHasSession(true);
     try {
-      await s.connect();
+      await session.connect();
     } catch {
       /* reported through the error event */
     }
   }, [build]);
 
-  const end = useCallback(async () => {
-    const s = sessionRef.current;
-    if (!s) return;
-    sessionRef.current = null;
-    setHasSession(false);
-    live.current.registry.declineAll();
-    await s.disconnect();
+  const end = useCallback((): Promise<void> => {
+    if (ending.current) return ending.current;
+    const session = sessionRef.current;
+    const registry = live.current.registry;
+    if (!session && registry.sharedContext.length === 0) return Promise.resolve();
+    registry.declineAll();
+    registry.consumeNavigation();
     detach();
+    transcript.closeAll();
     setMock(null);
     setTracks({ local: null, bot: null });
     setEndOfTurn(null);
-  }, []);
+    setSegments([]);
+    setTurnState("idle");
+    setConnectionState("disconnected");
 
-  const disconnect = useCallback(() => end(), [end]);
+    ending.current = (async () => {
+      try {
+        await session?.disconnect();
+      } catch {
+        toast({ level: "caution", title: "Session could not close cleanly" });
+      } finally {
+        await registry.clearShared();
+        sessionRef.current = null;
+        ending.current = null;
+        setHasSession(false);
+        setConnectionState("idle");
+      }
+    })();
+    return ending.current;
+  }, [toast]);
 
   // End the session when the active crew member changes.
   const crewId = activeCrew?.id ?? null;
@@ -175,33 +196,23 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
     prevCrew.current = crewId;
     if (!had) return;
     const wasActive = sessionRef.current !== null;
-    live.current.registry.clearShared();
+    void end();
     if (wasActive) {
-      void end();
-      toast({ level: "standby", title: "Session ended — crew changed", description: "Any shared record context was cleared." });
+      toast({ level: "standby", title: "Session ended — crew changed" });
     }
   }, [crewId, end, toast]);
 
   // Leaving the workspace ends the session.
   useEffect(
-    () => () => {
-      const s = sessionRef.current;
-      sessionRef.current = null;
-      if (s) {
-        live.current.registry.declineAll();
-        live.current.registry.clearShared();
-        void s.disconnect();
-      }
-      detach();
-    },
-    [],
+    () => () => { void end(); },
+    [end],
   );
 
   // Hiding the tab mutes the microphone; returning does not unmute.
   useEffect(() => {
     const onVis = () => {
-      const s = sessionRef.current;
-      if (document.visibilityState === "hidden" && s?.micEnabled) s.setMicEnabled(false);
+      const session = sessionRef.current;
+      if (document.visibilityState === "hidden" && session?.micEnabled) session.setMicEnabled(false);
     };
     document.addEventListener("visibilitychange", onVis);
     return () => document.removeEventListener("visibilitychange", onVis);
@@ -243,28 +254,22 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
   const toolCalls = useMemo(() => Object.values(state.calls), [state.calls]);
   const metrics = metricsHistory[metricsHistory.length - 1] ?? null;
 
-  const mockControls = useMemo(() => {
-    if (!mock) return null;
-    const wrap = (fn: () => void) => () => {
-      fn();
-      setMockTick((n) => n + 1);
-    };
-    return {
-      forceTurnState: (s: TurnState | null) => mock.forceTurnState(s),
-      triggerError: (fatal: boolean) => mock.triggerError(fatal),
-      playNextTurn: wrap(() => mock.playNextTurn()),
-      setAutoPlay: (on: boolean) => {
-        mock.setAutoPlay(on);
-        setMockTick((n) => n + 1);
-      },
-      sayConfirmShare: () => mock.sayConfirmShare(),
-      autoPlay: mock.autoPlay,
-      scriptIndex: mock.scriptIndex,
-      scriptLength: mock.scriptLength,
-    };
-    // mockTick forces a fresh snapshot of autoPlay / scriptIndex.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mock, mockTick, turnState]);
+  const mockControls = mock ? {
+    forceTurnState: (state: TurnState | null) => mock.forceTurnState(state),
+    triggerError: (fatal: boolean) => mock.triggerError(fatal),
+    playNextTurn: () => {
+      mock.playNextTurn();
+      refreshMock((version) => version + 1);
+    },
+    setAutoPlay: (on: boolean) => {
+      mock.setAutoPlay(on);
+      refreshMock((version) => version + 1);
+    },
+    sayConfirmShare: () => mock.sayConfirmShare(),
+    autoPlay: mock.autoPlay,
+    scriptIndex: mock.scriptIndex,
+    scriptLength: mock.scriptLength,
+  } : null;
 
   return {
     connectionState,
@@ -284,7 +289,7 @@ export function useVoiceSession(registry: ToolRegistry, settings: VoiceSettings 
     /** A session object exists (connecting, connected, or failed and awaiting "End session"). */
     isActive: hasSession,
     connect,
-    disconnect,
+    disconnect: end,
     sendText,
     interrupt,
     setMic,

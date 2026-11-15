@@ -36,9 +36,29 @@ export function isToolName(name: string): name is ToolName {
   return TOOL_DEFINITIONS.some((t) => t.name === name);
 }
 
+/**
+ * How long a write/share confirmation waits for a person. Kept shorter than the
+ * server's CONFIRM_TIMEOUT_SECS (300 s, server/orbit_server/tools.py) so the
+ * browser always gives up first and reports "declined" to the model, instead of
+ * leaving a Save button that still works after the model was told it timed out.
+ */
+export const CONFIRM_TIMEOUT_MS = 285_000;
+
 /** The exact phrase a person must speak to approve a share by voice. */
 export const VOICE_SHARE_PHRASE = "confirm share";
 
+/** The exact phrase a person must speak to save a drafted reading by voice. */
+export const VOICE_SAVE_PHRASE = "confirm save";
+
+/** Speech recognition may add punctuation ("Confirm, save."); compare the words only. */
+function spokenWords(text: string): string {
+  return text.toLowerCase().replace(/[.!?,;:]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
 export function isVoiceShareApproval(text: string): boolean {
-  return text.trim().toLowerCase().replace(/[.!?,]+$/g, "") === VOICE_SHARE_PHRASE;
+  return spokenWords(text) === VOICE_SHARE_PHRASE;
+}
+
+export function isVoiceSaveApproval(text: string): boolean {
+  return spokenWords(text) === VOICE_SAVE_PHRASE;
 }
