@@ -42,7 +42,7 @@ from pipecat.workers.runner import WorkerRunner
 from . import config
 from .health import pipeline_health, warm_up_llm
 from .store import store
-from .tools import ClientToolBridge, openai_tools, register_client_tools, tools_schema
+from .tools import ClientToolBridge, ConfirmPhraseGate, openai_tools, register_client_tools, tools_schema
 from .voice_settings import VAD_CONFIDENCE, VoiceSettings, load_settings
 
 BASE_PROMPT = """You are the ORBIT crew assistant, a calm, warm and knowledgeable voice assistant
@@ -240,6 +240,7 @@ async def run_bot(connection: SmallWebRTCConnection) -> None:
             transport.input(),
             bridge,
             stt,
+            ConfirmPhraseGate(bridge),
             user_aggregator,
             llm,
             tts,

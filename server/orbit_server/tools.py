@@ -12,12 +12,19 @@ interruption and context bookkeeping work as for any server-side tool.
 """
 
 import asyncio
+import re
 from typing import Any
 
 from loguru import logger
 from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 from pipecat.adapters.llm.schemas.tools_schema import ToolsSchema
-from pipecat.frames.frames import Frame, FunctionCallResultFrame
+from pipecat.frames.frames import (
+    Frame,
+    FunctionCallResultFrame,
+    InterimTranscriptionFrame,
+    LLMMessagesAppendFrame,
+    TranscriptionFrame,
+)
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 from pipecat.services.llm_service import FunctionCallParams, LLMService
 
@@ -127,12 +134,39 @@ def openai_tools() -> list[dict]:
     return [{"type": "function", "function": s.to_default_dict()} for s in SCHEMAS]
 
 
+# The exact phrase a person speaks to approve each waiting tool. The browser decides whether
+# it counts (spoken only, never typed); see src/modules/assistant/tools/definitions.ts.
+CONFIRM_PHRASES = {"confirm save": "log_vital", "confirm share": "share_record_with_assistant"}
+
+
+def confirm_phrase_tool(text: str) -> str | None:
+    """The tool a confirm phrase approves, or None if the text is not one."""
+    words = re.sub(r"[.!?,;:]+", " ", text.lower())
+    return CONFIRM_PHRASES.get(" ".join(words.split()))
+
+
 class ClientToolBridge(FrameProcessor):
-    """Catches tool results sent by the browser and hands them to the waiting handler."""
+    """Catches tool results sent by the browser and hands them to the waiting handler.
+
+    Also keeps a confirm phrase ("Confirm save", "Confirm share") from the LLM when it
+    approves nothing, while a save or share waits. The model would otherwise answer that
+    something was saved before the person's decision is known. Typed text arrives here and
+    never approves; spoken text is checked by ConfirmPhraseGate after speech recognition.
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._waiting: dict[str, asyncio.Future] = {}
+        # Names of human-confirmed tools waiting for a person, one entry per call.
+        self.confirmations: list[str] = []
+
+    def holds_back(self, text: str, spoken: bool) -> bool:
+        tool = confirm_phrase_tool(text)
+        if not tool or not self.confirmations:
+            return False
+        # A spoken phrase that matches a waiting tool approves it in the browser, so the
+        # model may answer it (the result arrives with it). Anything else approves nothing.
+        return not (spoken and tool in self.confirmations)
 
     def expect(self, tool_call_id: str) -> asyncio.Future:
         fut = asyncio.get_running_loop().create_future()
@@ -153,16 +187,46 @@ class ClientToolBridge(FrameProcessor):
             if not fut.done():
                 fut.set_result(frame.result)
             return  # the LLM service re-broadcasts the result properly
+        if isinstance(frame, LLMMessagesAppendFrame) and self._typed_confirmation(frame):
+            logger.debug("Kept a typed confirm phrase from the LLM while a confirmation waits")
+            return
+        await self.push_frame(frame, direction)
+
+    def _typed_confirmation(self, frame: LLMMessagesAppendFrame) -> bool:
+        messages = frame.messages
+        if len(messages) != 1 or messages[0].get("role") != "user":
+            return False
+        content = messages[0].get("content")
+        return isinstance(content, str) and self.holds_back(content, spoken=False)
+
+
+class ConfirmPhraseGate(FrameProcessor):
+    """Sits after speech recognition. Drops a spoken confirm phrase that approves nothing
+    (such as "Confirm save" while only a share waits), so the LLM does not answer it."""
+
+    def __init__(self, bridge: ClientToolBridge, **kwargs):
+        super().__init__(**kwargs)
+        self._bridge = bridge
+
+    async def process_frame(self, frame: Frame, direction: FrameDirection):
+        await super().process_frame(frame, direction)
+        if isinstance(frame, (TranscriptionFrame, InterimTranscriptionFrame)) and self._bridge.holds_back(frame.text, spoken=True):
+            return
         await self.push_frame(frame, direction)
 
 
 def register_client_tools(llm: LLMService, bridge: ClientToolBridge) -> None:
     async def relay(params: FunctionCallParams):
         fut = bridge.expect(params.tool_call_id)
+        confirmed = params.function_name in HUMAN_CONFIRMED
+        if confirmed:
+            bridge.confirmations.append(params.function_name)
         try:
             result: Any = await fut
         finally:
             bridge.forget(params.tool_call_id)
+            if confirmed:
+                bridge.confirmations.remove(params.function_name)
         logger.debug(f"Tool {params.function_name} returned from browser")
         await params.result_callback(result)
 
