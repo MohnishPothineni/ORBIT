@@ -66,7 +66,7 @@ Or `npm run build` and open `https://localhost:8443` directly (also from other d
 
 **Tools** run in the browser. The server advertises them to the model (`server/orbit_server/tools.py`) and relays each call to the page and its result back. `log_vital` and `share_record_with_assistant` survive interruptions and wait for a person. The browser gives up after 4 min 45 s and tells the model nothing was saved or shared, before the server's 5-minute backstop, so no Save button outlives the request.
 
-**Data:** crew data is synthetic (`server/data/seed.json`, matching the frontend mocks). Saved vitals and voice settings go to `server/data/runtime/` (gitignored).
+**Data:** the voice assistant's crew are the website's historical showcase, Gordon Cooper (Mercury-Atlas 9) and Scott Carpenter (Mercury-Atlas 7), with the same ids (`hist-ma9`, `hist-ma7`). `server/data/seed.json` holds their latest readings, generated from `ui/historical-crew.js` by `node scripts/seed-historical-crew.cjs`. The React mock mode keeps its own synthetic crew (`src/shared/mocks/crew.ts`). Saved vitals and voice settings go to `server/data/runtime/` (gitignored).
 
 **Evidence:** the assistant searches the website's Evidence library. `scripts/export-research.mjs` exports `ui/research-library.js` to `server/data/research-library.json` (run by `npm run build`; the file is committed, and `npm test` fails if it falls out of date). Each passage carries its evidence type, tracking guidance and source papers. Citations link to `#research?doc=<topic>&chunk=<entry>`, which opens that entry. Search is keyword matching; there is no FAISS index yet, so the status bar reports the index as missing.
 

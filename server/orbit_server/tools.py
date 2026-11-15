@@ -30,7 +30,7 @@ from pipecat.services.llm_service import FunctionCallParams, LLMService
 
 from .store import VITAL_META
 
-CALLSIGN = {"type": "string", "description": "Crew callsign, e.g. VEGA, HALO, TALON or IRIS."}
+CALLSIGN = {"type": "string", "description": "Crew callsign: COOPER (Gordon Cooper, Mercury-Atlas 9) or CARPENTER (Scott Carpenter, Mercury-Atlas 7)."}
 
 SCHEMAS = [
     FunctionSchema(
@@ -63,15 +63,14 @@ SCHEMAS = [
     FunctionSchema(
         name="navigate",
         description=(
-            "Open a screen in this console. Paths: /crew, /crew?crew=c01, /anatomy, /anatomy?region=left_knee, "
-            "/evidence, /assistant. Crew ids: VEGA=c01, HALO=c02, TALON=c03, IRIS=c04. "
+            "Open a screen in this console. Paths: /crew, /anatomy, /anatomy?region=left_knee, /evidence, /assistant. "
             "Website pages: /status (crew status), /log (health log and trends), /trends (the trends section of /log), "
             "/care (health assessment), /wellbeing, /exercise and /skin (tabs inside health assessment), "
             "/routine (daily routine), /risks (health risk readings). "
             "To open a crew member's record on the main screen, use /crew?crew=<their name or callsign, as the "
             "person said it>, or /log?crew=<name> for their health log. Examples: /crew?crew=Gordon Cooper, "
-            "/log?crew=Scott Carpenter, /crew?crew=HALO. Gordon Cooper (Mercury-Atlas 9) and Scott Carpenter "
-            "(Mercury-Atlas 7) are historical profiles from past missions, not current crew. "
+            "/log?crew=Scott Carpenter. The crew are Gordon Cooper (Mercury-Atlas 9, 1963) and Scott Carpenter "
+            "(Mercury-Atlas 7, 1962): historical profiles from past missions. "
             "The result names the screen that opened."
         ),
         properties={"path": {"type": "string", "description": "A path starting with /."}},

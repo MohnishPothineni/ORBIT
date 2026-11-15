@@ -59,15 +59,9 @@ export function websiteTab(path: string): string {
 
 /** Website URL for an in-app path such as `/anatomy?region=knee_left`. */
 export function websiteHref(path: string): string {
-  const [, rawQuery = ""] = path.split("?");
-  const params = new URLSearchParams(rawQuery);
-  // This app's crew (c01 to c04, callsigns VEGA, HALO, TALON, IRIS) are the website's crew-01 to
-  // crew-04. Anything else, such as a name ("Gordon Cooper"), is matched by the website itself.
-  const crew = params.get("crew")?.trim();
-  const callsign = ["VEGA", "HALO", "TALON", "IRIS"].indexOf((crew ?? "").toUpperCase());
-  if (crew && /^c\d{2}$/i.test(crew)) params.set("crew", `crew-${crew.slice(1)}`);
-  else if (callsign >= 0) params.set("crew", `crew-0${callsign + 1}`);
-  const query = params.toString();
+  // Crew ids are shared with the website (hist-ma9, hist-ma7). A name or callsign such as
+  // "Gordon Cooper" or "COOPER" is matched by the website itself.
+  const [, query = ""] = path.split("?");
   const tab = websiteTab(path);
   return `/#${tab}${query ? `?${query}` : ""}`;
 }

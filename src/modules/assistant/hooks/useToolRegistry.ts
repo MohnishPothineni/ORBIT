@@ -98,9 +98,14 @@ export function useToolRegistry() {
     const { crew: list, getCrew: byId } = live.current;
     const id = readString(args.crew_id) ?? readString(args.crewId);
     if (id) return byId(id) ?? null;
-    const callsign = readString(args.callsign)?.toUpperCase();
-    if (callsign) return list.find((c) => c.callsign === callsign) ?? null;
-    return null;
+    // The model may give a callsign ("COOPER"), a full name ("Gordon Cooper") or a surname.
+    const said = (readString(args.callsign) ?? readString(args.name))?.trim().toUpperCase();
+    if (!said) return null;
+    return (
+      list.find((c) => c.callsign === said || c.fullName.toUpperCase() === said) ??
+      list.find((c) => c.fullName.toUpperCase().split(" ").at(-1) === said) ??
+      null
+    );
   }, []);
 
   const waitFor = useCallback((req: Confirmation, signal: AbortSignal): Promise<Decision> => {

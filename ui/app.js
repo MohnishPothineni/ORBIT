@@ -92,9 +92,8 @@ window.addEventListener('message',e=>{
  if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||m?.type!=='orbit:vital-saved')return;
  const field=VOICE_VITAL_FIELDS[m.kind],limits=InputLogic.fields[field],value=Number(m.value),at=Date.parse(m.recordedAt);
  if(!field||!limits||!Number.isFinite(value)||value<limits.min||value>limits.max||!Number.isFinite(at))return;
- /* The assistant's crew ids are c01 to c04; the website's are crew-01 to crew-04. */
- const crewId=/^c\d{2}$/.test(m.crewId)?'crew-'+m.crewId.slice(1):'';
- const profile=crewProfiles().find(p=>p.id===crewId);
+ /* The assistant and the website share crew ids (hist-ma9, hist-ma7). */
+ const profile=crewProfiles().find(p=>p.id===m.crewId),crewId=profile?.id;
  if(!profile){toast('The assistant saved a reading for a crew member who is not in this workspace, so it was not added to the Health log.');return;}
  /* Readings said together (systolic, then diastolic) become one Health log row. */
  const recent=db().entries.find(r=>r.source===VOICE_VITAL_SOURCE&&r.crewId===crewId&&!Number.isFinite(r[field])&&Math.abs(Date.parse(r.at)-at)<120000);
