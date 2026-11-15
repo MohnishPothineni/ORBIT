@@ -38,7 +38,6 @@
           <button type="button" id="assistant-tab-chat" role="tab" aria-controls="assistant-room" aria-selected="true">Assistant</button>
           <button type="button" id="assistant-tab-appearance" role="tab" aria-controls="assistant-appearance" aria-selected="false" tabindex="-1">Appearance</button>
         </div>
-        <button class="companion-collapse" id="assistant-collapse" type="button" aria-label="Close assistant" title="Close assistant">${icon('close')}</button>
       </div>
       <header class="companion-head">
         <div class="companion-portrait" id="assistant-avatar-canvas" aria-label="3D crew avatar">
@@ -318,7 +317,8 @@
       selectCrew(profile.id);return siteReply('session_ended','The crew member changed. The previous conversation and record permissions ended.');
     }
     if(f.startsWith('assistant-')){
-      if(f==='assistant-expand'||f==='assistant-minimize'){setExpanded(f==='assistant-expand');return siteReply('applied','Assistant controls '+(f==='assistant-expand'?'expanded.':'minimized.'));}
+      if(f==='assistant-expand'){setExpanded(true);return siteReply('applied','Assistant controls are open.');}
+      if(f==='assistant-minimize')return siteReply('declined','The assistant stays open in its own panel on this site and cannot be minimized.');
       if(f==='assistant-end'){await stop();return siteReply('session_ended','The assistant session ended.');}
       const session=bridge.active();if(!session||sessionKind!=='voice')return siteReply('session_required','No voice microphone session is active.');
       if(f==='assistant-unmute'){if(muted&&control.source==='user'){muted=false;session.setMicMuted(false);setStatus('Listening');paint();return siteReply('applied','The microphone is unmuted.');}el('mute').focus();return siteReply(muted?'user_gesture_required':'unchanged',muted?'Type Unmute microphone or choose the Unmute microphone button to resume sending audio.':'The microphone is already unmuted.');}
@@ -637,15 +637,16 @@
     document.querySelector('.local-status small').textContent = connected ? 'AGENT ONLINE' : 'LOCAL RECORDS';
     updateDoctorState();
   }
-  function setExpanded(expanded) {
+  /* The assistant stays fully open in its own panel; it cannot be minimized or closed. */
+  function setExpanded() {
+    const expanded = true;
     if (!expanded && el('panel').contains(document.activeElement)) el('launch').focus({preventScroll:true});
     el('room').hidden = !expanded||assistantTab!=='chat';
     el('appearance').hidden = !expanded||assistantTab!=='appearance';
     el('panel').dataset.expanded=String(expanded);
     document.body.dataset.assistantExpanded=String(expanded);
     el('launch').setAttribute('aria-expanded',String(expanded));
-    el('launch').setAttribute('aria-label',expanded?'Collapse assistant controls':'Open crew assistant');
-    if(!expanded&&el('collapse')===document.activeElement)el('launch').focus({preventScroll:true});
+    el('launch').setAttribute('aria-label','Crew assistant');
   }
   function setAssistantTab(tab) {
     assistantTab=tab==='appearance'?'appearance':'chat';
@@ -659,13 +660,6 @@
     setAssistantTab('chat');paint();
     if(localVoice)return;
     void loadDoctor();doctorAvatar?.setVisible(true);
-  }
-  function closePanel() {
-    el('panel').hidden = true;
-    document.body.dataset.assistantClosed = 'true';
-    el('reopen').hidden = false;
-    doctorAvatar?.setVisible(false);
-    el('reopen').focus({preventScroll:true});
   }
   function setLocalVoice(on, options = {}) {
     if (on === localVoice && !options.drop) return;
@@ -895,9 +889,8 @@
     if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
     event.preventDefault();setAssistantTab(event.key==='Home'?'chat':event.key==='End'?'appearance':assistantTab==='chat'?'appearance':'chat');el('tab-'+assistantTab).focus();
   });
-  el('launch').addEventListener('click',()=>setExpanded(el('panel').dataset.expanded!=='true'));
-  el('collapse').addEventListener('click',closePanel);
-  el('reopen').addEventListener('click',()=>{openPanel();el('collapse').focus({preventScroll:true});});
+  el('launch').addEventListener('click',()=>setExpanded(true));
+  el('reopen').addEventListener('click',()=>{openPanel();el('launch').focus({preventScroll:true});});
   host.addEventListener('click',event=>{const command=event.target.closest('[data-assistant-command]');if(command)void send(command.dataset.assistantCommand);});
   for(const type of ['input','change'])document.addEventListener(type,event=>{
     const form=event.target.closest('form');if(form?.matches('#health-form,#care-assessment-form,#condition-form,#crew-profile-form,#care-plan-form,#input-photo-form,#settings-form'))form.dataset.assistantDirty='true';
@@ -946,10 +939,6 @@
     if ($('#modal').open) closeModal(); openPanel();el('share-details').open=true;
     if (bridge.active()) void reviewPhoto(); else showError('Start a voice or text session, then choose Review selected image. Nothing has been uploaded.');
   });
-  document.addEventListener('keydown',event => {
-    if (event.key !== 'Escape' || el('panel').dataset.expanded!=='true' || document.querySelector('dialog[open]') || document.body.classList.contains('nav-open')) return;
-    setExpanded(false);
-  });
   document.addEventListener('visibilitychange',() => {
     doctorAvatar?.setVisible(isOpen()&&!document.hidden&&!localVoice);
     if(document.hidden)doctorSpeech?.reset();
@@ -959,10 +948,8 @@
   window.addEventListener('pageshow',event => { if (event.persisted){void stop();if(isOpen())void loadDoctor();} });
   window.addEventListener('offline',() => { if (bridge.active() || starting) void stop('Offline'); showError('The assistant needs internet access. The local medical response guide remains available.'); paint(); });
   window.addEventListener('online',() => { if (isOpen()) { showError(); paint(); } });
-  /* The dock opens on wide screens (ORBIT 2's dock layout) and folds away when the screen narrows, unless a conversation is running. */
-  const wideDock = window.matchMedia('(min-width: 1100px)');
-  wideDock.addEventListener('change', event => { if (!event.matches && !bridge.active() && !starting && !localVoice) setExpanded(false); });
-  setExpanded(wideDock.matches);paint();
+  /* The dock is always open: a column beside the page, or its own section below it on small screens. */
+  setExpanded(true);paint();
   /* The avatar is about 7 MB with three.js. Mount the same portrait for the launcher and conversation after the page is usable, and only when the dock is open. */
   const whenIdle=run=>'requestIdleCallback' in window?requestIdleCallback(run,{timeout:3000}):setTimeout(run,1200);
   const deferDoctor=()=>whenIdle(()=>{if(isOpen())void loadDoctor();});
