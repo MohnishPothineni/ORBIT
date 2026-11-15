@@ -53,7 +53,7 @@ SCHEMAS = [
         description=(
             "Draft a vital-sign reading for a crew member. The person presses Save on screen, or says \"confirm save\", before it is stored; "
             "this tool returns only after they decide, and the result says whether it was saved. "
-            "Saved readings also appear in the website's Health log."
+            "Saved readings also appear in the website's Health log. If a form is open on screen, use fill_form instead."
         ),
         properties={
             "callsign": CALLSIGN,
@@ -109,6 +109,18 @@ SCHEMAS = [
             )},
         },
         required=["form"],
+    ),
+    FunctionSchema(
+        name="fill_form",
+        description=(
+            "Type values into the form that is open on screen (one you opened with open_form, or one the person "
+            "opened). Use the field names listed when the form opened, e.g. {\"hr\": 82, \"sys\": 120, \"dia\": 80, "
+            "\"notes\": \"after exercise\"}. When a form is open and the person tells you values or asks you to "
+            "type or change something in it, use this, not log_vital. It does not save: the person checks the "
+            "form and presses Save, so never say anything was saved or logged."
+        ),
+        properties={"values": {"type": "object", "description": "Field names and their values."}},
+        required=["values"],
     ),
     FunctionSchema(
         name="control_anatomy",
