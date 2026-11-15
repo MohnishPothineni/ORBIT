@@ -136,7 +136,9 @@ class Store:
 
     def search_evidence(self, query: str, k: int) -> list[dict[str, Any]]:
         """Keyword search over the local passages (no embeddings yet)."""
-        terms = {_stem(w) for w in _WORD.findall(query.lower()) if len(w) > 2}
+        # Keep short numerical record identifiers (e.g. 001, 9) and ignore question filler.
+        stop = {"what", "was", "were", "the", "for", "and", "with", "does", "this", "that", "show", "tell", "about", "during"}
+        terms = {_stem(w) for w in _WORD.findall(query.lower()) if (len(w) > 2 or w.isdigit()) and w not in stop}
         if not terms:
             return []
         scored = []
@@ -145,7 +147,10 @@ class Store:
             words |= {_stem(w) for w in chunk.get("keywords", [])}
             hits = len(terms & words)
             if hits:
-                scored.append((hits / len(terms), chunk))
+                # Exact record ids outrank incidental word matches in other records.
+                record_ids = re.findall(r"\b(?:NASA-VITAL-\d+|SKYLAB[\w-]+)\b", query, re.IGNORECASE)
+                exact = any(record_id.lower() in chunk["title"].lower() for record_id in record_ids)
+                scored.append((hits / len(terms) + (1 if exact else 0), chunk))
         scored.sort(key=lambda s: s[0], reverse=True)
         return [
             {k_: c[k_] for k_ in ("documentId", "chunkId", "title", "excerpt")} | {"score": round(score, 2)}
