@@ -49,6 +49,18 @@ def _stem(word: str) -> str:
     return word[:5] if len(word) > 5 else word.rstrip("s")
 
 
+def _dated_today(item: dict[str, Any], field: str) -> dict[str, Any]:
+    """Replace a "dailyAt" local time of day ("07:00") with today's date at that time, in UTC."""
+    if "dailyAt" not in item:
+        return item
+    hour, minute = (int(x) for x in item["dailyAt"].split(":"))
+    local = datetime.now().astimezone().replace(hour=hour, minute=minute, second=0, microsecond=0)
+    at = min(local, datetime.now().astimezone())  # never in the future, as on the website
+    out = {k: v for k, v in item.items() if k != "dailyAt"}
+    out[field] = at.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return out
+
+
 class Store:
     def __init__(self) -> None:
         self._lock = threading.Lock()
@@ -85,7 +97,14 @@ class Store:
         return next((c for c in self.crew if c["id"] == crew_id), None)
 
     def summary(self, crew_id: str) -> dict[str, Any]:
-        return self.summaries.get(crew_id) or {"crewId": crew_id, "readings": [], "wellbeing": None}
+        summary = self.summaries.get(crew_id) or {"crewId": crew_id, "readings": [], "wellbeing": None}
+        # The sample crew's readings roll forward on the website (a reading every morning), so the
+        # seed gives a local time of day ("dailyAt") and they are dated today here.
+        readings = [_dated_today(r, "recordedAt") for r in summary["readings"]]
+        wellbeing = summary.get("wellbeing")
+        if wellbeing and "dailyAt" in wellbeing:
+            wellbeing = _dated_today(wellbeing, "checkInAt")
+        return {**summary, "readings": readings, "wellbeing": wellbeing}
 
     def add_vital(self, crew_id: str, kind: str, value: float, recorded_at: str | None) -> dict[str, Any]:
         """Validate and store a reading. Raises ValueError with a readable message."""

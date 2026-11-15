@@ -30,7 +30,10 @@ from pipecat.services.llm_service import FunctionCallParams, LLMService
 
 from .store import VITAL_META
 
-CALLSIGN = {"type": "string", "description": "Crew callsign: COOPER (Gordon Cooper, Mercury-Atlas 9) or CARPENTER (Scott Carpenter, Mercury-Atlas 7)."}
+CALLSIGN = {"type": "string", "description": (
+    "Crew callsign: CREW01, CREW02, CREW03 or CREW04 (Crew 01 to 04, the current sample crew), "
+    "COOPER (Gordon Cooper, Mercury-Atlas 9) or CARPENTER (Scott Carpenter, Mercury-Atlas 7)."
+)}
 
 SCHEMAS = [
     FunctionSchema(
@@ -69,8 +72,10 @@ SCHEMAS = [
             "/routine (daily routine), /risks (health risk readings). "
             "To open a crew member's record on the main screen, use /crew?crew=<their name or callsign, as the "
             "person said it>, or /log?crew=<name> for their health log. Examples: /crew?crew=Gordon Cooper, "
-            "/log?crew=Scott Carpenter. The crew are Gordon Cooper (Mercury-Atlas 9, 1963) and Scott Carpenter "
-            "(Mercury-Atlas 7, 1962): historical profiles from past missions. "
+            "/log?crew=Scott Carpenter, /crew?crew=Crew 03. The crew are Crew 01 (commander, crew leader), Crew 02 (pilot), "
+            "Crew 03 (mission specialist, medical officer) and Crew 04 (flight engineer), the current sample crew; "
+            "and Gordon Cooper (Mercury-Atlas 9, 1963) and Scott Carpenter (Mercury-Atlas 7, 1962), historical "
+            "profiles from past missions. "
             "The result names the screen that opened."
         ),
         properties={"path": {"type": "string", "description": "A path starting with /."}},

@@ -1,6 +1,42 @@
 {
-  "_note": "Historical showcase: Gordon Cooper (Mercury-Atlas 9) and Scott Carpenter (Mercury-Atlas 7). Latest readings per kind from ui/historical-crew.js (user-supplied transcription of NASA records, not independently verified). Regenerate with node scripts/seed-historical-crew.cjs if those records change.",
+  "_note": "The voice assistant's crew, the same as the website's demo workspace: Crew 01 to 04 (fictional sample crew; readings dated today by the server) and Gordon Cooper and Scott Carpenter (historical NASA records, user-supplied transcription, not independently verified). Regenerate with node scripts/seed-voice-crew.cjs.",
   "crew": [
+    {
+      "id": "crew-01",
+      "callsign": "CREW01",
+      "fullName": "Crew 01",
+      "role": "commander",
+      "initials": "01",
+      "isCrewLeader": true,
+      "isMedicalOfficer": false
+    },
+    {
+      "id": "crew-02",
+      "callsign": "CREW02",
+      "fullName": "Crew 02",
+      "role": "pilot",
+      "initials": "02",
+      "isCrewLeader": false,
+      "isMedicalOfficer": false
+    },
+    {
+      "id": "crew-03",
+      "callsign": "CREW03",
+      "fullName": "Crew 03",
+      "role": "mission_specialist",
+      "initials": "03",
+      "isCrewLeader": false,
+      "isMedicalOfficer": true
+    },
+    {
+      "id": "crew-04",
+      "callsign": "CREW04",
+      "fullName": "Crew 04",
+      "role": "flight_engineer",
+      "initials": "04",
+      "isCrewLeader": false,
+      "isMedicalOfficer": false
+    },
     {
       "id": "hist-ma9",
       "callsign": "COOPER",
@@ -21,6 +57,242 @@
     }
   ],
   "summaries": {
+    "crew-01": {
+      "crewId": "crew-01",
+      "readings": [
+        {
+          "kind": "heart_rate",
+          "label": "Heart rate",
+          "value": 64,
+          "unit": "bpm",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "spo2",
+          "label": "SpO₂",
+          "value": 98,
+          "unit": "%",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "systolic_bp",
+          "label": "Systolic BP",
+          "value": 118,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "diastolic_bp",
+          "label": "Diastolic BP",
+          "value": 77,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "temperature",
+          "label": "Temperature",
+          "value": 36.7,
+          "unit": "°C",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "respiratory_rate",
+          "label": "Respiratory rate",
+          "value": 15,
+          "unit": "/min",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        }
+      ],
+      "wellbeing": {
+        "dailyAt": "07:00",
+        "mood": "Neutral",
+        "stress": "High",
+        "note": "Slept less after a schedule change. No symptoms reported."
+      }
+    },
+    "crew-02": {
+      "crewId": "crew-02",
+      "readings": [
+        {
+          "kind": "heart_rate",
+          "label": "Heart rate",
+          "value": 60,
+          "unit": "bpm",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "spo2",
+          "label": "SpO₂",
+          "value": 98,
+          "unit": "%",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "systolic_bp",
+          "label": "Systolic BP",
+          "value": 115,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "diastolic_bp",
+          "label": "Diastolic BP",
+          "value": 76,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "temperature",
+          "label": "Temperature",
+          "value": 36.6,
+          "unit": "°C",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "respiratory_rate",
+          "label": "Respiratory rate",
+          "value": 15,
+          "unit": "/min",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        }
+      ],
+      "wellbeing": {
+        "dailyAt": "07:00",
+        "mood": "Good",
+        "stress": "Low",
+        "note": "Synthetic routine check for Crew 02. No actual astronaut data."
+      }
+    },
+    "crew-03": {
+      "crewId": "crew-03",
+      "readings": [
+        {
+          "kind": "heart_rate",
+          "label": "Heart rate",
+          "value": 82,
+          "unit": "bpm",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "spo2",
+          "label": "SpO₂",
+          "value": 98,
+          "unit": "%",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "systolic_bp",
+          "label": "Systolic BP",
+          "value": 118,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "diastolic_bp",
+          "label": "Diastolic BP",
+          "value": 77,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "temperature",
+          "label": "Temperature",
+          "value": 36.6,
+          "unit": "°C",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "respiratory_rate",
+          "label": "Respiratory rate",
+          "value": 15,
+          "unit": "/min",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        }
+      ],
+      "wellbeing": {
+        "dailyAt": "07:00",
+        "mood": "Good",
+        "stress": "Low",
+        "note": "Synthetic routine check for Crew 03. No actual astronaut data."
+      }
+    },
+    "crew-04": {
+      "crewId": "crew-04",
+      "readings": [
+        {
+          "kind": "heart_rate",
+          "label": "Heart rate",
+          "value": 66,
+          "unit": "bpm",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "spo2",
+          "label": "SpO₂",
+          "value": 98,
+          "unit": "%",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "systolic_bp",
+          "label": "Systolic BP",
+          "value": 121,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "diastolic_bp",
+          "label": "Diastolic BP",
+          "value": 78,
+          "unit": "mmHg",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "temperature",
+          "label": "Temperature",
+          "value": 36.6,
+          "unit": "°C",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        },
+        {
+          "kind": "respiratory_rate",
+          "label": "Respiratory rate",
+          "value": 15,
+          "unit": "/min",
+          "dailyAt": "07:00",
+          "source": "sample crew record (fictional)"
+        }
+      ],
+      "wellbeing": {
+        "dailyAt": "07:00",
+        "mood": "Good",
+        "stress": "Low",
+        "note": "Synthetic routine check for Crew 04. No actual astronaut data."
+      }
+    },
     "hist-ma9": {
       "crewId": "hist-ma9",
       "readings": [
@@ -30,7 +302,7 @@
           "value": 80,
           "unit": "bpm",
           "recordedAt": "1963-05-17T17:29:00Z",
-          "source": "historical record NASA-VITAL-006 (Mercury-Atlas 9, Postflight, standing, 18 hours after landing)"
+          "source": "historical record NASA-VITAL-006 (Mercury-Atlas 9)"
         },
         {
           "kind": "systolic_bp",
@@ -38,7 +310,7 @@
           "value": 94,
           "unit": "mmHg",
           "recordedAt": "1963-05-17T17:29:00Z",
-          "source": "historical record NASA-VITAL-006 (Mercury-Atlas 9, Postflight, standing, 18 hours after landing)"
+          "source": "historical record NASA-VITAL-006 (Mercury-Atlas 9)"
         },
         {
           "kind": "diastolic_bp",
@@ -46,7 +318,7 @@
           "value": 68,
           "unit": "mmHg",
           "recordedAt": "1963-05-17T17:29:00Z",
-          "source": "historical record NASA-VITAL-006 (Mercury-Atlas 9, Postflight, standing, 18 hours after landing)"
+          "source": "historical record NASA-VITAL-006 (Mercury-Atlas 9)"
         },
         {
           "kind": "temperature",
@@ -54,7 +326,7 @@
           "value": 37.44,
           "unit": "°C",
           "recordedAt": "1963-05-17T03:10:00Z",
-          "source": "historical record NASA-VITAL-007 (Mercury-Atlas 9, Postflight)"
+          "source": "historical record NASA-VITAL-007 (Mercury-Atlas 9)"
         },
         {
           "kind": "respiratory_rate",
@@ -62,7 +334,7 @@
           "value": 15,
           "unit": "/min",
           "recordedAt": "1963-05-16T06:00:00Z",
-          "source": "historical record NASA-VITAL-002 (Mercury-Atlas 9, Orbital)"
+          "source": "historical record NASA-VITAL-002 (Mercury-Atlas 9)"
         }
       ],
       "wellbeing": null
@@ -76,7 +348,7 @@
           "value": 84,
           "unit": "bpm",
           "recordedAt": "1962-05-24T17:30:00Z",
-          "source": "historical record NASA-VITAL-012 (Mercury-Atlas 7, Reentry)"
+          "source": "historical record NASA-VITAL-012 (Mercury-Atlas 7)"
         },
         {
           "kind": "temperature",
@@ -84,7 +356,7 @@
           "value": 38,
           "unit": "°C",
           "recordedAt": "1962-05-24T17:30:00Z",
-          "source": "historical record NASA-VITAL-012 (Mercury-Atlas 7, Reentry)"
+          "source": "historical record NASA-VITAL-012 (Mercury-Atlas 7)"
         },
         {
           "kind": "respiratory_rate",
@@ -92,7 +364,7 @@
           "value": 19,
           "unit": "/min",
           "recordedAt": "1962-05-24T17:30:00Z",
-          "source": "historical record NASA-VITAL-012 (Mercury-Atlas 7, Reentry)"
+          "source": "historical record NASA-VITAL-012 (Mercury-Atlas 7)"
         }
       ],
       "wellbeing": null
