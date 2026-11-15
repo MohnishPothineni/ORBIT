@@ -69,7 +69,7 @@ SCHEMAS = [
             "Open a screen in this console. Paths: /crew, /anatomy, /anatomy?region=left_knee, /evidence, /assistant. "
             "Website pages: /status (crew status), /log (health log and trends), /trends (the trends section of /log), "
             "/care (health assessment), /wellbeing, /exercise and /skin (tabs inside health assessment), "
-            "/routine (daily routine), /risks (health risk readings). "
+            "/routine (daily routine), /risks (health risk readings), /collect (collect vitals: how to take each measurement). "
             "To open a crew member's record on the main screen, use /crew?crew=<their name or callsign, as the "
             "person said it>, or /log?crew=<name> for their health log. Examples: /crew?crew=Gordon Cooper, "
             "/log?crew=Scott Carpenter, /crew?crew=Crew 03. The crew are Crew 01 (commander, crew leader), Crew 02 (pilot), "
