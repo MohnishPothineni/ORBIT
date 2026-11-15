@@ -1,5 +1,5 @@
 /* Caches public application assets only. Medical records remain in localStorage. */
-const CACHE = 'orbit-assets-shared-design-v39';
+const CACHE = 'orbit-assets-shared-design-v40';
 const SHELL = [
   './', './index.html', './studio.css', './assistant-dock.css', './doctor-appearance.mjs', './doctor-materials.js', './assets/avatar/skin-microdetail.png', './style.css', './crew.css', './anatomy-lab.css', './anatomy-workspace.css', './care.css', './theme-scale.css', './design-tokens.css', './theme.css', './mission.css', './touch.css',
 
