@@ -4,7 +4,7 @@
   /* The public ElevenLabs agent the crew assistant connects to directly, with no sign-in or server (as on GitHub's dhruv branch). */
   const AGENT_ID = 'agent_3801m7fw0fbvf95969qwr52phbpd';
   let doctorQuality='balanced';try{doctorQuality=localStorage.getItem('orbit-doctor-quality')==='high'?'high':'balanced';}catch{}
-  let doctorPersona='male';try{doctorPersona=localStorage.getItem('orbit-doctor-persona')==='female'?'female':'male';}catch{}
+  let doctorPersona='male';try{doctorPersona=localStorage.getItem('orbit-doctor-persona-v2')==='female'?'female':'male';localStorage.removeItem('orbit-doctor-persona');}catch{}
   let assistantTab='chat';
   const scope = () => `${state.mode}/${activeCrewId()}`;
   const micIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg>';
@@ -886,7 +886,7 @@
   });
   host.querySelectorAll('[data-doctor-persona]').forEach(input=>input.addEventListener('change',()=>{
     const next=input.value;if(!input.checked||next===doctorPersona)return;
-    doctorPersona=next;try{localStorage.setItem('orbit-doctor-persona',next);}catch{}
+    doctorPersona=next;try{localStorage.setItem('orbit-doctor-persona-v2',next);}catch{}
     doctorEpoch++;doctorAvatar?.destroy();doctorAvatar=null;doctorPromise=null;
     const target=el('avatar-canvas');delete target.dataset.loaded;target.replaceChildren();
     const loading=document.createElement('p');loading.id='assistant-avatar-loading';loading.className='companion-loading';loading.textContent='Loading 3D avatar…';target.append(loading);
