@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useCrew } from "../../../shared/context/CrewContext";
 import { useToast } from "../../../shared/ui/Toast";
 import { formatUtcTime } from "../../../shared/format";
+import { EMBEDDED, notifyWebsite, WEBSITE_PAGES, websiteTab } from "../../../shared/embed";
 import type { CrewMember } from "../../../shared/types";
 import {
   clearAssistantContext,
@@ -173,6 +174,8 @@ export function useToolRegistry() {
           }
           update({ status: "running" });
           const saved = await logVital(draft, signal);
+          // Inside the website, also add it to the website's Health log (kept in that page's browser storage).
+          notifyWebsite({ type: "orbit:vital-saved", id: saved.id, crewId: subject.id, kind, value, recordedAt: saved.recordedAt });
           return ok(`Saved ${meta.label} ${value} ${meta.unit} for ${subject.callsign} at ${formatUtcTime(saved.recordedAt)}`, {
             id: saved.id,
             recordedAt: saved.recordedAt,
@@ -183,10 +186,15 @@ export function useToolRegistry() {
           const path = readString(args.path) ?? readString(args.route);
           if (!path || !path.startsWith("/") || path.startsWith("//")) return fail("Navigation needs a path inside this console.");
           const first = path.slice(1).split(/[/?#]/)[0];
-          if (!ALLOWED_ROUTES.includes(first)) return fail(`No screen at ${path}.`);
+          const websitePage = EMBEDDED && Object.hasOwn(WEBSITE_PAGES, first);
+          if (!ALLOWED_ROUTES.includes(first) && !websitePage) {
+            return fail(Object.hasOwn(WEBSITE_PAGES, first) ? `${WEBSITE_PAGES[first]} is only on the website.` : `No screen at ${path}.`);
+          }
           update({ status: "running" });
           setPendingNavigation(path);
-          return ok(`Opening ${path}`, { path });
+          // Name the screen that actually opens, so the reply cannot claim a different one.
+          const label = EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path;
+          return ok(`Opening ${label}`, { path, screen: label });
         }
 
         case "control_anatomy": {

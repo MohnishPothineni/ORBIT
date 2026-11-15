@@ -89,6 +89,26 @@ window.addEventListener('storage',e=>{
  state=StateLogic.adoptState(state,stored.state);initCrewData();initMissionData();
  if($('#modal').open||$('#main form')||['crew','anatomy'].includes(currentPage()))toast('Records changed in another tab. They appear here when this page next updates.');else render();
 });
+/* A vital the offline voice assistant saved after a person pressed Save. Only the website's own voice frame may send it. */
+const VOICE_VITAL_FIELDS={heart_rate:'hr',systolic_bp:'sys',diastolic_bp:'dia',temperature:'temp',spo2:'spo2',respiratory_rate:'rr'};
+const VOICE_VITAL_SOURCE='Crew voice assistant';
+window.addEventListener('message',e=>{
+ const m=e.data,frame=document.getElementById('voice-frame');
+ if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||m?.type!=='orbit:vital-saved')return;
+ const field=VOICE_VITAL_FIELDS[m.kind],limits=InputLogic.fields[field],value=Number(m.value),at=Date.parse(m.recordedAt);
+ if(!field||!limits||!Number.isFinite(value)||value<limits.min||value>limits.max||!Number.isFinite(at))return;
+ /* The assistant's crew ids are c01 to c04; the website's are crew-01 to crew-04. */
+ const crewId=/^c\d{2}$/.test(m.crewId)?'crew-'+m.crewId.slice(1):'';
+ const profile=crewProfiles().find(p=>p.id===crewId);
+ if(!profile){toast('The assistant saved a reading for a crew member who is not in this workspace, so it was not added to the Health log.');return;}
+ /* Readings said together (systolic, then diastolic) become one Health log row. */
+ const recent=db().entries.find(r=>r.source===VOICE_VITAL_SOURCE&&r.crewId===crewId&&!Number.isFinite(r[field])&&Math.abs(Date.parse(r.at)-at)<120000);
+ if(recent)recent[field]=value;
+ else db().entries.push({id:crypto.randomUUID?.()||'entry-'+Date.now().toString(36),crewId,at:new Date(at).toISOString(),source:VOICE_VITAL_SOURCE,notes:'',[field]:value});
+ persist();
+ if(!$('#modal').open&&!$('#main form'))render();
+ toast(`Added to ${profile.name}'s Health log.`);
+});
 function db(){return state.data[state.mode];}
 function entries(){return crewRecords(activeCrewId());}
 /* Shown in place of a mood score or check-in note the current viewer is not allowed to see. */

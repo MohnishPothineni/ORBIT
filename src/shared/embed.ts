@@ -30,12 +30,50 @@ const WEBSITE_TAB: Record<string, string> = {
   assistant: "voice",
 };
 
+/**
+ * The website's own pages (PAGE_NAMES in ui/app.js), by tab id. The navigate tool can
+ * open these only when this app runs inside the website.
+ */
+export const WEBSITE_PAGES: Record<string, string> = {
+  status: "Crew status",
+  crew: "Crew profiles",
+  log: "Health log",
+  trends: "Health trends",
+  care: "Health assessment",
+  wellbeing: "Sleep & wellbeing",
+  exercise: "Exercise",
+  skin: "Skin & wounds",
+  routine: "Daily routine",
+  risks: "Health risk readings",
+  anatomy: "Anatomy lab",
+  voice: "Crew voice AI assistant",
+  research: "Offline evidence library",
+};
+
+/** The website tab a path opens: `/evidence` gives `research`, `/log` gives `log`. */
+export function websiteTab(path: string): string {
+  const first = path.split(/[?#]/)[0].replace(/^\/+/, "").split("/")[0];
+  return WEBSITE_TAB[first] ?? (Object.hasOwn(WEBSITE_PAGES, first) ? first : "status");
+}
+
 /** Website URL for an in-app path such as `/anatomy?region=knee_left`. */
 export function websiteHref(path: string): string {
-  const [pathname, query = ""] = path.split("?");
-  const first = pathname.replace(/^\/+/, "").split("/")[0];
-  const tab = WEBSITE_TAB[first] ?? "status";
+  const [, query = ""] = path.split("?");
+  const tab = websiteTab(path);
   return `/#${tab}${query ? `?${query}` : ""}`;
+}
+
+/**
+ * Tell the website about something this app did, such as a saved vital, so it can update
+ * its own records. Same origin only; the website checks that the sender is its voice frame.
+ */
+export function notifyWebsite(message: Record<string, unknown>): void {
+  if (!EMBEDDED || window.parent === window) return;
+  try {
+    window.parent.postMessage(message, window.location.origin);
+  } catch {
+    /* no parent to tell */
+  }
 }
 
 /** Open a website tab from inside the embedded workspace. */
