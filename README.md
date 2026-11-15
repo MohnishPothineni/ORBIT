@@ -15,14 +15,47 @@ The backend (Python, FastAPI, Uvicorn, Pipecat) serves the built frontend and `/
 | Command | What it does |
 |---|---|
 | `npm run dev` | Dev server. `.env.development` sets `VITE_USE_MOCKS=true`. |
+| `npm run dev:live` | Dev server against the real local server (`.env.live` sets `VITE_USE_MOCKS=false`). |
+| `npm run server` | Starts the local Python server (`server/run.py`) on `https://localhost:8443`. |
 | `npm run build` | Typecheck, then production build to `dist/`. |
 | `npm run typecheck` | `tsc -b --noEmit` |
 | `npm run lint` | ESLint |
 | `npm test` | Regression tests for microphone races, session cleanup, tool history, and input validation. |
 
+## Local server (`server/`)
+
+FastAPI + Pipecat, all on this machine. It implements every `/api/*` route the frontend calls and serves `dist/` after `npm run build`.
+
+**One-time setup**
+
+1. Install [Ollama](https://ollama.com) and pull the model: `ollama pull qwen3:8b`
+2. Create a Python 3.12 environment and install: `pip install -r server/requirements.txt`
+3. Download the models once (needs internet): set `ORBIT_ALLOW_DOWNLOADS=1` in `server/.env`, start the server, open a session, then remove the line. Or point `ORBIT_KOKORO_MODEL` / `ORBIT_KOKORO_VOICES` at existing Kokoro files. See `server/.env.example`.
+
+**Run**
+
+```
+npm run server        # terminal 1: https://localhost:8443
+npm run dev:live      # terminal 2: http://localhost:5173, proxies /api to the server
+```
+
+Or `npm run build` and open `https://localhost:8443` directly (also from other devices on the LAN). The HTTPS certificate is self-signed and created on first run (`server/certs/`); accept it once in the browser. Browsers only allow the microphone over HTTPS or on `localhost`.
+
+**Pipeline:** SmallWebRTC → Silero VAD → fixed-silence end of turn (`ORBIT_SILENCE_SECONDS`, default 1 s) → faster-whisper `base.en` → Ollama `qwen3:8b` (thinking off) → Kokoro. The status panel still labels turn detection "Smart Turn v3"; the server uses a silence timer instead.
+
+**Tools** run in the browser. The server advertises them to the model (`server/orbit_server/tools.py`) and relays each call to the page and its result back. `log_vital` and `share_record_with_assistant` survive interruptions and wait up to five minutes for a person.
+
+**Data** is synthetic (`server/data/seed.json`, matching the frontend mocks). Saved vitals and voice settings go to `server/data/runtime/` (gitignored). Evidence search is keyword matching over the local passages; there is no FAISS index yet.
+
+**Voice settings** applied live: voice, speed, response length and VAD sensitivity. Blend is reported as unsupported. Interruptions on/off and end-of-turn threshold take effect for the next session and are ignored respectively.
+
 ## Layout
 
 ```
+server/
+  run.py          starts uvicorn over HTTPS
+  orbit_server/   app.py (routes) · voice.py (pipeline) · tools.py · store.py · health.py · certs.py
+  data/           seed.json (synthetic); runtime/ for saved vitals and settings
 src/
   app/            route table and application shell (status bar, sidebar, crew selector)
   shared/         design tokens, UI kit, types, API client, mock mode, contexts

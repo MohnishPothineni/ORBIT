@@ -1,0 +1,270 @@
+"""The voice pipeline for one browser session.
+
+SmallWebRTC -> Silero VAD -> fixed-silence end of turn -> faster-whisper -> Ollama (qwen3)
+-> Kokoro -> SmallWebRTC. Tools run in the browser (see tools.py).
+"""
+
+import asyncio
+import json
+from typing import Any
+
+from loguru import logger
+from pipecat.audio.vad.silero import SileroVADAnalyzer
+from pipecat.audio.vad.vad_analyzer import VADParams
+from pipecat.frames.frames import LLMUpdateSettingsFrame, TTSSpeakFrame, TTSUpdateSettingsFrame
+from pipecat.pipeline.pipeline import Pipeline
+from pipecat.pipeline.worker import PipelineParams, PipelineWorker
+from pipecat.processors.aggregators.llm_context import LLMContext
+from pipecat.processors.aggregators.llm_response_universal import (
+    LLMContextAggregatorPair,
+    LLMUserAggregatorParams,
+)
+from pipecat.processors.frameworks.rtvi.observer import RTVIFunctionCallReportLevel, RTVIObserverParams
+from pipecat.services.kokoro.tts import KokoroTTSService
+from pipecat.services.llm_service import ASYNC_TOOL_INSTRUCTIONS
+from pipecat.services.ollama.llm import OLLamaLLMService
+from pipecat.services.whisper.stt import WhisperSTTService
+from pipecat.transcriptions.language import Language
+from pipecat.transports.base_transport import TransportParams
+from pipecat.transports.smallwebrtc.connection import SmallWebRTCConnection
+from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
+from pipecat.turns.user_start.transcription_user_turn_start_strategy import (
+    TranscriptionUserTurnStartStrategy,
+)
+from pipecat.turns.user_start.vad_user_turn_start_strategy import VADUserTurnStartStrategy
+from pipecat.turns.user_stop.speech_timeout_user_turn_stop_strategy import (
+    SpeechTimeoutUserTurnStopStrategy,
+)
+from pipecat.turns.user_turn_strategies import UserTurnStrategies
+from pipecat.utils.text.transforms import expand_currency, expand_percentages, strip_markdown
+from pipecat.workers.runner import WorkerRunner
+
+from . import config
+from .health import pipeline_health, warm_up_llm
+from .store import store
+from .tools import ClientToolBridge, openai_tools, register_client_tools, tools_schema
+from .voice_settings import VAD_CONFIDENCE, VoiceSettings, load_settings
+
+BASE_PROMPT = """You are the ORBIT crew assistant, a calm, warm and knowledgeable voice assistant
+inside a spacecraft crew medical and operations console. You talk out loud with crew members.
+
+What you can do:
+- Look up crew readings, draft vital-sign entries, open screens, control the Anatomy lab, and search
+  the local Evidence library. Use your tools for these; never invent readings or study results.
+- For any medical or research question, call search_evidence first and answer from the passages,
+  citing them by number like [1]. If nothing relevant comes back, say so.
+- Drafting a vital or sharing a record always waits for a person to confirm on screen.
+  Tell them to check the screen. Never say something was saved or shared until the tool result says so.
+
+Safety:
+- You do not diagnose, do not assess fitness for duty, and are not clinically validated.
+  For anything urgent, tell them to contact the medical officer right away.
+
+How you answer:
+- Give real substance: a specific detail, number or reason, not a generic summary.
+- {length}
+- Be friendly and natural. Sometimes end with a short follow-up question, but not every time.
+- You already greeted the person. Never introduce yourself again.
+- Answer the actual question right away. Do not ask them to repeat themselves.
+- Their words come from speech recognition, which sometimes mishears a word. If a word seems odd,
+  quietly assume the most likely meaning.
+- Never repeat an earlier answer. If they ask again, add new detail or go deeper.
+
+Because your words are spoken aloud:
+- Use short, natural sentences of about 15 words or fewer.
+- Plain text only. No emojis, asterisks, dashes, bullet points, markdown or lists.
+- Say numbers and units the way a person would say them out loud."""
+
+LENGTH = {
+    "concise": "Answer in 1 to 3 sentences unless they ask for more.",
+    "standard": "Answer in 2 to 5 sentences. Go longer only if they ask for detail.",
+}
+
+# Live sessions, so shared-record changes reach them.
+_sessions: set["VoiceSessionHandle"] = set()
+
+
+def build_prompt(settings: VoiceSettings) -> str:
+    prompt = BASE_PROMPT.format(length=LENGTH[settings.responseLength])
+    if store.shared_context:
+        records = "\n".join(json.dumps(r["content"], ensure_ascii=False) for r in store.shared_context)
+        prompt += (
+            "\n\nRecords a person reviewed and chose to share with you for this session "
+            "(use them only to help this crew):\n" + records
+        )
+    return prompt
+
+
+def _language(voice_id: str) -> Language:
+    return Language.EN_GB if voice_id.startswith("b") else Language.EN_US
+
+
+class VoiceSessionHandle:
+    """What the REST API needs to reach a running session."""
+
+    def __init__(self, worker: PipelineWorker, settings: VoiceSettings, vad: SileroVADAnalyzer):
+        self.worker = worker
+        self.settings = settings
+        self.vad = vad
+
+    async def refresh_prompt(self) -> None:
+        await self.worker.queue_frames(
+            [LLMUpdateSettingsFrame(delta=OLLamaLLMService.Settings(system_instruction=build_prompt(self.settings)))]
+        )
+
+    async def apply_settings(self, data: dict[str, Any]) -> None:
+        """Apply settings sent by the browser (`orbit.voice-settings`). Volume stays in the browser."""
+        merged = self.settings.model_dump() | {k: v for k, v in data.items() if k != "volume"}
+        try:
+            new = VoiceSettings.model_validate(merged)
+        except ValueError as e:
+            logger.warning(f"Ignoring invalid voice settings: {e}")
+            return
+        old, self.settings = self.settings, new
+        frames = []
+        if (new.voiceId, new.speed) != (old.voiceId, old.speed):
+            frames.append(
+                TTSUpdateSettingsFrame(
+                    delta=KokoroTTSService.Settings(voice=new.voiceId, speed=new.speed, language=_language(new.voiceId))
+                )
+            )
+        if new.responseLength != old.responseLength:
+            frames.append(
+                LLMUpdateSettingsFrame(delta=OLLamaLLMService.Settings(system_instruction=build_prompt(new)))
+            )
+        if new.vadSensitivity != old.vadSensitivity:
+            self.vad.set_params(VADParams(stop_secs=config.VAD_STOP_SECS, confidence=VAD_CONFIDENCE[new.vadSensitivity]))
+        if frames:
+            await self.worker.queue_frames(frames)
+
+
+async def refresh_all_prompts() -> None:
+    """Called when shared records change."""
+    for s in list(_sessions):
+        await s.refresh_prompt()
+
+
+def composed_prompt(settings: VoiceSettings) -> str:
+    """The system prompt exactly as Pipecat sends it: ours plus its async-tool note
+    (added because log_vital/share wait for a person). Must match for Ollama's cache."""
+    return f"{build_prompt(settings)}\n\n{ASYNC_TOOL_INSTRUCTIONS}"
+
+
+async def warm_up_session_prompt() -> None:
+    """Pre-process the default session prompt in Ollama (see health.warm_up_llm)."""
+    await warm_up_llm(composed_prompt(load_settings()), openai_tools())
+
+
+async def run_bot(connection: SmallWebRTCConnection) -> None:
+    settings = load_settings()
+    logger.info(f"Starting voice session {connection.pc_id}")
+    # Runs while WebRTC connects and the greeting plays, so the first answer is fast.
+    warm_task = asyncio.create_task(warm_up_llm(composed_prompt(settings), openai_tools()))
+
+    transport = SmallWebRTCTransport(
+        webrtc_connection=connection,
+        params=TransportParams(audio_in_enabled=True, audio_out_enabled=True),
+    )
+
+    stt = WhisperSTTService(
+        device="cpu",
+        compute_type="int8",
+        settings=WhisperSTTService.Settings(model=config.STT_MODEL),
+    )
+
+    model_path, voices_path = config.kokoro_paths()
+    tts = KokoroTTSService(
+        model_path=str(model_path),
+        voices_path=str(voices_path),
+        settings=KokoroTTSService.Settings(
+            voice=settings.voiceId, speed=settings.speed, language=_language(settings.voiceId)
+        ),
+        text_transforms=[("*", strip_markdown), ("*", expand_currency), ("*", expand_percentages)],
+    )
+
+    llm = OLLamaLLMService(
+        base_url=f"{config.OLLAMA_URL}/v1",
+        settings=OLLamaLLMService.Settings(
+            model=config.LLM_MODEL,
+            extra={"extra_body": {"reasoning_effort": "none"}},  # qwen3: no hidden "thinking" (20 s -> 2 s)
+            temperature=0.7,
+            presence_penalty=0.6,
+            frequency_penalty=0.4,
+            system_instruction=build_prompt(settings),
+        ),
+    )
+
+    bridge = ClientToolBridge()
+    register_client_tools(llm, bridge)
+
+    vad = SileroVADAnalyzer(
+        params=VADParams(stop_secs=config.VAD_STOP_SECS, confidence=VAD_CONFIDENCE[settings.vadSensitivity])
+    )
+    context = LLMContext(tools=tools_schema())
+    user_aggregator, assistant_aggregator = LLMContextAggregatorPair(
+        context,
+        user_params=LLMUserAggregatorParams(
+            vad_analyzer=vad,
+            user_turn_strategies=UserTurnStrategies(
+                start=[
+                    VADUserTurnStartStrategy(enable_interruptions=settings.allowInterruptions),
+                    TranscriptionUserTurnStartStrategy(enable_interruptions=settings.allowInterruptions),
+                ],
+                stop=[
+                    SpeechTimeoutUserTurnStopStrategy(
+                        user_speech_timeout=max(config.SILENCE_SECONDS - config.VAD_STOP_SECS, 0.0)
+                    )
+                ],
+            ),
+        ),
+    )
+
+    pipeline = Pipeline(
+        [
+            transport.input(),
+            bridge,
+            stt,
+            user_aggregator,
+            llm,
+            tts,
+            transport.output(),
+            assistant_aggregator,
+        ]
+    )
+
+    worker = PipelineWorker(
+        pipeline,
+        params=PipelineParams(enable_metrics=True, enable_usage_metrics=True),
+        # The browser runs the tools, so it needs names, arguments and results.
+        rtvi_observer_params=RTVIObserverParams(
+            function_call_report_level={"*": RTVIFunctionCallReportLevel.FULL}
+        ),
+    )
+    handle = VoiceSessionHandle(worker, settings, vad)
+    runner = WorkerRunner(handle_sigint=False)
+    await runner.add_workers(worker)
+
+    @worker.rtvi.event_handler("on_client_ready")
+    async def on_client_ready(rtvi):
+        await rtvi.send_server_message({"type": "pipeline-health", "health": await pipeline_health()})
+        await worker.queue_frames([TTSSpeakFrame(config.GREETING)])
+
+    @worker.rtvi.event_handler("on_client_message")
+    async def on_client_message(rtvi, msg):
+        if msg.type == "orbit.voice-settings" and isinstance(msg.data, dict):
+            await handle.apply_settings(msg.data)
+        elif msg.type == "orbit.interrupt":
+            await rtvi.interrupt_bot()
+
+    @transport.event_handler("on_client_disconnected")
+    async def on_client_disconnected(transport, client):
+        logger.info(f"Voice session {connection.pc_id} disconnected")
+        await runner.cancel()
+
+    _sessions.add(handle)
+    try:
+        await runner.run()
+    finally:
+        warm_task.cancel()
+        _sessions.discard(handle)
+        logger.info(f"Voice session {connection.pc_id} ended")
