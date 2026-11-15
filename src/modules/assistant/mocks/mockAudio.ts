@@ -11,6 +11,9 @@ export class MockAudio {
   private botDest: MediaStreamAudioDestinationNode;
   private micSource: MediaStreamAudioSourceNode | null = null;
   private micStream: MediaStream | null = null;
+  private micEnabled = true;
+  private micRequest = 0;
+  private closed = false;
   private userVoice: Voice;
   private botVoice: Voice;
 
@@ -28,17 +31,21 @@ export class MockAudio {
 
   /** Try to open the microphone. Resolves false if permission is denied or no device. */
   async attachMic(deviceId: string | null): Promise<boolean> {
-    if (!navigator.mediaDevices?.getUserMedia) return false;
+    if (this.closed || !navigator.mediaDevices?.getUserMedia) return false;
+    const request = ++this.micRequest;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { deviceId: deviceId ? { exact: deviceId } : undefined, echoCancellation: true, noiseSuppression: true },
         video: false,
       });
-      const enabled = this.micStream?.getAudioTracks()[0]?.enabled ?? true;
+      if (this.closed || request !== this.micRequest) {
+        stream.getTracks().forEach((track) => track.stop());
+        return false;
+      }
       this.detachMic();
       this.micStream = stream;
       stream.getAudioTracks().forEach((t) => {
-        t.enabled = enabled;
+        t.enabled = this.micEnabled;
       });
       this.micSource = this.ctx.createMediaStreamSource(stream);
       this.micSource.connect(this.userDest);
@@ -56,6 +63,7 @@ export class MockAudio {
   }
 
   setMicEnabled(on: boolean): void {
+    this.micEnabled = on;
     this.micStream?.getAudioTracks().forEach((t) => {
       t.enabled = on;
     });
@@ -82,6 +90,8 @@ export class MockAudio {
   }
 
   async close(): Promise<void> {
+    this.closed = true;
+    this.micRequest += 1;
     this.userVoice.set(false);
     this.botVoice.set(false);
     this.detachMic();

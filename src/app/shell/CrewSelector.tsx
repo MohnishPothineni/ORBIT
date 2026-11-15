@@ -6,7 +6,7 @@ import { cn, ICON_STROKE } from "../../shared/ui/cn";
 import { Popover } from "../../shared/ui/Popover";
 import { StatusBadge } from "../../shared/ui/StatusBadge";
 import { useToast } from "../../shared/ui/Toast";
-import { useMediaQuery, WIDE } from "./useMediaQuery";
+import { useMediaQuery, WIDE } from "../../shared/hooks/useMediaQuery";
 
 function Avatar({ member }: { member: CrewMember }) {
   return (

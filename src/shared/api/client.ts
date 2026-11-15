@@ -48,13 +48,13 @@ function linkSignal(signal: AbortSignal | undefined, timeoutMs: number) {
   return {
     signal: ctrl.signal,
     timedOut: () => timedOut,
-    /** Stop the timeout but keep the caller's abort linked (open streams). */
+    /** Stop the timeout but keep the caller's abort linked (used by apiStream once a stream is open). */
     clearTimer: () => {
-      if (timer !== undefined) window.clearTimeout(timer);
+      window.clearTimeout(timer);
       timer = undefined;
     },
     cleanup: () => {
-      if (timer !== undefined) window.clearTimeout(timer);
+      window.clearTimeout(timer);
       timer = undefined;
       signal?.removeEventListener("abort", onAbort);
     },
@@ -121,6 +121,17 @@ export function apiSend<T>(
 ): Promise<T> {
   return request<T>(method, path, body, opts);
 }
+
+/*
+ * DO NOT DELETE apiStream, even if nothing imports it yet.
+ *
+ * It is part of the shared API contract that every ORBIT module is built
+ * against (Shared Foundation, section J: "apiGet, apiSend, apiStream"). The
+ * four modules are built separately and expect this file to match that spec;
+ * removing it breaks modules that are not in this repo yet, notably the
+ * Evidence library, which streams model answers over Server-Sent Events.
+ * "Unused" here means "not built yet", not "dead code".
+ */
 
 export interface StreamEvent {
   event: string;
