@@ -1,7 +1,7 @@
 import { List, MapPinPlus, OctagonAlert, PanelRight } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useMediaQuery, WIDE } from "../../../app/shell/useMediaQuery";
+import { useMediaQuery, WIDE } from "../../../shared/hooks/useMediaQuery";
 import { useCrew } from "../../../shared/context/CrewContext";
 import { useSystemStatus } from "../../../shared/context/SystemStatusContext";
 import { Button } from "../../../shared/ui/Button";
