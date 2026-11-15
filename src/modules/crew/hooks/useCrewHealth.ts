@@ -1,9 +1,28 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useCrew } from "../../../shared/context/CrewContext";
 import { isAbortError, toApiError } from "../../../shared/api/client";
-import type { ApiError } from "../../../shared/types";
+import { canSeeWellbeing, type ApiError } from "../../../shared/types";
 import * as service from "../services/crewService";
-import type { ReviewBand, VitalReading } from "../types";
+import { WELLBEING_KINDS, type ReviewBand, type VitalReading } from "../types";
+let optimistic: VitalReading[] = [];
+const listeners = new Set<() => void>();
+const subscribe = (fn: () => void) => {
+  listeners.add(fn);
+  return () => {
+    listeners.delete(fn);
+  };
+};
+const snapshot = () => optimistic;
+function updateOptimistic(next: VitalReading[]) {
+  optimistic = next;
+  listeners.forEach((fn) => fn());
+}
 export const invalidate = () =>
   window.dispatchEvent(new Event("orbit:crew-change"));
 export function useRead<T>(
@@ -56,7 +75,7 @@ export function useCrewSummaries() {
 }
 export function useReadings(id: string, range: service.Range = {}) {
   const key = JSON.stringify(range);
-  return useRead(
+  const query = useRead(
     useCallback(
       async (v: string, s: AbortSignal) => {
         const range = JSON.parse(key) as service.Range;
@@ -84,6 +103,25 @@ export function useReadings(id: string, range: service.Range = {}) {
       [id, key],
     ),
   );
+  const pending = useSyncExternalStore(subscribe, snapshot);
+  const { activeCrew } = useCrew();
+  const added = pending.filter(
+    (r) =>
+      r.crewId === id &&
+      activeCrew &&
+      (canSeeWellbeing(activeCrew, id) || !WELLBEING_KINDS.includes(r.kind)),
+  );
+  return {
+    ...query,
+    data: query.data
+      ? {
+          ...query.data,
+          items: [...added, ...query.data.items].sort((a, b) =>
+            b.recordedAt.localeCompare(a.recordedAt),
+          ),
+        }
+      : query.data,
+  };
 }
 export function useReviewBands(id: string) {
   return useRead(
@@ -127,11 +165,23 @@ export function useMutation<A, T>(
 }
 export const useCreateReading = () =>
   useMutation(
-    (
+    async (
       { id, input }: { id: string; input: Omit<VitalReading, "id" | "crewId"> },
       v,
       s,
-    ) => service.createReading(id, input, v, s),
+    ) => {
+      const temporary: VitalReading = {
+        ...input,
+        crewId: id,
+        id: `pending-${crypto.randomUUID()}`,
+      };
+      updateOptimistic([...optimistic, temporary]);
+      try {
+        return await service.createReading(id, input, v, s);
+      } finally {
+        updateOptimistic(optimistic.filter((r) => r.id !== temporary.id));
+      }
+    },
   );
 export const useDeleteReading = () =>
   useMutation(({ id, readingId }: { id: string; readingId: string }, v, s) =>
