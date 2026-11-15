@@ -10,9 +10,6 @@ import {
   Vector3,
   type Object3D,
 } from "three";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { BODY_SHAPES, type BodyShape } from "./bodyShapes";
 
 /** One drawable piece of the reference body, already placed in body space. */
@@ -71,6 +68,12 @@ export function buildPlaceholderParts(): BodyPart[] {
  * Meshes that match no region are skipped.
  */
 export async function loadGlbParts(url: string, byMeshName: Map<string, string>, signal?: AbortSignal): Promise<BodyPart[]> {
+  // Loaders are split out: the placeholder body never downloads them.
+  const [{ GLTFLoader }, { DRACOLoader }, { MeshoptDecoder }] = await Promise.all([
+    import("three/examples/jsm/loaders/GLTFLoader.js"),
+    import("three/examples/jsm/loaders/DRACOLoader.js"),
+    import("three/examples/jsm/libs/meshopt_decoder.module.js"),
+  ]);
   const draco = new DRACOLoader().setDecoderPath(DRACO_PATH);
   const loader = new GLTFLoader().setDRACOLoader(draco).setMeshoptDecoder(MeshoptDecoder);
   try {

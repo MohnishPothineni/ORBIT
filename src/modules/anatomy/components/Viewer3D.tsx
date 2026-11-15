@@ -1,4 +1,5 @@
-import { OrbitControls, Outlines } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei/core/OrbitControls.js";
+import { Outlines } from "@react-three/drei/core/Outlines.js";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type KeyboardEvent, type MutableRefObject } from "react";
 import { DoubleSide, Plane, Spherical, Vector3, type PerspectiveCamera } from "three";
