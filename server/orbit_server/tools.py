@@ -82,6 +82,35 @@ SCHEMAS = [
         required=["path"],
     ),
     FunctionSchema(
+        name="open_form",
+        description=(
+            "Open a form on the website for the person, as if they pressed its button: use this when they ask "
+            "you to log, record, add or report something, or to click a button such as Log health data. "
+            "It only opens the form; the person fills it in and presses Save, so never say anything was saved. "
+            "Forms: health-check (Log health data: vitals, sleep, glucose, mood, notes), wellbeing-check-in, "
+            "workout (exercise session), risk-reading (radiation dose, bone density or muscle strength), "
+            "skin-check, eva-skin-check (after a spacewalk), wound, condition-note, image-record (photo or "
+            "scan), health-assessment (guided symptom assessment), emergency-checklist (crew medical response), "
+            "flight-surgeon-report (whole crew), crew-report (one crew member), crew-member (add a profile). "
+            "For a single vital the person tells you, log_vital is quicker. Name the form the way the result does."
+        ),
+        properties={
+            "form": {
+                "type": "string",
+                "enum": [
+                    "health-check", "wellbeing-check-in", "workout", "risk-reading", "skin-check", "eva-skin-check",
+                    "wound", "condition-note", "image-record", "health-assessment", "emergency-checklist",
+                    "flight-surgeon-report", "crew-report", "crew-member",
+                ],
+            },
+            "crew": {"type": "string", "description": (
+                "Whose record, by name or callsign as said, e.g. Crew 02. Use \"me\" when they say I, me or my. "
+                "Leave it out for the whole-crew report or when they name no one."
+            )},
+        },
+        required=["form"],
+    ),
+    FunctionSchema(
         name="control_anatomy",
         description="Control the 3D view in the Anatomy lab.",
         properties={

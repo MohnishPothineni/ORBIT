@@ -109,6 +109,44 @@ window.addEventListener('message',e=>{
  if(!$('#modal').open&&!$('#main form'))render();
  toast(`Added to ${profile.name}'s Health log.`);
 });
+/* Forms the offline voice assistant may open for a person, as if they pressed the button themselves.
+   It only opens the form: the person fills it in and presses Save. Keys are the voice tool's names. */
+const VOICE_FORMS={
+ 'health-check':{action:'log',label:'Log health data'},
+ 'wellbeing-check-in':{action:'mission-checkin',label:'Wellbeing check-in'},
+ 'workout':{action:'mission-workout',label:'Log a workout'},
+ 'risk-reading':{action:'mission-risk-add',label:'Add a radiation, bone or muscle reading'},
+ 'skin-check':{action:'skin-check',label:'Skin check'},
+ 'eva-skin-check':{action:'skin-eva',label:'Skin check after a spacewalk'},
+ 'wound':{action:'skin-wound-add',label:'Add a wound'},
+ 'condition-note':{action:'condition-add',label:'Add a condition note',page:'crew'},
+ 'image-record':{action:'input-photo',label:'Add an image record'},
+ 'health-assessment':{action:'input-assessment',label:'Guided health assessment',page:'care',noModal:true},
+ 'emergency-checklist':{action:'emergency',label:'Crew medical response'},
+ 'flight-surgeon-report':{action:'mission-report',label:'Flight surgeon report'},
+ 'crew-report':{action:'mission-crew-report',label:'Crew member report',withCrew:true},
+ 'crew-member':{action:'crew-add',label:'Add a crew member'},
+};
+function openVoiceForm(m){
+ const spec=Object.hasOwn(VOICE_FORMS,m.form)?VOICE_FORMS[m.form]:null;
+ if(!spec)return {ok:false,reason:'That is not a form the assistant can open.'};
+ if($('#modal').open)return {ok:false,reason:'Another form or dialog is already open on screen. Ask the person to finish or close it first.'};
+ if(m.crew){const p=crewFromLink(m.crew);if(!p)return {ok:false,reason:`No crew profile matches “${m.crew}”.`};if(db().activeCrewId!==p.id){db().activeCrewId=p.id;focusedConditionId=null;persist();}}
+ if(spec.page&&currentPage()!==spec.page)location.hash=spec.page;
+ render();
+ /* The same path as a person's click: the page's own button handlers do the rest. */
+ const b=document.createElement('button');b.type='button';b.hidden=true;b.dataset.action=spec.action;if(spec.withCrew)b.dataset.id=activeCrewId();
+ document.body.append(b);b.click();b.remove();
+ const opened=spec.noModal?currentPage()===spec.page:$('#modal').open;
+ if(!opened)return {ok:false,reason:`${spec.label} did not open.`};
+ return {ok:true,label:spec.label,crew:activeCrew().name,title:$('#modal').open?($('#modal h2')?.textContent||spec.label):spec.label};
+}
+window.addEventListener('message',e=>{
+ const m=e.data,frame=document.getElementById('voice-frame');
+ if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||m?.type!=='orbit:open-form')return;
+ let result;try{result=openVoiceForm(m);}catch(err){result={ok:false,reason:'The form could not be opened.'};console.error('ORBIT voice form:',err);}
+ frame.contentWindow.postMessage({type:'orbit:open-form-result',requestId:m.requestId,...result},location.origin);
+});
 function db(){return state.data[state.mode];}
 function entries(){return crewRecords(activeCrewId());}
 /* Shown in place of a mood score or check-in note the current viewer is not allowed to see. */

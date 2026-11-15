@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useCrew } from "../../../shared/context/CrewContext";
 import { useToast } from "../../../shared/ui/Toast";
 import { formatUtcTime } from "../../../shared/format";
-import { EMBEDDED, notifyWebsite, WEBSITE_PAGES, websiteTab } from "../../../shared/embed";
+import { EMBEDDED, notifyWebsite, requestWebsite, WEBSITE_FORMS, WEBSITE_PAGES, websiteTab } from "../../../shared/embed";
 import type { CrewMember } from "../../../shared/types";
 import {
   clearAssistantContext,
@@ -215,6 +215,23 @@ export function useToolRegistry() {
           const crewAsked = new URLSearchParams(path.split("?")[1] ?? "").get("crew");
           const label = (EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path) + (crewAsked ? ` for ${crewAsked}` : "");
           return ok(`Opening ${label}`, { path, screen: label });
+        }
+
+        case "open_form": {
+          const form = readString(args.form);
+          if (!form || !(WEBSITE_FORMS as readonly string[]).includes(form)) return fail(`Unknown form: ${form ?? "none"}.`);
+          if (!EMBEDDED) return fail("Forms open only inside the ORBIT website.");
+          update({ status: "running" });
+          // "me" is the person talking: the crew member this console is viewing as.
+          const asked = readString(args.crew);
+          const crew = asked && /^(me|myself|my|i|self)$/i.test(asked.trim()) ? viewer.fullName : asked;
+          const reply = await requestWebsite({ type: "orbit:open-form", form, crew: crew ?? undefined });
+          if (!reply.ok) return fail(reply.reason ?? "The form did not open.");
+          // Opening is all it does: say so, so the reply does not claim anything was saved.
+          return ok(`Opened the ${String(reply.title)} form for ${String(reply.crew)}. Call it that. Nothing is saved until the person fills it in and presses Save.`, {
+            form,
+            crew: reply.crew,
+          });
         }
 
         case "control_anatomy": {
