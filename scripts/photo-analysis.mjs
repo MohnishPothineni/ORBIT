@@ -46,7 +46,7 @@ export function geminiConfig(env = process.env) {
   const file = readEnvFile();
   const apiKey = (env.GEMINI_API_KEY || file.GEMINI_API_KEY || "").trim();
   if (!apiKey) return null;
-  const model = (env.GEMINI_IMAGE_MODEL || file.GEMINI_IMAGE_MODEL || "gemini-2.5-flash").trim();
+  const model = (env.GEMINI_IMAGE_MODEL || file.GEMINI_IMAGE_MODEL || "gemini-3.8-flash").trim();
   return { apiKey, model };
 }
 
@@ -202,8 +202,10 @@ async function viaGemini({ apiKey, model }, image, mediaType, text, fetchImpl = 
   }
   if (res.status === 429) throw new PhotoAnalysisError("The Gemini quota for this key is used up for now. Try again later.", 429);
   if (!res.ok) {
-    console.error("[photo] gemini error:", res.status, (await res.text().catch(() => "")).slice(0, 300));
-    throw new PhotoAnalysisError("Photo check isn't available right now. Please try again shortly.", 502);
+    console.error("[photo] gemini error:", model, res.status, (await res.text().catch(() => "")).slice(0, 300));
+    const busy = new PhotoAnalysisError("Gemini is busy right now. Please try again in a minute.", 503);
+    busy.retryable = res.status >= 500 || res.status === 404; // overloaded, outage, or model retired
+    throw busy;
   }
   const data = await res.json();
   const cand = data.candidates?.[0];
@@ -217,6 +219,9 @@ async function viaGemini({ apiKey, model }, image, mediaType, text, fetchImpl = 
     throw new PhotoAnalysisError("The analysis came back in an unexpected format. Try again.", 502);
   }
 }
+
+/** Used when the chosen model is overloaded or unavailable. */
+export const FALLBACK_MODEL = "gemini-flash-latest";
 
 export const DEMO = {
   imageQuality: "good",
@@ -258,8 +263,21 @@ export async function analyzePhoto({ image, note = "" }, { config = geminiConfig
   const mediaType = sniff(buf);
   if (!mediaType) throw new PhotoAnalysisError("That file isn't a JPEG, PNG or WebP photo.", 400);
   if (!config) return { analysis: DEMO, provider: "demo", message: summaryMessage(DEMO) };
-  const analysis = normalize(await viaGemini(config, buf.toString("base64"), mediaType, userText(note), fetchImpl));
-  return { analysis, provider: "gemini", model: config.model, message: summaryMessage(analysis) };
+  // Gemini models are often briefly overloaded: retry once, then try the stable alias.
+  const models = [config.model, config.model, FALLBACK_MODEL].filter((m, i, all) => i < 2 || m !== all[0]);
+  let lastError;
+  for (const [i, model] of models.entries()) {
+    try {
+      const raw = await viaGemini({ ...config, model }, buf.toString("base64"), mediaType, userText(note), fetchImpl);
+      const analysis = normalize(raw);
+      return { analysis, provider: "gemini", model, message: summaryMessage(analysis) };
+    } catch (error) {
+      lastError = error;
+      if (!error?.retryable && !(error?.name === "TimeoutError")) throw error;
+      if (i < models.length - 1) await new Promise((r) => setTimeout(r, i === 0 ? 1200 : 300));
+    }
+  }
+  throw lastError;
 }
 
 // ─── HTTP handler for scripts/serve-ui.mjs ────────────────────────────

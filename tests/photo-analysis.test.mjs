@@ -42,8 +42,8 @@ test('Gemini is called with the key header and the photo, and its answer is norm
     const out = { imageQuality: 'good', observations: 'A small red patch.', possibilities: [{ name: 'Contact dermatitis', likelihood: 'more likely', reasoning: 'Sharp edge.', historyLink: '' }], warningSigns: [], urgency: 'routine', urgencyReason: 'Small and stable.', suggestedSpecialty: 'Dermatology', selfCare: [], followUpQuestions: [] };
     return new Response(JSON.stringify({ candidates: [{ finishReason: 'STOP', content: { parts: [{ text: JSON.stringify(out) }] } }] }), { status: 200 });
   };
-  const r = await analyzePhoto({ image: PNG, note: 'Itchy since Monday' }, { config: { apiKey: 'test-key', model: 'gemini-2.5-flash' }, fetchImpl });
-  assert.match(call.url, /models\/gemini-2\.5-flash:generateContent$/);
+  const r = await analyzePhoto({ image: PNG, note: 'Itchy since Monday' }, { config: { apiKey: 'test-key', model: 'gemini-3.8-flash' }, fetchImpl });
+  assert.match(call.url, /models\/gemini-3\.8-flash:generateContent$/);
   assert.equal(call.init.headers['x-goog-api-key'], 'test-key');
   const body = JSON.parse(call.init.body);
   assert.equal(body.contents[0].parts[0].inlineData.mimeType, 'image/png');
@@ -56,4 +56,17 @@ test('Gemini is called with the key header and the photo, and its answer is norm
 test('a Gemini safety block becomes a safe, final message', async () => {
   const fetchImpl = async () => new Response(JSON.stringify({ promptFeedback: { blockReason: 'SAFETY' } }), { status: 200 });
   await assert.rejects(analyzePhoto({ image: PNG }, { config: { apiKey: 'k', model: 'm' }, fetchImpl }), /can't analyze this photo/);
+});
+
+test('an overloaded model is retried and then falls back to the stable alias', async () => {
+  const seen = [];
+  const out = { imageQuality: 'good', observations: 'x', possibilities: [], warningSigns: [], urgency: 'routine', urgencyReason: '', suggestedSpecialty: 'Dermatology', selfCare: [], followUpQuestions: [] };
+  const fetchImpl = async (url) => {
+    seen.push(url.match(/models\/([^:]+)/)[1]);
+    if (seen.length < 3) return new Response('{"error":{"code":503}}', { status: 503 });
+    return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: JSON.stringify(out) }] } }] }), { status: 200 });
+  };
+  const r = await analyzePhoto({ image: PNG }, { config: { apiKey: 'k', model: 'gemini-3.8-flash' }, fetchImpl });
+  assert.deepEqual(seen, ['gemini-3.8-flash', 'gemini-3.8-flash', 'gemini-flash-latest']);
+  assert.equal(r.model, 'gemini-flash-latest');
 });
