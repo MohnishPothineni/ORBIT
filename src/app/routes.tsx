@@ -33,3 +33,11 @@ export const moduleRoutes: RouteObject[] = [
     element: <SharedWorkspace page="research" />,
   },
 ];
+// App.tsx renders these. The merge of 'dhruv' (1868aa9) dropped this block; keep it.
+export const appRoutes: RouteObject[] = [
+  { index: true, element: <Navigate to="/assistant" replace /> },
+  {
+    element: <AppShell />,
+    children: [...moduleRoutes, { path: "*", element: <NotFound /> }],
+  },
+];
