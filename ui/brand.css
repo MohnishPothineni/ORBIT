@@ -27,8 +27,10 @@ input, textarea { caret-color: var(--orbit-cyan-ink); }
 :where(button, a, input, select, textarea, summary):focus-visible { outline-color: var(--orbit-cyan); }
 
 /* Logo in the sidebar */
-.sidebar .brand { display: block; padding: 4px 8px 10px; }
+.sidebar .brand { display: block; padding: 6px 0 0; margin: 0 0 0 -2px; }
 .sidebar .brand-logo { display: block; width: 100%; max-width: 184px; height: auto; }
+/* The nav sits lower, using the space freed below the logo */
+.sidebar .main-nav { margin-top: 30px; }
 
 /* Navigation: the active tab gets the orbit cyan */
 .main-nav a.active { background: var(--orbit-cyan-soft); box-shadow: inset 3px 0 var(--orbit-cyan); }
@@ -62,3 +64,9 @@ input, textarea { caret-color: var(--orbit-cyan-ink); }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(orbit-page), ::view-transition-new(orbit-page), #main.page-enter { animation: none; }
 }
+
+/* Assistant panel spacing: avatar lower, then name and controls, toggle, and Connect text, evenly spaced */
+#assistant-panel .companion-head { padding-top: 40px; row-gap: 18px; }
+#assistant-panel .companion-avatar-choice { margin-top: 4px; }
+#assistant-panel .companion-connect { padding: 22px 0 10px; }
+#assistant-panel .assistant-empty { padding-top: 18px; }

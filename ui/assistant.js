@@ -626,7 +626,6 @@
     el('sharing').hidden = !(permissions.hasRecords() || bridge.hasHealth() || bridge.sharedImage());
     el('share-details').hidden = !connected;
     el('sharing').textContent = (permissions.hasRecords()?'Workspace record access allowed for this conversation. ':'')+sharing.join(' ') + (bridge.hasHealth() ? ' Review again to share newer readings.' : '');
-    document.querySelector('.local-status small').textContent = connected ? 'AGENT ONLINE' : 'LOCAL RECORDS';
     updateDoctorState();
   }
   /* The assistant stays fully open in its own panel; it cannot be minimized or closed. */
