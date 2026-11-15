@@ -22,9 +22,10 @@ export interface BodyPart {
   bounds: Box3;
 }
 
-export const MODEL_URL = "/models/anatomy/body.glb";
+// Under the app base (/voice/ in the website build), not the site root.
+export const MODEL_URL = `${import.meta.env.BASE_URL}models/anatomy/body.glb`;
 /** Draco decoders are served locally next to the model, never from a CDN. */
-export const DRACO_PATH = "/models/anatomy/draco/";
+export const DRACO_PATH = `${import.meta.env.BASE_URL}models/anatomy/draco/`;
 
 export const PLACEHOLDER_ENABLED = import.meta.env.VITE_ANATOMY_PLACEHOLDER === "true";
 

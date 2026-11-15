@@ -1,5 +1,5 @@
 /** Kept apart from bodyModel.ts so reading it does not pull three.js into the 2D path. */
-export const ATTRIBUTION_URL = "/models/anatomy/ATTRIBUTION.json";
+export const ATTRIBUTION_URL = `${import.meta.env.BASE_URL}models/anatomy/ATTRIBUTION.json`;
 
 export interface ModelAttribution {
   text: string;

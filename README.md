@@ -70,6 +70,10 @@ Or `npm run build` and open `https://localhost:8443` directly (also from other d
 
 **Evidence:** the assistant searches the website's Evidence library. `scripts/export-research.mjs` exports `ui/research-library.js` to `server/data/research-library.json` (run by `npm run build`; the file is committed, and `npm test` fails if it falls out of date). Each passage carries its evidence type, tracking guidance and source papers. Citations link to `#research?doc=<topic>&chunk=<entry>`, which opens that entry. Search is keyword matching; there is no FAISS index yet, so the status bar reports the index as missing.
 
+**Anatomy lab** (`/api/anatomy/*`, `server/orbit_server/anatomy.py`) serves the React Anatomy lab module. Regions come from the module's own `src/modules/anatomy/mocks/regions.json`. Pins start from the synthetic `server/data/anatomy-pins.json`, and changes are saved to `server/data/runtime/anatomy-pins.json`. Region references list pin notes only.
+
+**Ask the onboard library** (`/api/assistant/status`, `/api/assistant/ask`, `server/orbit_server/onboard_library.py`) powers the panel on the website's Evidence library page. It answers from the matching library passages with the local model and streams the answer with its sources. If nothing in the library matches, the model is not called and the answer is marked as not covered.
+
 **Shared records** belong to the voice session they were shared with (keyed by its WebRTC `pc_id`). They reach only that session's prompt, framed as data rather than instructions, and are dropped when that session ends or the person removes them.
 
 **Voice settings** applied live: voice, speed, response length and VAD sensitivity. Blend is reported as unsupported. Interruptions on/off and end-of-turn threshold take effect for the next session and are ignored respectively.

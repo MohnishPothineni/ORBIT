@@ -60,10 +60,14 @@ class Store:
         # seed.json's synthetic passages are only a fallback if the export is missing.
         library = DATA_DIR / "research-library.json"
         evidence_file = library if library.exists() else DATA_DIR / "seed.json"
-        self.evidence: list[dict[str, Any]] = (
-            [_library_passage(p) for p in json.loads(library.read_text(encoding="utf-8"))["passages"]]
+        # The exported entries as written, for answers that show each paper (onboard_library.py).
+        self.library: dict[tuple[str, str], dict[str, Any]] = (
+            {(p["documentId"], p["chunkId"]): p for p in json.loads(library.read_text(encoding="utf-8"))["passages"]}
             if library.exists()
-            else seed["evidence"]
+            else {}
+        )
+        self.evidence: list[dict[str, Any]] = (
+            [_library_passage(p) for p in self.library.values()] if self.library else seed["evidence"]
         )
         self.evidence_updated_at = datetime.fromtimestamp(
             evidence_file.stat().st_mtime, timezone.utc
