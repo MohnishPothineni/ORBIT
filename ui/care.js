@@ -225,9 +225,6 @@ function handleCareControl(target) {
 }
 function attachCarePage() {
   const rail = $('.care-rail');
-  // In the narrow chip row, keep the selected chip visible.
-  const activeItem = $('.care-rail-item.active');
-  if (rail && activeItem && rail.scrollWidth > rail.clientWidth) rail.scrollLeft = Math.max(0, activeItem.offsetLeft - rail.clientWidth / 2 + activeItem.offsetWidth / 2);
   if (rail) rail.addEventListener('keydown', event => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
     const items = $$('.care-rail-item'), i = items.indexOf(document.activeElement);

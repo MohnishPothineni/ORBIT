@@ -67,19 +67,18 @@ main{container:content / inline-size;max-width:1500px;padding:30px 28px 40px;min
 .care-section-head p{margin:4px 0 0;max-width:62ch;color:var(--muted);font-size:13px;line-height:1.5}
 .care-pane>:first-child,.care-pane .care-section-head+*{margin-top:0}
 @media (prefers-reduced-motion:reduce){.care-rail-item,.care-rail-icon{transition:none}}
-/* Narrow content: the menu becomes a scrollable row of chips above the content */
-@container content (max-width:760px){
-  .care-layout{grid-template-columns:1fr;gap:16px}
-  .care-rail{position:static;display:flex;gap:6px;padding:6px;overflow-x:auto;scrollbar-width:thin}
-  .care-rail-group{display:contents}
-  .care-rail-group+.care-rail-group{padding:0;border:0}
-  .care-rail-label{display:none}
-  .care-rail-list{display:flex;gap:6px}
-  .care-rail-item{flex:0 0 auto;grid-template-columns:auto auto;gap:8px;width:auto;min-height:44px;padding:6px 12px 6px 6px;white-space:nowrap}
-  .care-rail-text{min-width:max-content}
-  .care-rail-list{flex:0 0 auto}
-  .care-rail-group+.care-rail-group .care-rail-list{padding-left:8px;margin-left:2px;border-left:1px solid var(--line)}
-  .care-rail-item.active::before{display:none}
+/* The menu always stays vertical. Medium widths: a slimmer side menu without hints. */
+@container content (max-width:860px){
+  .care-layout{grid-template-columns:188px minmax(0,1fr);gap:18px}
+  .care-rail{padding:10px 8px}
+  .care-rail-item{grid-template-columns:30px minmax(0,1fr);gap:9px;min-height:46px;padding:7px 8px}
+  .care-rail-item.active::before{left:-8px}
   .care-rail-icon{width:30px;height:30px}
   .care-rail-text small{display:none}
+  .care-rail-label{padding:0 8px}
+}
+/* Phones: no room beside the content, so the vertical menu sits above it. */
+@container content (max-width:520px){
+  .care-layout{grid-template-columns:1fr;gap:16px}
+  .care-rail{position:static}
 }
