@@ -257,7 +257,8 @@ if config.DIST_DIR.exists():
         file = (config.DIST_DIR / path).resolve()
         if path and file.is_file() and config.DIST_DIR.resolve() in file.parents:
             return FileResponse(file)
-        return FileResponse(config.DIST_DIR / "index.html")
+        entry = "voice/index.html" if path == "voice" or path.startswith("voice/") else "index.html"
+        return FileResponse(config.DIST_DIR / entry)
 else:
 
     @app.get("/")

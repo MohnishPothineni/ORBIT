@@ -4,6 +4,19 @@ A local-first, offline-capable crew medical and mission operations console. Afte
 
 The app does not diagnose, does not assess fitness for duty and is not clinically validated.
 
+## Shared website design
+
+The complete NASA-TEST UI is tracked in `ui/` and is the default website.
+It includes every screen, stylesheet, bundled font, image, and 3D model.
+Run `npm ci` and `npm run dev`, then open http://localhost:5173.
+Edit `ui/` to change the design; do not edit the generated `dist/` folder.
+See [UI setup and provenance](docs/ui-reference/README.md) and the retained
+[design system](docs/ui-reference/DESIGN.md).
+
+The existing React/Pipecat workspace is preserved at `/voice/` after building.
+Optional NASA-TEST cloud/account/ElevenLabs APIs require their own backend;
+the local FastAPI server implements the React voice workspace's API.
+
 ## Stack
 
 React 18 · TypeScript (strict) · Vite · Tailwind CSS v4 · lucide-react · react-router-dom v6. Fonts are bundled through `@fontsource`. All dependency versions are pinned exactly.
@@ -14,17 +27,19 @@ The backend (Python, FastAPI, Uvicorn, Pipecat) serves the built frontend and `/
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Dev server. `.env.development` sets `VITE_USE_MOCKS=true`. |
-| `npm run dev:live` | Dev server against the real local server (`.env.live` sets `VITE_USE_MOCKS=false`). |
+| `npm run dev` | Complete NASA-TEST UI at http://localhost:5173. |
+| `npm run dev:live` | Same UI, with `/api` proxied to the local server. |
+| `npm run dev:voice` | Vite development server for the React voice workspace in live mode. |
 | `npm run server` | Starts the local Python server (`server/run.py`) on `https://localhost:8443`. |
-| `npm run build` | Typecheck, then production build to `dist/`. |
+| `npm run build` | Typecheck; copy `ui/` to `dist/`; build React at `dist/voice/`. |
+| `npm run preview` | Serve the complete production build at http://localhost:5173. |
 | `npm run typecheck` | `tsc -b --noEmit` |
 | `npm run lint` | ESLint |
 | `npm test` | Regression tests for microphone races, session cleanup, tool history, and input validation. |
 
 ## Local server (`server/`)
 
-FastAPI + Pipecat, all on this machine. It implements every `/api/*` route the frontend calls and serves `dist/` after `npm run build`.
+FastAPI + Pipecat, all on this machine. It implements the React voice workspace?s `/api/*` routes and serves `dist/` after `npm run build`.
 
 **One-time setup**
 
@@ -36,7 +51,7 @@ FastAPI + Pipecat, all on this machine. It implements every `/api/*` route the f
 
 ```
 npm run server        # terminal 1: https://localhost:8443
-npm run dev:live      # terminal 2: http://localhost:5173, proxies /api to the server
+npm run dev:voice     # terminal 2: http://localhost:5173, proxies /api to the server
 ```
 
 Or `npm run build` and open `https://localhost:8443` directly (also from other devices on the LAN). The HTTPS certificate is self-signed and created on first run (`server/certs/`); accept it once in the browser. Browsers only allow the microphone over HTTPS or on `localhost`.

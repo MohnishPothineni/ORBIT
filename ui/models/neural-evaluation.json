@@ -1,0 +1,912 @@
+{
+  "per_label": [
+    {
+      "key": "cardiovascular",
+      "name": "Cardiovascular strain",
+      "auroc": 0.9745626474427643,
+      "auprc": 0.958302007007145,
+      "f1": 0.9130328867235079,
+      "precision": 0.9128105211885046,
+      "recall": 0.9132553606237817,
+      "specificity": 0.9552052052052052,
+      "brier": 0.045291052624149876,
+      "ece": 0.006998263826374872,
+      "threshold": 0.52,
+      "prevalence": 0.3392857142857143,
+      "confusion": {
+        "tn": 3817,
+        "fp": 179,
+        "fn": 178,
+        "tp": 1874
+      }
+    },
+    {
+      "key": "recovery",
+      "name": "Sleep & behavioral strain",
+      "auroc": 0.977153111659101,
+      "auprc": 0.9645990886199177,
+      "f1": 0.9284126278345931,
+      "precision": 0.9473684210526315,
+      "recall": 0.9102005231037489,
+      "specificity": 0.9690996270644646,
+      "brier": 0.04115583707970132,
+      "ece": 0.012392660550858626,
+      "threshold": 0.53,
+      "prevalence": 0.3792989417989418,
+      "confusion": {
+        "tn": 3638,
+        "fp": 116,
+        "fn": 206,
+        "tp": 2088
+      }
+    },
+    {
+      "key": "febrile",
+      "name": "Fever-like pattern",
+      "auroc": 0.9735932147699882,
+      "auprc": 0.9522976924904315,
+      "f1": 0.9016109045848822,
+      "precision": 0.9072319201995013,
+      "recall": 0.8960591133004926,
+      "specificity": 0.95370831259333,
+      "brier": 0.05054705906748368,
+      "ece": 0.005269625512524367,
+      "threshold": 0.5,
+      "prevalence": 0.33564814814814814,
+      "confusion": {
+        "tn": 3832,
+        "fp": 186,
+        "fn": 211,
+        "tp": 1819
+      }
+    },
+    {
+      "key": "musculoskeletal",
+      "name": "Musculoskeletal strain",
+      "auroc": 0.977507610151124,
+      "auprc": 0.9614380912620909,
+      "f1": 0.9312659106688267,
+      "precision": 0.9306197964847364,
+      "recall": 0.9319129226493748,
+      "specificity": 0.9614296734379018,
+      "brier": 0.03906640108926052,
+      "ece": 0.00922425031336004,
+      "threshold": 0.47,
+      "prevalence": 0.35697751322751325,
+      "confusion": {
+        "tn": 3739,
+        "fp": 150,
+        "fn": 147,
+        "tp": 2012
+      }
+    },
+    {
+      "key": "nutrition",
+      "name": "Hydration & nutrition strain",
+      "auroc": 0.9712075766291397,
+      "auprc": 0.958973016254696,
+      "f1": 0.9119895173618694,
+      "precision": 0.9019438444924406,
+      "recall": 0.9222614840989399,
+      "specificity": 0.9400105708245243,
+      "brier": 0.050508846500601674,
+      "ece": 0.011553548528591575,
+      "threshold": 0.45999999999999996,
+      "prevalence": 0.37433862433862436,
+      "confusion": {
+        "tn": 3557,
+        "fp": 227,
+        "fn": 176,
+        "tp": 2088
+      }
+    }
+  ],
+  "macro_auroc": 0.9748048321304236,
+  "macro_auprc": 0.9591219791268563,
+  "macro_f1": 0.9172623694347358,
+  "data_origin": "100% fictional; generated locally for this demo. No NASA patient records.",
+  "seed": 20261110,
+  "daily_records": 32400,
+  "crew_count": 360,
+  "window_count": 30240,
+  "split": {
+    "train": {
+      "crew": 216,
+      "windows": 18144,
+      "crew_ids": [
+        "SIM-0234",
+        "SIM-0313",
+        "SIM-0105",
+        "SIM-0275",
+        "SIM-0151",
+        "SIM-0299",
+        "SIM-0356",
+        "SIM-0143",
+        "SIM-0065",
+        "SIM-0354",
+        "SIM-0224",
+        "SIM-0071",
+        "SIM-0245",
+        "SIM-0229",
+        "SIM-0019",
+        "SIM-0051",
+        "SIM-0292",
+        "SIM-0085",
+        "SIM-0099",
+        "SIM-0009",
+        "SIM-0100",
+        "SIM-0170",
+        "SIM-0027",
+        "SIM-0222",
+        "SIM-0327",
+        "SIM-0334",
+        "SIM-0116",
+        "SIM-0249",
+        "SIM-0068",
+        "SIM-0172",
+        "SIM-0064",
+        "SIM-0046",
+        "SIM-0247",
+        "SIM-0296",
+        "SIM-0340",
+        "SIM-0035",
+        "SIM-0134",
+        "SIM-0258",
+        "SIM-0221",
+        "SIM-0156",
+        "SIM-0242",
+        "SIM-0217",
+        "SIM-0311",
+        "SIM-0088",
+        "SIM-0048",
+        "SIM-0139",
+        "SIM-0003",
+        "SIM-0161",
+        "SIM-0238",
+        "SIM-0173",
+        "SIM-0186",
+        "SIM-0343",
+        "SIM-0024",
+        "SIM-0130",
+        "SIM-0197",
+        "SIM-0336",
+        "SIM-0012",
+        "SIM-0013",
+        "SIM-0342",
+        "SIM-0256",
+        "SIM-0252",
+        "SIM-0322",
+        "SIM-0125",
+        "SIM-0004",
+        "SIM-0045",
+        "SIM-0326",
+        "SIM-0355",
+        "SIM-0236",
+        "SIM-0193",
+        "SIM-0023",
+        "SIM-0358",
+        "SIM-0150",
+        "SIM-0028",
+        "SIM-0096",
+        "SIM-0321",
+        "SIM-0057",
+        "SIM-0177",
+        "SIM-0094",
+        "SIM-0136",
+        "SIM-0109",
+        "SIM-0253",
+        "SIM-0291",
+        "SIM-0082",
+        "SIM-0210",
+        "SIM-0060",
+        "SIM-0333",
+        "SIM-0016",
+        "SIM-0341",
+        "SIM-0074",
+        "SIM-0307",
+        "SIM-0206",
+        "SIM-0032",
+        "SIM-0248",
+        "SIM-0237",
+        "SIM-0214",
+        "SIM-0335",
+        "SIM-0255",
+        "SIM-0302",
+        "SIM-0142",
+        "SIM-0332",
+        "SIM-0047",
+        "SIM-0205",
+        "SIM-0098",
+        "SIM-0131",
+        "SIM-0331",
+        "SIM-0040",
+        "SIM-0144",
+        "SIM-0081",
+        "SIM-0312",
+        "SIM-0155",
+        "SIM-0348",
+        "SIM-0070",
+        "SIM-0054",
+        "SIM-0360",
+        "SIM-0169",
+        "SIM-0145",
+        "SIM-0062",
+        "SIM-0093",
+        "SIM-0317",
+        "SIM-0020",
+        "SIM-0233",
+        "SIM-0284",
+        "SIM-0260",
+        "SIM-0310",
+        "SIM-0043",
+        "SIM-0212",
+        "SIM-0176",
+        "SIM-0191",
+        "SIM-0187",
+        "SIM-0167",
+        "SIM-0194",
+        "SIM-0115",
+        "SIM-0216",
+        "SIM-0184",
+        "SIM-0110",
+        "SIM-0141",
+        "SIM-0276",
+        "SIM-0288",
+        "SIM-0286",
+        "SIM-0316",
+        "SIM-0049",
+        "SIM-0201",
+        "SIM-0349",
+        "SIM-0303",
+        "SIM-0278",
+        "SIM-0102",
+        "SIM-0183",
+        "SIM-0092",
+        "SIM-0160",
+        "SIM-0338",
+        "SIM-0359",
+        "SIM-0053",
+        "SIM-0106",
+        "SIM-0180",
+        "SIM-0259",
+        "SIM-0101",
+        "SIM-0011",
+        "SIM-0042",
+        "SIM-0189",
+        "SIM-0153",
+        "SIM-0137",
+        "SIM-0006",
+        "SIM-0005",
+        "SIM-0044",
+        "SIM-0158",
+        "SIM-0218",
+        "SIM-0083",
+        "SIM-0146",
+        "SIM-0162",
+        "SIM-0209",
+        "SIM-0315",
+        "SIM-0117",
+        "SIM-0025",
+        "SIM-0353",
+        "SIM-0128",
+        "SIM-0264",
+        "SIM-0294",
+        "SIM-0078",
+        "SIM-0026",
+        "SIM-0104",
+        "SIM-0297",
+        "SIM-0095",
+        "SIM-0056",
+        "SIM-0293",
+        "SIM-0270",
+        "SIM-0120",
+        "SIM-0123",
+        "SIM-0022",
+        "SIM-0232",
+        "SIM-0175",
+        "SIM-0124",
+        "SIM-0108",
+        "SIM-0002",
+        "SIM-0309",
+        "SIM-0198",
+        "SIM-0111",
+        "SIM-0203",
+        "SIM-0323",
+        "SIM-0262",
+        "SIM-0337",
+        "SIM-0135",
+        "SIM-0148",
+        "SIM-0075",
+        "SIM-0227",
+        "SIM-0063",
+        "SIM-0272",
+        "SIM-0306",
+        "SIM-0287",
+        "SIM-0228",
+        "SIM-0226",
+        "SIM-0246",
+        "SIM-0066",
+        "SIM-0318",
+        "SIM-0207",
+        "SIM-0329",
+        "SIM-0069"
+      ]
+    },
+    "validation": {
+      "crew": 72,
+      "windows": 6048,
+      "crew_ids": [
+        "SIM-0347",
+        "SIM-0344",
+        "SIM-0254",
+        "SIM-0239",
+        "SIM-0298",
+        "SIM-0268",
+        "SIM-0265",
+        "SIM-0008",
+        "SIM-0121",
+        "SIM-0103",
+        "SIM-0235",
+        "SIM-0014",
+        "SIM-0168",
+        "SIM-0154",
+        "SIM-0295",
+        "SIM-0029",
+        "SIM-0182",
+        "SIM-0076",
+        "SIM-0112",
+        "SIM-0324",
+        "SIM-0021",
+        "SIM-0034",
+        "SIM-0261",
+        "SIM-0119",
+        "SIM-0243",
+        "SIM-0319",
+        "SIM-0357",
+        "SIM-0084",
+        "SIM-0282",
+        "SIM-0274",
+        "SIM-0107",
+        "SIM-0036",
+        "SIM-0188",
+        "SIM-0220",
+        "SIM-0244",
+        "SIM-0195",
+        "SIM-0181",
+        "SIM-0052",
+        "SIM-0269",
+        "SIM-0202",
+        "SIM-0038",
+        "SIM-0037",
+        "SIM-0017",
+        "SIM-0266",
+        "SIM-0086",
+        "SIM-0140",
+        "SIM-0215",
+        "SIM-0118",
+        "SIM-0030",
+        "SIM-0330",
+        "SIM-0240",
+        "SIM-0157",
+        "SIM-0061",
+        "SIM-0031",
+        "SIM-0166",
+        "SIM-0225",
+        "SIM-0279",
+        "SIM-0174",
+        "SIM-0305",
+        "SIM-0039",
+        "SIM-0152",
+        "SIM-0147",
+        "SIM-0350",
+        "SIM-0241",
+        "SIM-0165",
+        "SIM-0250",
+        "SIM-0001",
+        "SIM-0015",
+        "SIM-0149",
+        "SIM-0223",
+        "SIM-0080",
+        "SIM-0018"
+      ]
+    },
+    "test": {
+      "crew": 72,
+      "windows": 6048,
+      "crew_ids": [
+        "SIM-0050",
+        "SIM-0129",
+        "SIM-0285",
+        "SIM-0133",
+        "SIM-0097",
+        "SIM-0352",
+        "SIM-0059",
+        "SIM-0190",
+        "SIM-0219",
+        "SIM-0079",
+        "SIM-0290",
+        "SIM-0345",
+        "SIM-0271",
+        "SIM-0230",
+        "SIM-0132",
+        "SIM-0308",
+        "SIM-0325",
+        "SIM-0267",
+        "SIM-0314",
+        "SIM-0077",
+        "SIM-0127",
+        "SIM-0122",
+        "SIM-0251",
+        "SIM-0339",
+        "SIM-0164",
+        "SIM-0204",
+        "SIM-0304",
+        "SIM-0185",
+        "SIM-0257",
+        "SIM-0320",
+        "SIM-0091",
+        "SIM-0200",
+        "SIM-0199",
+        "SIM-0178",
+        "SIM-0072",
+        "SIM-0328",
+        "SIM-0300",
+        "SIM-0351",
+        "SIM-0301",
+        "SIM-0346",
+        "SIM-0289",
+        "SIM-0281",
+        "SIM-0089",
+        "SIM-0277",
+        "SIM-0087",
+        "SIM-0041",
+        "SIM-0159",
+        "SIM-0058",
+        "SIM-0211",
+        "SIM-0213",
+        "SIM-0126",
+        "SIM-0073",
+        "SIM-0007",
+        "SIM-0113",
+        "SIM-0067",
+        "SIM-0138",
+        "SIM-0090",
+        "SIM-0231",
+        "SIM-0055",
+        "SIM-0033",
+        "SIM-0283",
+        "SIM-0171",
+        "SIM-0263",
+        "SIM-0179",
+        "SIM-0280",
+        "SIM-0114",
+        "SIM-0163",
+        "SIM-0273",
+        "SIM-0196",
+        "SIM-0208",
+        "SIM-0192",
+        "SIM-0010"
+      ]
+    }
+  },
+  "architecture": [
+    60,
+    48,
+    24,
+    5
+  ],
+  "parameter_count": 4229,
+  "best_epoch": 44,
+  "epochs_run": 59,
+  "loss_history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.36390206514885504,
+      "validation_loss": 0.37050210488824853
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.2310358417976689,
+      "validation_loss": 0.2333705384827114
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.19361502445664355,
+      "validation_loss": 0.19874885332790868
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.18136751810294954,
+      "validation_loss": 0.1887882492753596
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.1756484634723731,
+      "validation_loss": 0.1834079116016555
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.17218120536698123,
+      "validation_loss": 0.1812006155144566
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.1697596555219081,
+      "validation_loss": 0.18004337596463862
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.16747567966279975,
+      "validation_loss": 0.17843357290889633
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.16577998317734913,
+      "validation_loss": 0.17705243571086654
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.164161640903729,
+      "validation_loss": 0.1760413146194548
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.16339279592478473,
+      "validation_loss": 0.17520748788920734
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.1618121941569276,
+      "validation_loss": 0.17520687864566414
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.1610164909033863,
+      "validation_loss": 0.17461087226571315
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.15967887297555075,
+      "validation_loss": 0.17423868756142705
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.15909456459541482,
+      "validation_loss": 0.1739373318454889
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.15842503748353376,
+      "validation_loss": 0.17376964855249472
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.15735257204736983,
+      "validation_loss": 0.17266228526959845
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.15658626581152915,
+      "validation_loss": 0.17218617521930774
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.1559706360085377,
+      "validation_loss": 0.17182617605145303
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.15546052420138246,
+      "validation_loss": 0.17209826914907517
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.15489774351579452,
+      "validation_loss": 0.17119396803764592
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.1540696643994459,
+      "validation_loss": 0.1721310225144489
+    },
+    {
+      "epoch": 23,
+      "train_loss": 0.15356379348539942,
+      "validation_loss": 0.17158490038159416
+    },
+    {
+      "epoch": 24,
+      "train_loss": 0.15293794116088633,
+      "validation_loss": 0.17123325878910692
+    },
+    {
+      "epoch": 25,
+      "train_loss": 0.15244934995437498,
+      "validation_loss": 0.17146662217266978
+    },
+    {
+      "epoch": 26,
+      "train_loss": 0.1519766233132615,
+      "validation_loss": 0.1709248592458716
+    },
+    {
+      "epoch": 27,
+      "train_loss": 0.15159275069457168,
+      "validation_loss": 0.17046969114380633
+    },
+    {
+      "epoch": 28,
+      "train_loss": 0.15082082154946638,
+      "validation_loss": 0.17114067178142373
+    },
+    {
+      "epoch": 29,
+      "train_loss": 0.15082900266521354,
+      "validation_loss": 0.17010989062738718
+    },
+    {
+      "epoch": 30,
+      "train_loss": 0.14961428499426027,
+      "validation_loss": 0.17082293434151594
+    },
+    {
+      "epoch": 31,
+      "train_loss": 0.14932743720024325,
+      "validation_loss": 0.17087767770602572
+    },
+    {
+      "epoch": 32,
+      "train_loss": 0.1487785298240185,
+      "validation_loss": 0.17044286059759228
+    },
+    {
+      "epoch": 33,
+      "train_loss": 0.14855746794646693,
+      "validation_loss": 0.17074228644205267
+    },
+    {
+      "epoch": 34,
+      "train_loss": 0.14830976559158313,
+      "validation_loss": 0.17042562374297873
+    },
+    {
+      "epoch": 35,
+      "train_loss": 0.1475102476548324,
+      "validation_loss": 0.1707526440795819
+    },
+    {
+      "epoch": 36,
+      "train_loss": 0.14725265351526637,
+      "validation_loss": 0.17051156681275434
+    },
+    {
+      "epoch": 37,
+      "train_loss": 0.14702014048219514,
+      "validation_loss": 0.17121969051771574
+    },
+    {
+      "epoch": 38,
+      "train_loss": 0.14672991587304743,
+      "validation_loss": 0.17051203586799912
+    },
+    {
+      "epoch": 39,
+      "train_loss": 0.14623416981284096,
+      "validation_loss": 0.17061318119865462
+    },
+    {
+      "epoch": 40,
+      "train_loss": 0.14607923190164904,
+      "validation_loss": 0.17034974108356882
+    },
+    {
+      "epoch": 41,
+      "train_loss": 0.1452646652456958,
+      "validation_loss": 0.17085436124001943
+    },
+    {
+      "epoch": 42,
+      "train_loss": 0.1450216320178011,
+      "validation_loss": 0.17054610493091157
+    },
+    {
+      "epoch": 43,
+      "train_loss": 0.1448951893692457,
+      "validation_loss": 0.17093939619257123
+    },
+    {
+      "epoch": 44,
+      "train_loss": 0.1444327522772016,
+      "validation_loss": 0.16993328258232382
+    },
+    {
+      "epoch": 45,
+      "train_loss": 0.1440883512112668,
+      "validation_loss": 0.1707857817265929
+    },
+    {
+      "epoch": 46,
+      "train_loss": 0.14365794098078305,
+      "validation_loss": 0.17074421856458133
+    },
+    {
+      "epoch": 47,
+      "train_loss": 0.14316588330369218,
+      "validation_loss": 0.17100402185017
+    },
+    {
+      "epoch": 48,
+      "train_loss": 0.14316356870666533,
+      "validation_loss": 0.17053618027539683
+    },
+    {
+      "epoch": 49,
+      "train_loss": 0.14231921199839323,
+      "validation_loss": 0.1705207243946461
+    },
+    {
+      "epoch": 50,
+      "train_loss": 0.14374493062134058,
+      "validation_loss": 0.1718708948077724
+    },
+    {
+      "epoch": 51,
+      "train_loss": 0.14214871558773667,
+      "validation_loss": 0.17083158892444347
+    },
+    {
+      "epoch": 52,
+      "train_loss": 0.14165021062612806,
+      "validation_loss": 0.17099207143183107
+    },
+    {
+      "epoch": 53,
+      "train_loss": 0.14139164547495267,
+      "validation_loss": 0.1704058537914828
+    },
+    {
+      "epoch": 54,
+      "train_loss": 0.14119776257492075,
+      "validation_loss": 0.17124135416143557
+    },
+    {
+      "epoch": 55,
+      "train_loss": 0.14038728257304617,
+      "validation_loss": 0.17037557727404448
+    },
+    {
+      "epoch": 56,
+      "train_loss": 0.14004483817603106,
+      "validation_loss": 0.1707591583095293
+    },
+    {
+      "epoch": 57,
+      "train_loss": 0.14038515168790983,
+      "validation_loss": 0.17092640870423023
+    },
+    {
+      "epoch": 58,
+      "train_loss": 0.13967038016295683,
+      "validation_loss": 0.17037809596949582
+    },
+    {
+      "epoch": 59,
+      "train_loss": 0.13977346922652897,
+      "validation_loss": 0.17135079831945826
+    }
+  ],
+  "macro_auroc_95ci_crew_bootstrap": [
+    0.9721966806942625,
+    0.9767030171245071
+  ],
+  "bootstrap_replicates": 200,
+  "baseline": {
+    "per_label": [
+      {
+        "key": "cardiovascular",
+        "name": "Cardiovascular strain",
+        "auroc": 0.9762520805405794,
+        "auprc": 0.9620098227278695,
+        "f1": 0.9200196270853778,
+        "precision": 0.9263833992094862,
+        "recall": 0.9137426900584795,
+        "specificity": 0.9627127127127127,
+        "brier": 0.044106416555083836,
+        "ece": 0.018062129053934034,
+        "threshold": 0.52,
+        "prevalence": 0.3392857142857143,
+        "confusion": {
+          "tn": 3847,
+          "fp": 149,
+          "fn": 177,
+          "tp": 1875
+        }
+      },
+      {
+        "key": "recovery",
+        "name": "Sleep & behavioral strain",
+        "auroc": 0.9777986306033807,
+        "auprc": 0.9660731544940279,
+        "f1": 0.9362541073384447,
+        "precision": 0.9409951563188023,
+        "recall": 0.9315605928509154,
+        "specificity": 0.9643047416089504,
+        "brier": 0.03953913361799772,
+        "ece": 0.019888088720972818,
+        "threshold": 0.44999999999999996,
+        "prevalence": 0.3792989417989418,
+        "confusion": {
+          "tn": 3620,
+          "fp": 134,
+          "fn": 157,
+          "tp": 2137
+        }
+      },
+      {
+        "key": "febrile",
+        "name": "Fever-like pattern",
+        "auroc": 0.975398024162206,
+        "auprc": 0.9544975563797109,
+        "f1": 0.8993849938499385,
+        "precision": 0.8982800982800982,
+        "recall": 0.9004926108374385,
+        "specificity": 0.9484818317570931,
+        "brier": 0.049209259304034775,
+        "ece": 0.0121754317524929,
+        "threshold": 0.47,
+        "prevalence": 0.33564814814814814,
+        "confusion": {
+          "tn": 3811,
+          "fp": 207,
+          "fn": 202,
+          "tp": 1828
+        }
+      },
+      {
+        "key": "musculoskeletal",
+        "name": "Musculoskeletal strain",
+        "auroc": 0.9794291591668808,
+        "auprc": 0.9636153954961472,
+        "f1": 0.937471051412691,
+        "precision": 0.937471051412691,
+        "recall": 0.937471051412691,
+        "specificity": 0.9652867060941116,
+        "brier": 0.03722957814017746,
+        "ece": 0.01655764990920716,
+        "threshold": 0.48,
+        "prevalence": 0.35697751322751325,
+        "confusion": {
+          "tn": 3754,
+          "fp": 135,
+          "fn": 135,
+          "tp": 2024
+        }
+      },
+      {
+        "key": "nutrition",
+        "name": "Hydration & nutrition strain",
+        "auroc": 0.973350222995839,
+        "auprc": 0.9626273276115714,
+        "f1": 0.9221687800612156,
+        "precision": 0.912987012987013,
+        "recall": 0.9315371024734982,
+        "specificity": 0.9468816067653277,
+        "brier": 0.04688373125204201,
+        "ece": 0.017294658389055056,
+        "threshold": 0.43000000000000005,
+        "prevalence": 0.37433862433862436,
+        "confusion": {
+          "tn": 3583,
+          "fp": 201,
+          "fn": 155,
+          "tp": 2109
+        }
+      }
+    ],
+    "macro_auroc": 0.9764456234937772,
+    "macro_auprc": 0.9617646513418654,
+    "macro_f1": 0.9230597119495334
+  },
+  "model_sha256": "f2e767a12acb8bb92fcfe6d82f2c842c60f5906ec7b1b78cf8e5d5e899c5eaee",
+  "evaluation_scope": "Held-out fictional crew drawn from the same simulator. Does not estimate real astronaut performance."
+}

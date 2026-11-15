@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101d32">
+  <meta name="description" content="ORBIT is a crew health monitoring prototype for long duration space missions. Track health indicators, review trends, and complete your daily routine.">
+  <title>ORBIT | Crew Health</title>
+  <link rel="icon" type="image/svg+xml" href="assets/orbit.svg">
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="crew.css">
+  <link rel="stylesheet" href="anatomy-lab.css">
+  <link rel="stylesheet" href="care.css">
+  <link rel="stylesheet" href="health-inputs.css">
+  <link rel="stylesheet" href="assistant.css">
+  <link rel="stylesheet" href="integrations.css">
+  <link rel="stylesheet" href="workspace.css">
+  <link rel="stylesheet" href="theme-scale.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="mission.css">
+  <link rel="stylesheet" href="onboard-assistant.css">
+  <link rel="stylesheet" href="touch.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+  <script src="crew.js" defer></script>
+  <script src="condition-reference.js" defer></script>
+  <script src="bone-report-index.js" defer></script>
+  <script src="condition-panel.js" defer></script>
+  <script src="anatomy-lab.js" defer></script>
+  <script src="neural-model.js" defer></script>
+  <script src="neural-logic.js" defer></script>
+  <script src="neural-adapter.js" defer></script>
+  <script src="input-logic.js" defer></script>
+  <script src="neural-upload.js" defer></script>
+  <script src="neural-ui.js" defer></script>
+  <script src="observation-store.js" defer></script>
+  <script src="health-inputs.js" defer></script>
+  <script src="care-logic.js" defer></script>
+  <script src="care.js" defer></script>
+  <script src="state-logic.js" defer></script>
+  <script src="pdf-logic.js" defer></script>
+  <script src="access-logic.js" defer></script>
+  <script src="mission-logic.js" defer></script>
+  <script src="skin-logic.js" defer></script>
+  <script src="research-library.js" defer></script>
+  <script src="onboard-assistant.js" defer></script>
+  <script src="mission.js" defer></script>
+  <script src="skin.js" defer></script>
+  <link rel="stylesheet" href="solar-system.css">
+  <script src="solar-system.js" defer></script>
+  <script src="hrp-reference.js" defer></script>
+  <script src="hrp-links.js" defer></script>
+  <link rel="stylesheet" href="neural-ui.css">
+  <link rel="stylesheet" href="workspace-layout.css">
+  <link rel="stylesheet" href="studio.css">
+  <link rel="stylesheet" href="assistant-dock.css">
+  <link rel="stylesheet" href="anatomy-workspace.css">
+  <script src="app.js" defer></script>
+  <script src="assistant-bridge.js" defer></script>
+  <script src="condition-anatomy.js" defer></script>
+  <script src="assistant-permissions.js" defer></script>
+  <script src="assistant-features.js" defer></script>
+  <script src="assistant-actions.js" defer></script>
+  <script src="api-client.js" defer></script>
+  <script src="integrations.js" defer></script>
+  <script src="assistant.js" defer></script>
+  <script src="workspace.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <a class="skip skip-assistant" href="#assistant-launch">Skip to crew assistant</a>
+  <aside class="sidebar" id="sidebar">
+    <a href="#overview" class="brand" aria-label="ORBIT Crew Health home"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 46 40"><circle cx="23" cy="20" r="13"/><ellipse cx="23" cy="20" rx="24" ry="7" transform="rotate(-35 23 20)"/><path d="m39 6 3 1-1 3"/></svg></span><span>ORBIT<small>CREW HEALTH SYSTEM</small></span></a>
+    <div class="rail-rule"></div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#overview" data-nav="overview"><i data-icon="overview"></i><span class="nav-copy"><strong>Overview</strong><small>Your health at a glance</small></span><span class="nav-mark"></span></a>
+      <a href="#status" data-nav="status"><i data-icon="alert"></i><span class="nav-copy"><strong>Crew status</strong><small>Who needs attention first</small></span></a>
+      <details class="nav-group" open>
+        <summary>Daily health<i data-icon="chevrondown" aria-hidden="true"></i></summary>
+        <div class="nav-group-links">
+          <a href="#log" data-nav="log"><i data-icon="clipboard"></i><span class="nav-copy"><strong>Health log</strong><small>Record & review readings</small></span></a>
+          <a href="#routine" data-nav="routine"><i data-icon="checksquare"></i><span class="nav-copy"><strong>Daily routine</strong><small>Your planned health tasks</small></span><span class="nav-count" id="routine-count">3/5</span></a>
+          <a href="#wellbeing" data-nav="wellbeing"><i data-icon="moon"></i><span class="nav-copy"><strong>Sleep & wellbeing</strong><small>Daily check-ins</small></span></a>
+          <a href="#exercise" data-nav="exercise"><i data-icon="dumbbell"></i><span class="nav-copy"><strong>Exercise</strong><small>Workouts against your plan</small></span></a>
+          <a href="#skin" data-nav="skin"><i data-icon="shield"></i><span class="nav-copy"><strong>Skin & wounds</strong><small>Daily checks and healing</small></span></a>
+        </div>
+      </details>
+      <details class="nav-group" open>
+        <summary>Assessment & analysis<i data-icon="chevrondown" aria-hidden="true"></i></summary>
+        <div class="nav-group-links">
+          <a href="#care" data-nav="care"><i data-icon="shield"></i><span class="nav-copy"><strong>Health assessment</strong><small>Symptoms, inputs & guidance</small></span></a>
+          <a href="#trends" data-nav="trends"><i data-icon="chart"></i><span class="nav-copy"><strong>Health trends</strong><small>Compare changes over time</small></span></a>
+          <a href="#model" data-nav="model"><i data-icon="activity"></i><span class="nav-copy"><strong>Neural model</strong><small>Pattern scores & data upload</small></span></a>
+        </div>
+      </details>
+      <details class="nav-group">
+        <summary>Crew & anatomy<i data-icon="chevrondown" aria-hidden="true"></i></summary>
+        <div class="nav-group-links">
+          <a href="#crew" data-nav="crew"><i data-icon="crew"></i><span class="nav-copy"><strong>Astronauts</strong><small>Profiles, vitals & conditions</small></span><span class="nav-new">3D</span></a>
+          <a href="#anatomy" data-nav="anatomy"><i data-icon="layers"></i><span class="nav-copy"><strong>Anatomy lab</strong><small>Systems, structures & 206 bones</small></span></a>
+          <a href="#systems" data-nav="systems"><i data-icon="body"></i><span class="nav-copy"><strong>Body systems</strong><small>Understand health in space</small></span></a>
+        </div>
+      </details>
+      <details class="nav-group">
+        <summary>Mission resources<i data-icon="chevrondown" aria-hidden="true"></i></summary>
+        <div class="nav-group-links">
+          <a href="#solar-system" data-nav="solar-system"><i data-icon="orbit"></i><span class="nav-copy"><strong>Solar system map</strong><small>Explore all eight planets</small></span></a>
+          <a href="#risks" data-nav="risks"><i data-icon="radiation"></i><span class="nav-copy"><strong>Mission health risks</strong><small>Radiation, bone & muscle</small></span></a>
+          <a href="#supplies" data-nav="supplies"><i data-icon="box"></i><span class="nav-copy"><strong>Medical supplies</strong><small>Stock against mission length</small></span></a>
+          <a href="#earthlink" data-nav="earthlink"><i data-icon="signal"></i><span class="nav-copy"><strong>Earth link</strong><small>Signal delay simulator</small></span></a>
+          <a href="#research" data-nav="research"><i data-icon="book"></i><span class="nav-copy"><strong>Evidence library</strong><small>Research with citations</small></span></a>
+          <a href="#brief" data-nav="brief"><i data-icon="book"></i><span class="nav-copy"><strong>Mission health brief</strong><small>The five spaceflight hazards</small></span></a>
+        </div>
+      </details>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="mission-patch"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 55 17v30L32 61 9 47V17Z"/><circle cx="32" cy="28" r="14"/><path d="m21 43 11-31 11 31M25 34h14M15 47h34"/><path class="patch-red" d="M12 42c16 1 31-9 41-23"/></svg><span>EXPLORATION CLASS<small id="rail-environment">LUNAR TRANSIT</small></span></div>
+      <button class="rail-settings" id="service-settings" aria-label="Open account and connected services"><i data-icon="signal"></i>Services<i data-icon="chevronright"></i></button>
+      <button class="rail-settings" data-action="settings"><i data-icon="settings"></i>Mission settings<i data-icon="chevronright"></i></button>
+      <div class="local-status"><span></span> BROWSER STORAGE <small>LOCAL RECORDS</small></div>
+    </div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="icon-button menu-toggle" data-action="menu" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false"><i data-icon="menu"></i></button>
+      <button class="feature-finder-trigger" data-workspace-find aria-label="Find a feature"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><span>Find a feature</span><kbd>⌘ K</kbd></button><div class="topbar-location"><span class="mono">MISSION CONTROL</span><span class="slash">/</span><span id="header-page">Crew overview</span></div>
+      <div class="topbar-actions"><button class="care-header-response" data-action="emergency" aria-label="Open crew medical response guide"><i data-icon="alert"></i><span>Medical response</span></button><button class="demo-tag" data-action="settings"><span></span><span id="data-mode">DEMO MISSION</span><i data-icon="chevrondown"></i></button><button class="viewer-tag unset" data-action="viewer-select" aria-label="Choose who is using ORBIT"><i data-icon="crew"></i><span class="viewer-tag-label">Viewing as</span><strong class="viewer-tag-name">Choose</strong><strong class="viewer-tag-short" aria-hidden="true">?</strong></button><span class="header-divider"></span><button class="crew-avatar" data-action="crew-select" aria-label="Select crew member">01</button><span class="crew-name">Crew member<small>EXPLORATION CREW / 01</small></span></div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="app-footer"><span>ORBIT <b aria-hidden="true">/</b> HUMAN EXPLORATION, HUMAN HEALTH.</span><button data-action="about">Research prototype · About & data</button></footer>
+  </div>
+  <div class="mobile-scrim" data-action="menu"></div>
+  <dialog id="modal" aria-labelledby="modal-title"><h2 id="modal-title" hidden>Dialog</h2></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
