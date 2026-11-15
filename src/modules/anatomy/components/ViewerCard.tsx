@@ -51,16 +51,19 @@ export function ViewerCard(props: ViewerCardProps) {
   const [zoom, setZoom] = useState(100);
   const [source, setSource] = useState<"glb" | "placeholder" | null>(null);
   const [attribution, setAttribution] = useState<ModelAttribution | null>(null);
-  const fellBack = useRef(false);
+  const [fallbackReason, setFallbackReason] = useState<string | null>(null);
+  const toasted = useRef(false);
 
   const fallback = useCallback((reason: string) => {
     dispatch({ type: "setMode", payload: { mode: "2d", isFallback: true } });
     dispatch({ type: "setSection", payload: { axis: "off" } });
-    if (!fellBack.current && webgl) {
-      fellBack.current = true;
-      toast({ level: "standby", title: "Showing the 2D map", description: `The 3D model is not available: ${reason}` });
+    setFallbackReason(reason);
+    // A missing model is expected (the badge says so). Only a crash gets a toast.
+    if (reason !== "model-missing" && !toasted.current) {
+      toasted.current = true;
+      toast({ level: "standby", title: "Showing the 2D map", description: "The 3D viewer stopped on this device. Pins still work in 2D." });
     }
-  }, [dispatch, toast, webgl]);
+  }, [dispatch, toast]);
 
   useEffect(() => {
     if (!webgl) dispatch({ type: "setMode", payload: { mode: "2d", isFallback: true } });
@@ -87,7 +90,10 @@ export function ViewerCard(props: ViewerCardProps) {
   const show3d = state.mode === "3d" && !state.isFallback && webgl;
 
   const modelNote =
-    !show3d ? "Procedural 2D reference map"
+    !show3d
+      ? state.isFallback
+        ? !webgl ? "Procedural 2D map · WebGL 2 not available" : fallbackReason === "model-missing" ? "Procedural 2D map · body.glb not installed" : "Procedural 2D map"
+        : "Procedural 2D reference map"
       : source === "glb" ? (attribution?.text ?? "Model attribution unavailable")
         : source === "placeholder" ? "Procedural placeholder body · no third-party model"
           : "Loading model…";

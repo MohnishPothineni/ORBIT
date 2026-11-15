@@ -71,7 +71,7 @@ export function Viewer2D({
       }
       const cx = (x0 + x1) / 2 + OFFSET[view];
       const cy = (y0 + y1) / 2 + LABEL_H;
-      const w = Math.min(TOTAL_W, Math.max(MIN_W * 1.5, (x1 - x0) * 4, ((y1 - y0) * 4 * TOTAL_W) / TOTAL_H));
+      const w = Math.min(TOTAL_W, Math.max(TOTAL_W / 3, (x1 - x0) * 8, ((y1 - y0) * 8 * TOTAL_W) / TOTAL_H));
       const h = (w / TOTAL_W) * TOTAL_H;
       setBox({ x: cx - w / 2, y: cy - h / 2, w, h });
       return;

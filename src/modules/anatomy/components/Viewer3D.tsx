@@ -79,7 +79,9 @@ export default function Viewer3D(props: Viewer3DProps) {
       })
       .catch((e: unknown) => {
         if (ctrl.signal.aborted) return;
-        onLoadError(e instanceof Error ? e.message : "The 3D model could not be loaded.");
+        // A missing file comes back as the SPA's HTML page, which fails to parse.
+        const msg = e instanceof Error ? e.message : "";
+        onLoadError(/doctype|<|404|JSON/i.test(msg) || !msg ? "model-missing" : msg);
       });
     return () => ctrl.abort();
   }, [index, onLoadError, onModelSource]);
