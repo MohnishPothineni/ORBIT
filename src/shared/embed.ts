@@ -46,6 +46,7 @@ export const WEBSITE_PAGES: Record<string, string> = {
   skin: "Health assessment / Skin & wounds",
   routine: "Daily routine",
   collect: "Collect vitals",
+  scope: "SCOPE",
   risks: "Health risk readings",
   anatomy: "Anatomy lab",
   voice: "Crew voice AI assistant",

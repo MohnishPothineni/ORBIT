@@ -196,7 +196,8 @@ anatomy:'Anatomy lab',
 voice:'Crew voice AI assistant',
 log:'Health log & trends',
 routine:'Daily routine',
-collect:'Collect vitals'};
+collect:'Collect vitals',
+scope:'SCOPE'};
 function button(text,action,type='',ic=''){return `<button class="button ${type}" data-action="${action}">${ic?icon(ic):''}${text}</button>`;}
 /* Page heading, or a section heading when the page is shown as a Health assessment tab. */
 function sectionHeading(embedded,title,sub,actions=''){return embedded?`<div class="care-section-head"><div><h2>${title}</h2><p>${sub}</p></div><div class="heading-actions">${actions}</div></div>`:pageHeading(title,sub,actions)+demoNotice();}
@@ -293,15 +294,15 @@ function render(){
  const keepVoice=p==='voice'&&main.dataset.page==='voice'&&!!main.querySelector('#voice-frame');
  const parkedVoice=document.getElementById('voice-frame');
  const voiceOutside=parkedVoice&&!main.contains(parkedVoice);
- main.dataset.page=p;let scroll=window.scrollY;cleanupHealthInputs();disposeCrewViewer();CollectionPage.dispose();
+ main.dataset.page=p;let scroll=window.scrollY;cleanupHealthInputs();disposeCrewViewer();CollectionPage.dispose();if(p!=='scope')ScopePage.dispose();
  if(p==='collect'&&location.hash!==lastCollectHash){scroll=0;}lastCollectHash=p==='collect'?location.hash:'';
  if(!keepVoice){
-  main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,risks:missionRisksPage,research:missionResearchPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,voice:voicePage,log:logPage,routine:routinePage,collect:()=>CollectionPage.render()}[p])();
+  main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,risks:missionRisksPage,research:missionResearchPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,voice:voicePage,log:logPage,routine:routinePage,collect:()=>CollectionPage.render(),scope:()=>ScopePage.render()}[p])();
   if(p==='voice'&&voiceOutside&&parkedVoice.isConnected){const slot=main.querySelector('#voice-slot');if(slot){parkedVoice.classList.remove('assistant-local-frame');parkedVoice.classList.add('voice-frame');slot.append(parkedVoice);}}
  }
  $$('.main-nav a').forEach(a=>{a.classList.toggle('active',a.dataset.nav===p);if(a.dataset.nav===p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  $('#header-page').textContent=PAGE_NAMES[p];$('#data-mode').textContent=state.mode==='demo'?'DEMO MISSION':'MY HEALTH LOG';$('#rail-environment').textContent=state.settings.environment.toUpperCase();document.title=`${PAGE_NAMES[p]} | ORBIT`;
- syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='collect')CollectionPage.attach();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();window.scrollTo(0,scroll);
+ syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='collect')CollectionPage.attach();if(p==='scope')ScopePage.attach();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();window.scrollTo(0,scroll);
  const alias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(alias){history.replaceState(null,'','#'+alias.page);if(alias.section)requestAnimationFrame(()=>scrollToLogSection(alias.section));}
  window.dispatchEvent(new Event('orbit:context-change'));
 }
