@@ -88,11 +88,12 @@ async function request<T>(method: string, path: string, body: unknown, opts: Req
   const link = linkSignal(opts.signal, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   try {
     const headers: Record<string, string> = { Accept: "application/json" };
-    if (body !== undefined) headers["Content-Type"] = "application/json";
+    if (body !== undefined && !(body instanceof FormData)) headers["Content-Type"] = "application/json";
     const res = await fetch(`${API_BASE}${path}`, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      // Module 4: multipart document imports retain the browser-generated boundary.
+      body: body instanceof FormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
       signal: link.signal,
       credentials: "same-origin",
     });
@@ -136,14 +137,14 @@ export async function apiStream(
   path: string,
   body: unknown,
   onEvent: (e: StreamEvent) => void,
-  opts: RequestOptions = {},
+  opts: RequestOptions & { method?: "GET" | "POST" } = {},
 ): Promise<void> {
   const link = linkSignal(opts.signal, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   try {
     const res = await fetch(`${API_BASE}${path}`, {
-      method: "POST",
+      method: opts.method ?? "POST",
       headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
-      body: JSON.stringify(body ?? {}),
+      body: opts.method === "GET" ? undefined : JSON.stringify(body ?? {}),
       signal: link.signal,
       credentials: "same-origin",
     });

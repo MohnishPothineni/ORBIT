@@ -67,3 +67,15 @@ With `VITE_USE_MOCKS=true`, a `MockVoiceSession` plays a scripted conversation w
 3. Show the left knee, which navigates to the Anatomy lab.
 
 A **Demo controls** card can step the script, force any turn state, simulate errors, say the share approval phrase and cycle the status-bar states. Append `?state=loading|empty|error` to the URL in development to see those page states.
+
+## Offline evidence library
+
+Module 4 is implemented at `/evidence`, with cited search/Ask, a passage viewer,
+Offline center, import/indexing jobs, and a separate historical CSV reference view.
+Production builds include a Workbox service worker; live API responses are never
+cached. See [the module guide](src/modules/evidence/README.md) for API contracts,
+offline behavior, mock-mode limits, tests, and the colon-containing workspace path
+caveat. The separate local FastAPI/FAISS/Ollama backend is required for real search,
+indexing and generated answers.
+
+Run `npm run build` then `npm run test:evidence` for the evidence regression checks.
