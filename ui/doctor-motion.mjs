@@ -53,7 +53,8 @@ export class DoctorMotion {
   setPaused(paused){this.paused=paused;if(paused)this.resetSpeech();}
   preview(now){if(!this.paused&&this.visible){this.previewStart=now;this.previewUntil=now+3.2;}}
   previewYawn(now){if(this.paused||!this.visible||!['idle','text'].includes(this.mode)||now<this.previewUntil||this.watch.active)return false;return this.yawn.start(true);}
-  previewWatch(now){if(this.paused||!this.visible||!['idle','text'].includes(this.mode)||now<this.previewUntil||this.yawn.active)return false;return this.watch.start(true);}
+  /* The watch-check animation is turned off: the avatar never raises its wrist to look at the watch. */
+  previewWatch(){return false;}
   sample(now,dt,volume=0,centroid=.5){
     if(!this.visible||this.paused)return rest();
     const preview=now<this.previewUntil,speaking=(this.mode==='speaking'&&this.voice)||preview;
@@ -73,7 +74,7 @@ export class DoctorMotion {
     // Spectrum shapes are approximate articulation, never inferred phoneme timing.
     const closure=speaking?clamp(-this.velocity*.12)*(1-this.amplitude)*.24:0;
     this.press+=(closure-this.press)*(1-Math.exp(-step/.055));
-    const idle=!speaking&&(this.mode==='idle'||this.mode==='text'),yawn=this.yawn.sample(step,idle&&!this.watch.active),watch=this.watch.sample(step,idle&&!yawn.active),look=this.idleLook.sample(step,idle&&!yawn.active&&!watch.active);
+    const idle=!speaking&&(this.mode==='idle'||this.mode==='text'),yawn=this.yawn.sample(step,idle&&!this.watch.active),watch=this.watch.sample(step,false),look=this.idleLook.sample(step,idle&&!yawn.active&&!watch.active);
     if(now>this.blinkAt+.18)this.blinkAt=now+3.1+Math.abs(Math.sin(now*1.7))*2.6;
     const phase=(now-this.blinkAt)/.18,blink=phase>=0&&phase<=1?Math.sin(phase*Math.PI):0;
     const emphasis=this.amplitude*(.6+.4*Math.sin(now*1.8+.4));
