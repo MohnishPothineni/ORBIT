@@ -447,7 +447,14 @@ export class PipecatVoiceSession implements VoiceSession {
       onError: (msg: RTVIMessage) => {
         const data = msg.data as Partial<ErrorData> | undefined;
         const fatal = Boolean(data?.fatal);
-        this.em.emit("error", { code: "pipeline_error", message: data?.error ?? data?.message ?? "Pipeline error", fatal });
+        const message = data?.error ?? data?.message ?? "Pipeline error";
+        // Kokoro reports a text fragment that makes no sound (only punctuation, say) as a non-fatal
+        // error. The rest of the reply still plays, so it is not worth a toast.
+        if (!fatal && /completed with no audio/i.test(message)) {
+          console.debug("ORBIT voice:", message);
+          return;
+        }
+        this.em.emit("error", { code: "pipeline_error", message, fatal });
         if (fatal) this.tracker.update({ error: true });
       },
       onMessageError: (msg: RTVIMessage) => {

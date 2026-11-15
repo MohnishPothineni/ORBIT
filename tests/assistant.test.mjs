@@ -271,3 +271,33 @@ test("the first reply keeps its ending when spoken sentences take over from the 
   cb.onBotOutput({ text: "Which region would you like?", output_type: "sentence" });
   assert.equal(text, "The lab is open. Which region would you like?");
 });
+
+test("only the exact spoken phrases approve a save or a share", async () => {
+  const { isVoiceSaveApproval, isVoiceShareApproval } = await server.ssrLoadModule("/src/modules/assistant/tools/definitions.ts");
+  for (const said of ["Confirm save", "confirm save.", "Confirm, save!", "  CONFIRM SAVE  "]) assert.ok(isVoiceSaveApproval(said), said);
+  for (const said of ["save", "confirm", "please confirm save", "confirm save the reading", "don't confirm save", "Confirm share"]) {
+    assert.ok(!isVoiceSaveApproval(said), said);
+  }
+  assert.ok(isVoiceShareApproval("Confirm, share."));
+  assert.ok(!isVoiceShareApproval("Confirm save"));
+});
+
+test("assistant links pass the crew id or name to the website, which matches it", async () => {
+  const { websiteHref } = await server.ssrLoadModule("/src/shared/embed.ts");
+  assert.equal(websiteHref("/crew?crew=Gordon Cooper"), "/#crew?crew=Gordon Cooper");
+  assert.equal(websiteHref("/log?crew=hist-ma7"), "/#log?crew=hist-ma7");
+  assert.equal(websiteHref("/log?crew=COOPER"), "/#log?crew=COOPER");
+  assert.equal(websiteHref("/evidence"), "/#research");
+});
+
+test("crew summaries date readings from other days, such as historical records", async () => {
+  const { summarizeCrew } = await server.ssrLoadModule("/src/modules/assistant/tools/inputs.ts");
+  const cooper = { id: "hist-ma9", callsign: "COOPER", fullName: "Gordon Cooper", role: "pilot", initials: "GC", isCrewLeader: false, isMedicalOfficer: false };
+  const now = new Date().toISOString();
+  const { text } = summarizeCrew(cooper, { crewId: "hist-ma9", wellbeing: null, readings: [
+    { kind: "heart_rate", label: "Heart rate", value: 80, unit: "bpm", recordedAt: "1963-05-17T17:29:00Z" },
+    { kind: "heart_rate", label: "Heart rate", value: 75, unit: "bpm", recordedAt: now },
+  ] }, cooper);
+  assert.match(text, /Heart rate 80 bpm at 1963-05-17 17:29Z/);
+  assert.match(text, new RegExp(`Heart rate 75 bpm at ${now.slice(11, 16)}Z`), "today's reading keeps the time only");
+});

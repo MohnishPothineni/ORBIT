@@ -57,7 +57,10 @@ export function summarizeCrew(crew: CrewMember, summary: CrewSummary, viewer: Cr
   const readings = summary.readings.map((r) => ({ ...r }));
   const visible = canSeeWellbeing(viewer, crew.id);
   const wellbeing = summary.wellbeing ? (visible ? { ...summary.wellbeing } : { note: WELLBEING_NEUTRAL }) : null;
-  const parts = readings.map((r) => `${r.label} ${r.value} ${r.unit} at ${formatUtcTime(r.recordedAt)}`);
+  // Older readings, such as historical mission records, carry their date so they are not mistaken for today's.
+  const today = new Date().toISOString().slice(0, 10);
+  const when = (iso: string) => (iso.slice(0, 10) === today ? formatUtcTime(iso) : `${formatUtcDate(iso)} ${formatUtcTime(iso)}`);
+  const parts = readings.map((r) => `${r.label} ${r.value} ${r.unit} at ${when(r.recordedAt)}`);
   let text = `${crew.callsign}: ${parts.length ? parts.join(", ") : "no readings yet"}`;
   if (summary.wellbeing) {
     text += visible

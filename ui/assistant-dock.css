@@ -142,3 +142,17 @@ body[data-assistant-closed=true] .assistant-reopen:not([hidden]) { display: bloc
 @media (max-width: 1099px) {
   body[data-assistant-closed=true] .app-footer { padding-bottom: 26px; }
 }
+
+/* The assistant always keeps its own panel: never collapsed, closed, or floating over the page. */
+#assistant-panel .companion-collapse, .assistant-reopen { display: none !important; }
+@media (max-width: 1099px) and (min-width: 900px) {
+  .app-shell { margin-right: var(--assistant-width); }
+  #assistant-panel { inset: 0 0 0 auto; width: var(--assistant-width); height: 100dvh; z-index: auto; }
+  .app-footer { padding-bottom: 26px; }
+}
+@media (max-width: 899px) {
+  .app-shell { margin-right: 0; }
+  #assistant-panel { position: static; inset: auto; width: auto; max-width: none; height: auto; min-height: 0; margin: 0; border-left: 0; border-top: 1px solid var(--line); z-index: auto; overflow: visible; }
+  #assistant-panel .companion-portrait { height: clamp(200px, 40vw, 300px); }
+  .app-footer { padding-bottom: 26px; }
+}

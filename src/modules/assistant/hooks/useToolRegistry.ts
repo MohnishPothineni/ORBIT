@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useCrew } from "../../../shared/context/CrewContext";
 import { useToast } from "../../../shared/ui/Toast";
 import { formatUtcTime } from "../../../shared/format";
-import { EMBEDDED, notifyWebsite, WEBSITE_PAGES, websiteTab } from "../../../shared/embed";
+import { EMBEDDED, notifyWebsite, requestWebsite, WEBSITE_FORMS, WEBSITE_PAGES, websiteTab } from "../../../shared/embed";
 import type { CrewMember } from "../../../shared/types";
 import {
   clearAssistantContext,
@@ -13,7 +13,7 @@ import {
   shareRecordWithAssistant,
   VITAL_META,
 } from "../services/toolServices";
-import { CONFIRM_TIMEOUT_MS, isVoiceShareApproval, isToolName, TOOL_DEFINITIONS } from "../tools/definitions";
+import { CONFIRM_TIMEOUT_MS, isVoiceSaveApproval, isVoiceShareApproval, isToolName, TOOL_DEFINITIONS } from "../tools/definitions";
 import type { Citation, ToolHandler, ToolOutcome } from "../types";
 
 import {
@@ -89,6 +89,8 @@ export function useToolRegistry() {
   const [sharedContext, setSharedContext] = useState<SharedContextEntry[]>([]);
 
   const waiters = useRef(new Map<string, (d: Decision) => void>());
+  /** Drafted readings waiting for a person, as "crew|kind|value". */
+  const pendingVitals = useRef(new Set<string>());
   const live = useRef({ activeCrew, crew, getCrew, location, disabled });
   live.current = { activeCrew, crew, getCrew, location, disabled };
 
@@ -96,9 +98,14 @@ export function useToolRegistry() {
     const { crew: list, getCrew: byId } = live.current;
     const id = readString(args.crew_id) ?? readString(args.crewId);
     if (id) return byId(id) ?? null;
-    const callsign = readString(args.callsign)?.toUpperCase();
-    if (callsign) return list.find((c) => c.callsign === callsign) ?? null;
-    return null;
+    // The model may give a callsign ("COOPER"), a full name ("Gordon Cooper") or a surname.
+    const said = (readString(args.callsign) ?? readString(args.name))?.trim().toUpperCase();
+    if (!said) return null;
+    return (
+      list.find((c) => c.callsign === said || c.fullName.toUpperCase() === said) ??
+      list.find((c) => c.fullName.toUpperCase().split(" ").at(-1) === said) ??
+      null
+    );
   }, []);
 
   const waitFor = useCallback((req: Confirmation, signal: AbortSignal): Promise<Decision> => {
@@ -164,11 +171,23 @@ export function useToolRegistry() {
           const draft = parsed.draft;
           const { kind, value } = draft;
           const meta = VITAL_META[kind];
-          update({ status: "awaiting_confirmation" });
-          const decision = await waitFor(
-            { kind: "vital", callId: call.id, crew: subject, draft, question: `Save ${meta.label} ${value} ${meta.unit} for ${subject.callsign}?` },
-            signal,
-          );
+          // The model sometimes drafts the same reading again while the first waits. One
+          // "Confirm save" per draft would then save it twice, so refuse the repeat.
+          const draftKey = `${subject.id}|${kind}|${value}`;
+          if (pendingVitals.current.has(draftKey)) {
+            return fail(`That ${meta.label} reading is already waiting for a person to confirm. Do not draft it again.`);
+          }
+          pendingVitals.current.add(draftKey);
+          let decision: Decision;
+          try {
+            update({ status: "awaiting_confirmation" });
+            decision = await waitFor(
+              { kind: "vital", callId: call.id, crew: subject, draft, question: `Save ${meta.label} ${value} ${meta.unit} for ${subject.callsign}?` },
+              signal,
+            );
+          } finally {
+            pendingVitals.current.delete(draftKey);
+          }
           if (!decision.approve) {
             return declined(notApproved(decision.via, "Discarded by a person", "saved"));
           }
@@ -176,7 +195,7 @@ export function useToolRegistry() {
           const saved = await logVital(draft, signal);
           // Inside the website, also add it to the website's Health log (kept in that page's browser storage).
           notifyWebsite({ type: "orbit:vital-saved", id: saved.id, crewId: subject.id, kind, value, recordedAt: saved.recordedAt });
-          return ok(`Saved ${meta.label} ${value} ${meta.unit} for ${subject.callsign} at ${formatUtcTime(saved.recordedAt)}`, {
+          return ok(`Saved ${meta.label} ${value} ${meta.unit} for ${subject.callsign} at ${formatUtcTime(saved.recordedAt)} · ${decision.via === "voice" ? "approved by voice" : "approved on screen"}`, {
             id: saved.id,
             recordedAt: saved.recordedAt,
           });
@@ -193,8 +212,26 @@ export function useToolRegistry() {
           update({ status: "running" });
           setPendingNavigation(path);
           // Name the screen that actually opens, so the reply cannot claim a different one.
-          const label = EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path;
+          const crewAsked = new URLSearchParams(path.split("?")[1] ?? "").get("crew");
+          const label = (EMBEDDED ? WEBSITE_PAGES[websiteTab(path)] : path) + (crewAsked ? ` for ${crewAsked}` : "");
           return ok(`Opening ${label}`, { path, screen: label });
+        }
+
+        case "open_form": {
+          const form = readString(args.form);
+          if (!form || !(WEBSITE_FORMS as readonly string[]).includes(form)) return fail(`Unknown form: ${form ?? "none"}.`);
+          if (!EMBEDDED) return fail("Forms open only inside the ORBIT website.");
+          update({ status: "running" });
+          // "me" is the person talking: the crew member this console is viewing as.
+          const asked = readString(args.crew);
+          const crew = asked && /^(me|myself|my|i|self)$/i.test(asked.trim()) ? viewer.fullName : asked;
+          const reply = await requestWebsite({ type: "orbit:open-form", form, crew: crew ?? undefined });
+          if (!reply.ok) return fail(reply.reason ?? "The form did not open.");
+          // Opening is all it does: say so, so the reply does not claim anything was saved.
+          return ok(`Opened the ${String(reply.title)} form for ${String(reply.crew)}. Call it that. Nothing is saved until the person fills it in and presses Save.`, {
+            form,
+            crew: reply.crew,
+          });
         }
 
         case "control_anatomy": {
@@ -259,11 +296,16 @@ export function useToolRegistry() {
   const confirmationsRef = useRef(confirmations);
   confirmationsRef.current = confirmations;
 
-  /** Voice approval: only the exact phrase, only from a final user voice transcript. */
-  const approveShareByVoice = useCallback(
+  /**
+   * Voice approval: only the exact phrase, only from a final user voice transcript.
+   * "Confirm share" approves the pending share; "Confirm save" approves the oldest
+   * pending reading, one per phrase.
+   */
+  const approveByVoice = useCallback(
     (text: string): boolean => {
-      if (!isVoiceShareApproval(text)) return false;
-      const pending = confirmationsRef.current.find((c) => c.kind === "share");
+      const kind = isVoiceShareApproval(text) ? "share" : isVoiceSaveApproval(text) ? "vital" : null;
+      if (!kind) return false;
+      const pending = confirmationsRef.current.find((c) => c.kind === kind);
       if (!pending) return false;
       resolveConfirmation(pending.callId, true, "voice");
       return true;
@@ -314,7 +356,7 @@ export function useToolRegistry() {
     setToolEnabled,
     confirmations,
     resolveConfirmation,
-    approveShareByVoice,
+    approveByVoice,
     declineAll,
     pendingNavigation,
     consumeNavigation,

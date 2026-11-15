@@ -5,6 +5,7 @@ export type ToolName =
   | "get_crew_summary"
   | "log_vital"
   | "navigate"
+  | "open_form"
   | "control_anatomy"
   | "search_evidence"
   | "share_record_with_assistant";
@@ -21,6 +22,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   { name: "get_crew_summary", permission: "read", description: "The selected crew member's latest readings. Wellbeing detail follows the visibility rule." },
   { name: "log_vital", permission: "write", description: "Drafts a reading. A person must press Save before anything is stored." },
   { name: "navigate", permission: "read", description: "Opens a screen in this console, such as a crew record or an anatomy region." },
+  { name: "open_form", permission: "read", description: "Opens a website form to log or report something (health check, workout, skin check, report…). A person fills it in and saves." },
   { name: "control_anatomy", permission: "read", description: "Sends view actions to the Anatomy lab (select, focus, reset)." },
   { name: "search_evidence", permission: "read", description: "Searches the local Evidence library and returns cited passages." },
   { name: "share_record_with_assistant", permission: "share", description: "Shares a crew record with the assistant after a person reviews it and confirms." },
@@ -47,6 +49,18 @@ export const CONFIRM_TIMEOUT_MS = 285_000;
 /** The exact phrase a person must speak to approve a share by voice. */
 export const VOICE_SHARE_PHRASE = "confirm share";
 
+/** The exact phrase a person must speak to save a drafted reading by voice. */
+export const VOICE_SAVE_PHRASE = "confirm save";
+
+/** Speech recognition may add punctuation ("Confirm, save."); compare the words only. */
+function spokenWords(text: string): string {
+  return text.toLowerCase().replace(/[.!?,;:]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
 export function isVoiceShareApproval(text: string): boolean {
-  return text.trim().toLowerCase().replace(/[.!?,]+$/g, "") === VOICE_SHARE_PHRASE;
+  return spokenWords(text) === VOICE_SHARE_PHRASE;
+}
+
+export function isVoiceSaveApproval(text: string): boolean {
+  return spokenWords(text) === VOICE_SAVE_PHRASE;
 }

@@ -16,7 +16,7 @@ const types = {
   ".json": "application/json", ".webmanifest": "application/manifest+json",
   ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
   ".webp": "image/webp", ".woff2": "font/woff2", ".ttf": "font/ttf",
-  ".glb": "model/gltf-binary", ".txt": "text/plain; charset=utf-8",
+  ".glb": "model/gltf-binary", ".mp4": "video/mp4", ".webm": "video/webm", ".txt": "text/plain; charset=utf-8",
 };
 
 function insideRoot(path, directory = root) {
@@ -68,9 +68,22 @@ const server = createServer(async (request, response) => {
     }
     if (!insideRoot(file, directory)) { response.writeHead(403).end(); return; }
     const info = await stat(file);
-    response.writeHead(200, {
-      "Content-Type": types[extname(file)] || "application/octet-stream", "Content-Length": info.size,
-    });
+    const type = types[extname(file)] || "application/octet-stream";
+    // Byte ranges let Safari (and iPad) play and seek MP4 video.
+    const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.range || "");
+    if (range && (range[1] || range[2])) {
+      const start = range[1] ? Number(range[1]) : Math.max(0, info.size - Number(range[2]));
+      const end = range[1] && range[2] ? Math.min(info.size - 1, Number(range[2])) : info.size - 1;
+      if (!(start >= 0 && start < info.size && end >= start)) {
+        response.writeHead(416, { "Content-Range": `bytes */${info.size}` }).end();
+        return;
+      }
+      response.writeHead(206, { "Content-Type": type, "Content-Length": end - start + 1, "Content-Range": `bytes ${start}-${end}/${info.size}`, "Accept-Ranges": "bytes" });
+      if (request.method === "HEAD") response.end();
+      else createReadStream(file, { start, end }).on("error", () => response.destroy()).pipe(response);
+      return;
+    }
+    response.writeHead(200, { "Content-Type": type, "Content-Length": info.size, "Accept-Ranges": "bytes" });
     if (request.method === "HEAD") response.end();
     else createReadStream(file).on("error", () => response.destroy()).pipe(response);
   } catch {

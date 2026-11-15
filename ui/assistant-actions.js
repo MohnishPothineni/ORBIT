@@ -15,7 +15,8 @@ log:'Health log & trends',
 care:'Health assessment',
 anatomy:'Anatomy lab',
 voice:'Crew voice AI assistant',
-routine:'Daily routine'};
+routine:'Daily routine',
+collect:'Collect vitals'};
   const sections=['assessment','wellbeing','exercise','skin','inputs','measurements','mission'],methods=['manual','images','sensor','dataset'];
   const layers=['skeleton','cartilage','dental','muscles','connective','heart','arteries','veins','nervous','respiratory','digestive','urinary','reproductive','integumentary','lymphatic','endocrine','sensory'];
   const regions=['all','head-neck','thorax','abdomen','pelvis','upper','lower'];
@@ -29,6 +30,7 @@ log:['health log','log','logged vitals','health records','recorded vitals','vita
 care:['health assessment','assessment'],
 anatomy:['anatomy','anatomy lab','3d anatomy','3d model'],
 routine:['routine','daily routine','checklist'],
+collect:['collect vitals','collection methods','how to take vitals','vitals walkthrough','measurement animations'],
 status:['home','overview','dashboard','crew status','crew health','crew health overview','status'],
 wellbeing:['sleep and wellbeing','wellbeing','check-in','check in','mental health'],
 exercise:['exercise','workouts','exercise tracking'],

@@ -2,15 +2,16 @@ import { lazy, Suspense } from "react";
 import { Navigate, type RouteObject } from "react-router-dom";
 import { AppShell } from "./shell/AppShell";
 import { ModuleSkeleton, NotFound } from "./shell/ModulePlaceholder";
-import { SharedWorkspace } from "./shell/SharedWorkspace";
+const CrewModule = lazy(() => import("../modules/crew/components/CrewModule"));
 
+const EvidenceModule = lazy(() => import("../modules/evidence/components/EvidenceModule"));
 const AnatomyModule = lazy(() => import("../modules/anatomy/components/AnatomyModule"));
 const AssistantModule = lazy(() => import("../modules/assistant/components/AssistantModule"));
 
 export const moduleRoutes: RouteObject[] = [
   {
     path: "crew/*",
-    element: <SharedWorkspace page="status" />,
+    element: <Suspense fallback={<ModuleSkeleton />}><CrewModule /></Suspense>,
   },
   {
     path: "anatomy/*",
@@ -30,7 +31,7 @@ export const moduleRoutes: RouteObject[] = [
   },
   {
     path: "evidence/*",
-    element: <SharedWorkspace page="research" />,
+    element: <Suspense fallback={<ModuleSkeleton />}><EvidenceModule /></Suspense>,
   },
 ];
 // App.tsx renders these. The merge of 'dhruv' (1868aa9) dropped this block; keep it.

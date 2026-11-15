@@ -41,11 +41,19 @@ const STEPS: Array<(s: SystemStatus) => void> = [
 ];
 
 let step = 0;
+// Module 4: the simulated rebuild temporarily disables semantic search.
+let indexRebuildUntil = 0;
+export function setMockIndexRebuild(durationMs: number): void {
+  indexRebuildUntil = durationMs ? Date.now() + durationMs : 0;
+}
 
 /** Current mock status (server time is always "now"). */
 export function getMockSystemStatus(): SystemStatus {
   const s = clone(BASE);
   STEPS[step]?.(s);
+  if (Date.now() < indexRebuildUntil) {
+    s.faiss = { ...s.faiss, state: "building", buildProgress: Math.round(100 * (1 - (indexRebuildUntil - Date.now()) / 30_000)) };
+  }
   s.serverTime = new Date().toISOString();
   return s;
 }

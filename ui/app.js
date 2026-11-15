@@ -52,7 +52,8 @@ const esc=(x)=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':
 const KEY='orbit-crew-health-v1';
 const todayKey=()=>new Date().toLocaleDateString('en-CA');
 const localInput=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-const dayLabel=(d)=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+/* The year is shown only for other years, such as historical mission records. */
+const dayLabel=(d)=>{const t=new Date(d);return t.toLocaleDateString('en-US',t.getFullYear()===new Date().getFullYear()?{month:'short',day:'numeric'}:{month:'short',day:'numeric',year:'numeric'});};
 const formatNum=(n,d=0)=>Number.isFinite(n)?Number(n).toFixed(d):'—';
 let storageAvailable=true,toastTimer,chartMetric='hr',chartRange=7,filterQuery='',logLimit=20;
 const META={hr:{label:'Resting heart rate',short:'Heart rate',unit:'bpm',digits:0,icon:'heart',color:'#276bb4'},sys:{label:'Systolic blood pressure',short:'Blood pressure',unit:'mmHg',digits:0,icon:'pressure'},temp:{label:'Body temperature',short:'Temperature',unit:'°C',digits:1,icon:'temp'},sleep:{label:'Sleep duration',short:'Sleep',unit:'hrs',digits:1,icon:'moon'},glucose:{label:'Blood glucose',short:'Glucose',unit:'mg/dL',digits:0,icon:'drop'},mood:{label:'Mood check-in',short:'Mood',unit:'/ 5',digits:0,icon:'face'}};
@@ -68,10 +69,10 @@ const ROUTINES=[
 function seedDemo(){
  const hr=[65,63,64,66,62,65,64,63,65,67,64,63,65,66,64,65,63,64,66,65,64,63,65,67,66,64,65,64];
  const sleeps=[7.9,8.1,7.8,8.2,7.6,8.0,7.7,7.8,8.0,7.6,8.1,7.9,8.0,7.7,7.9,7.8,8.1,8.0,7.5,7.8,8.0,7.3,7.8,7.5,7.2,6.8,6.6,6.5];
- const entries=hr.map((h,i)=>{const d=new Date();d.setDate(d.getDate()-(27-i));d.setHours(7,0,0,0);if(d>new Date())d.setTime(Date.now()-60000);return {id:'sample-'+i,at:d.toISOString(),hr:h,sys:116+(i%5),dia:74+(i%4),temp:[36.6,36.7,36.8,36.7][i%4],sleep:sleeps[i],glucose:[89,92,94,91,90][i%5],glucoseContext:'Before meal',mood:i===27?3:4,notes:i===27?'Slept less after a schedule change. No symptoms reported.':'Routine morning check. No symptoms reported.'};});
+ const entries=hr.map((h,i)=>{const d=new Date();d.setDate(d.getDate()-(27-i));d.setHours(7,0,0,0);if(d>new Date())d.setTime(Date.now()-60000);return {id:'sample-'+i,at:d.toISOString(),hr:h,spo2:97+i%2,rr:15+i%3,fluids:1800+i%5*150,exercise:45+i%4*5,sys:116+(i%5),dia:74+(i%4),temp:[36.6,36.7,36.8,36.7][i%4],sleep:sleeps[i],glucose:[89,92,94,91,90][i%5],glucoseContext:'Before meal',mood:i===27?3:4,notes:i===27?'Slept less after a schedule change. No symptoms reported.':'Routine morning check. No symptoms reported.'};});
  return {entries,checks:{[todayKey()]:['vitals','exercise','nutrition']}};
 }
-function defaultState(){return {version:1,mode:'demo',data:{demo:seedDemo(),personal:{entries:[],checks:{}}},settings:{mission:'Exploration 01',environment:'Lunar transit',sleepTarget:8},reminderDismissed:false};}
+function defaultState(){return {version:1,mode:'demo',data:{demo:{entries:[],checks:{}},personal:{entries:[],checks:{}}},settings:{mission:'Exploration 01',environment:'Lunar transit',sleepTarget:8},reminderDismissed:false};}
 let state,storageNotice='',storageLocked=false;
 function loadState(){
  let raw=null;try{raw=localStorage.getItem(KEY);}catch{return defaultState();}
@@ -97,9 +98,8 @@ window.addEventListener('message',e=>{
  if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||m?.type!=='orbit:vital-saved')return;
  const field=VOICE_VITAL_FIELDS[m.kind],limits=InputLogic.fields[field],value=Number(m.value),at=Date.parse(m.recordedAt);
  if(!field||!limits||!Number.isFinite(value)||value<limits.min||value>limits.max||!Number.isFinite(at))return;
- /* The assistant's crew ids are c01 to c04; the website's are crew-01 to crew-04. */
- const crewId=/^c\d{2}$/.test(m.crewId)?'crew-'+m.crewId.slice(1):'';
- const profile=crewProfiles().find(p=>p.id===crewId);
+ /* The assistant and the website share crew ids (hist-ma9, hist-ma7). */
+ const profile=crewProfiles().find(p=>p.id===m.crewId),crewId=profile?.id;
  if(!profile){toast('The assistant saved a reading for a crew member who is not in this workspace, so it was not added to the Health log.');return;}
  /* Readings said together (systolic, then diastolic) become one Health log row. */
  const recent=db().entries.find(r=>r.source===VOICE_VITAL_SOURCE&&r.crewId===crewId&&!Number.isFinite(r[field])&&Math.abs(Date.parse(r.at)-at)<120000);
@@ -108,6 +108,44 @@ window.addEventListener('message',e=>{
  persist();
  if(!$('#modal').open&&!$('#main form'))render();
  toast(`Added to ${profile.name}'s Health log.`);
+});
+/* Forms the offline voice assistant may open for a person, as if they pressed the button themselves.
+   It only opens the form: the person fills it in and presses Save. Keys are the voice tool's names. */
+const VOICE_FORMS={
+ 'health-check':{action:'log',label:'Log health data'},
+ 'wellbeing-check-in':{action:'mission-checkin',label:'Wellbeing check-in'},
+ 'workout':{action:'mission-workout',label:'Log a workout'},
+ 'risk-reading':{action:'mission-risk-add',label:'Add a radiation, bone or muscle reading'},
+ 'skin-check':{action:'skin-check',label:'Skin check'},
+ 'eva-skin-check':{action:'skin-eva',label:'Skin check after a spacewalk'},
+ 'wound':{action:'skin-wound-add',label:'Add a wound'},
+ 'condition-note':{action:'condition-add',label:'Add a condition note',page:'crew'},
+ 'image-record':{action:'input-photo',label:'Add an image record'},
+ 'health-assessment':{action:'input-assessment',label:'Guided health assessment',page:'care',noModal:true},
+ 'emergency-checklist':{action:'emergency',label:'Crew medical response'},
+ 'flight-surgeon-report':{action:'mission-report',label:'Flight surgeon report'},
+ 'crew-report':{action:'mission-crew-report',label:'Crew member report',withCrew:true},
+ 'crew-member':{action:'crew-add',label:'Add a crew member'},
+};
+function openVoiceForm(m){
+ const spec=Object.hasOwn(VOICE_FORMS,m.form)?VOICE_FORMS[m.form]:null;
+ if(!spec)return {ok:false,reason:'That is not a form the assistant can open.'};
+ if($('#modal').open)return {ok:false,reason:'Another form or dialog is already open on screen. Ask the person to finish or close it first.'};
+ if(m.crew){const p=crewFromLink(m.crew);if(!p)return {ok:false,reason:`No crew profile matches “${m.crew}”.`};if(db().activeCrewId!==p.id){db().activeCrewId=p.id;focusedConditionId=null;persist();}}
+ if(spec.page&&currentPage()!==spec.page)location.hash=spec.page;
+ render();
+ /* The same path as a person's click: the page's own button handlers do the rest. */
+ const b=document.createElement('button');b.type='button';b.hidden=true;b.dataset.action=spec.action;if(spec.withCrew)b.dataset.id=activeCrewId();
+ document.body.append(b);b.click();b.remove();
+ const opened=spec.noModal?currentPage()===spec.page:$('#modal').open;
+ if(!opened)return {ok:false,reason:`${spec.label} did not open.`};
+ return {ok:true,label:spec.label,crew:activeCrew().name,title:$('#modal').open?($('#modal h2')?.textContent||spec.label):spec.label};
+}
+window.addEventListener('message',e=>{
+ const m=e.data,frame=document.getElementById('voice-frame');
+ if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||m?.type!=='orbit:open-form')return;
+ let result;try{result=openVoiceForm(m);}catch(err){result={ok:false,reason:'The form could not be opened.'};console.error('ORBIT voice form:',err);}
+ frame.contentWindow.postMessage({type:'orbit:open-form-result',requestId:m.requestId,...result},location.origin);
 });
 function db(){return state.data[state.mode];}
 function entries(){return crewRecords(activeCrewId());}
@@ -122,6 +160,28 @@ function factsUnlocked(){return typeof HrpLinks==='undefined'?0:Math.min(HrpLink
 function factSource(f){return `<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}<span class="sr-only"> (NASA page, opens in a new tab)</span></a> · NASA Human Research Program`;}
 function routineFacts(){const all=HrpLinks.facts(),n=factsUnlocked(),f=all[n-1];return `<div class="routine-facts"><div class="eyebrow">NASA FACTS · ${n} OF ${all.length}</div><div class="routine-facts-bar" role="img" aria-label="${n} of ${all.length} facts unlocked"><span style="width:${Math.round(n/all.length*100)}%"></span></div>${f?`<blockquote class="hrp-quote"><p>${esc(f.fact)}</p><footer>${factSource(f)}</footer></blockquote>`:'<p class="routine-facts-empty">Complete a daily task to unlock your first fact.</p>'}<p class="routine-facts-next">${n<all.length?'Each completed task unlocks the next fact from NASA’s risk pages.':`You have all ${all.length} facts.`}</p>${n?`<button class="text-button" data-facts="1">All your facts ${icon('arrowright')}</button>`:''}</div>`;}
 function factsModal(){const all=HrpLinks.facts(),n=factsUnlocked();modal('Your NASA facts',`${n} of ${all.length} unlocked · From the “Did you know?” sections of NASA’s risk pages`,`<ol class="facts-list">${all.map((f,i)=>i<n?`<li><span>${String(i+1).padStart(2,'0')}</span><div><p>${esc(f.fact)}</p><small>${factSource(f)}</small></div></li>`:'').join('')}</ol>${n<all.length?`<p class="form-help">${all.length-n} more to unlock. Each completed daily task opens the next one; unticking a task locks it again.</p>`:''}`);}
+/* Online / offline mode. Offline: the cloud assistant and external links are off, so nothing leaves this device. */
+const OFFLINE_MODE_KEY='orbit.offlineMode';
+let offlineMode=(()=>{try{return localStorage.getItem(OFFLINE_MODE_KEY)==='true';}catch{return false;}})();
+function orbitOnline(){return navigator.onLine&&!offlineMode;}
+function connectivityState(){return offlineMode?'offline-mode':navigator.onLine?'online':'no-internet';}
+function syncConnectivityUI(){
+ const state=connectivityState(),banner=$('#offline-banner');
+ document.body.dataset.connection=state;
+ $$('#connectivity-switch [data-connectivity]').forEach(b=>{const on=(b.dataset.connectivity==='offline')===offlineMode;b.setAttribute('aria-checked',String(on));b.tabIndex=on?0:-1;});
+ if(!banner)return;
+ banner.hidden=state==='online';
+ if(state==='offline-mode'){$('#offline-banner-title').textContent='Offline mode';$('#offline-banner-text').textContent='Nothing leaves this device. The cloud assistant and external links are off. Records keep saving in this browser, and the offline voice assistant still works.';$('#offline-banner-action').textContent='Go online';$('#offline-banner-action').hidden=false;}
+ else if(state==='no-internet'){$('#offline-banner-title').textContent='No internet connection';$('#offline-banner-text').textContent='The cloud assistant is unavailable. Records keep saving in this browser.';$('#offline-banner-action').textContent='Use offline mode';$('#offline-banner-action').hidden=false;}
+}
+function setOfflineMode(on,{announce=true}={}){
+ if(offlineMode===Boolean(on))return;
+ offlineMode=Boolean(on);
+ try{localStorage.setItem(OFFLINE_MODE_KEY,String(offlineMode));}catch{/* the mode still applies for this visit */}
+ syncConnectivityUI();
+ window.dispatchEvent(new Event('orbit:connectivity'));
+ if(announce)toast(offlineMode?'Offline mode is on. Nothing leaves this device.':(navigator.onLine?'Back online. The cloud assistant and external links are available.':'Online mode is on, but this device has no internet connection.'));
+}
 function toast(msg){$('#toast').textContent=msg;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3600);}
 /* Merged pages: old links open the page that now holds them (a section or a Health assessment tab). */
 const PAGE_ALIASES={trends:{page:'log',section:'health-trends'},wellbeing:{page:'care',tab:'wellbeing'},exercise:{page:'care',tab:'exercise'},skin:{page:'care',tab:'skin'}};
@@ -135,35 +195,44 @@ crew:'Astronauts',
 anatomy:'Anatomy lab',
 voice:'Crew voice AI assistant',
 log:'Health log & trends',
-routine:'Daily routine'};
+routine:'Daily routine',
+collect:'Collect vitals'};
 function button(text,action,type='',ic=''){return `<button class="button ${type}" data-action="${action}">${ic?icon(ic):''}${text}</button>`;}
 /* Page heading, or a section heading when the page is shown as a Health assessment tab. */
 function sectionHeading(embedded,title,sub,actions=''){return embedded?`<div class="care-section-head"><div><h2>${title}</h2><p>${sub}</p></div><div class="heading-actions">${actions}</div></div>`:pageHeading(title,sub,actions)+demoNotice();}
 function pageHeading(title,sub,actions=''){return `<div class="page-heading"><div><div class="eyebrow">${esc(state.settings.mission).toUpperCase()} / ${esc(activeCrew().name).toUpperCase()}</div><h1>${title}</h1><p>${sub}</p></div><div class="heading-actions">${actions}</div></div>`;}
-function demoNotice(){return state.mode==='demo'?`<div class="mode-notice"><span>Sample crew data. Explore the tools or start your own health log.</span><button class="text-button" data-action="personal">Use my own data ${icon('arrowright')}</button></div>`:'';}
+function demoNotice(){return state.mode==='demo'?`<div class="mode-notice"><span>Demo workspace · Fictional sample crew and the historical Mercury-Atlas 7 and 9 profiles.</span><button class="text-button" data-action="show-sample-crew">Show sample crew</button><button class="text-button" data-action="personal">Use my own data ${icon('arrowright')}</button></div>`:`<div class="mode-notice"><span>Showcase the tools with fictional crew and the historical Mercury profiles. Your personal workspace stays separate.</span><button class="text-button" data-action="show-sample-crew">Show sample crew</button></div>`;}
 function safetyNotice(){return `<div class="notice">${icon('info')}<p>Research prototype. Trend notes support review; they do not diagnose conditions or establish fitness for duty. Follow your crew medical officer’s instructions and mission procedures.</p></div>`;}
 function sparkline(key){const v=entries().filter(e=>Number.isFinite(e[key])).slice(-12).map(e=>e[key]);if(v.length<2)return '';let min=Math.min(...v),max=Math.max(...v);if(max===min){min-=1;max+=1;}return `<svg class="sparkline" viewBox="0 0 80 28" aria-hidden="true"><path d="${v.map((n,i)=>`${i?'L':'M'}${(i*78/(v.length-1)+1).toFixed(1)},${(24-(n-min)/(max-min)*20).toFixed(1)}`).join(' ')}" fill="none" stroke="${key==='sleep'?'#ad8544':'#5d8fc1'}" stroke-width="1.4"/></svg>`;}
 function metricCard(key){const m=META[key],e=latest(key),val=e?.[key];const attention=key==='sleep'&&Number.isFinite(val)&&val<state.settings.sleepTarget;const v=key==='sys'&&e?`${formatNum(e.sys)}/${formatNum(e.dia)}`:formatNum(val,m.digits);const sub=e?(key==='sleep'?`${state.settings.sleepTarget} hr planned rest target`:`Last recorded ${new Date(e.at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`):'Add your first measurement';return `<article class="metric-card"><div class="metric-top">${icon(m.icon)}<span>${m.short}</span><span class="metric-status ${attention?'attention':''}">${e?(attention?'REVIEW':'RECORDED'):'NO DATA'}</span></div><div class="metric-value ${key==='sys'?'bp':''}">${v}<small>${m.unit}</small></div><div class="metric-sub ${attention?'attention':''}">${attention?icon('clock'):''}${sub}</div>${sparkline(key)}</article>`;}
-function chartData(){return previousValues(chartMetric,chartRange);}
-function chartSVG(large=false){
- const e=chartData(),m=META[chartMetric];if(chartMetric==='mood'&&!canSeeWellbeing())return '<div class="busy-empty">Mood is hidden. Only this crew member, the crew leader and the medical officer can see it. To change who is using ORBIT, use Viewing as at the top of the screen.</div>';if(!e.length)return '<div class="busy-empty">No readings in this period. Log a health check to start a trend.</div>';
- const w=600,h=large?280:175,p={l:42,r:22,t:20,b:30};let min=Math.min(...e.map(x=>x[chartMetric])),max=Math.max(...e.map(x=>x[chartMetric]));let pad=Math.max((max-min)*.6,chartMetric==='temp'?.3:chartMetric==='sleep'?.5:chartMetric==='mood'?1:4);min=Math.max(chartMetric==='temp'?30:0,min-pad);max+=pad;if(chartMetric==='mood'){min=1;max=5;}
+/* A historical mission profile (ui/historical-crew.js) has readings from decades ago, so its charts cover the whole mission instead of the last few days. */
+const historicalView=()=>!!activeCrew()?.historical;
+function chartData(){return historicalView()?entries().filter(e=>Number.isFinite(e[chartMetric])):previousValues(chartMetric,chartRange);}
+const chartPeriod=()=>historicalView()?'across the mission':`in the selected ${chartRange} day period`;
+function chartSVG(large=false,width=600){
+ const e=chartData(),m=META[chartMetric];if(chartMetric==='mood'&&!canSeeWellbeing())return '<div class="busy-empty">Mood is hidden. Only this crew member, the crew leader and the medical officer can see it. To change who is using ORBIT, use Viewing as at the top of the screen.</div>';if(!e.length)return '<div class="busy-empty">'+(historicalView()?'This historical record has no readings of this indicator.':'No readings in this period. Log a health check to start a trend.')+'</div>';
+ const w=Math.max(240,Math.round(width)),h=large?280:200,p={l:48,r:20,t:16,b:54};let min=Math.min(...e.map(x=>x[chartMetric])),max=Math.max(...e.map(x=>x[chartMetric]));let pad=Math.max((max-min)*.6,chartMetric==='temp'?.3:chartMetric==='sleep'?.5:chartMetric==='mood'?1:4);min=Math.max(chartMetric==='temp'?30:0,min-pad);max+=pad;if(chartMetric==='mood'){min=1;max=5;}
  const first=Date.parse(e[0].at),last=Date.parse(e.at(-1).at),start=last>first?first:first-86400000,end=last>first?last:first+86400000;
  const x=d=>p.l+(Date.parse(d)-start)/(end-start)*(w-p.l-p.r),y=v=>p.t+(1-(v-min)/(max-min))*(h-p.t-p.b);
  const path=e.map((d,i)=>`${i?'L':'M'}${x(d.at).toFixed(2)},${y(d[chartMetric]).toFixed(2)}`).join(' ');
  let grid='';for(let i=0;i<4;i++){const yy=p.t+i*(h-p.t-p.b)/3,v=max-i*(max-min)/3;grid+=`<line class="gridline" x1="${p.l}" y1="${yy}" x2="${w-p.r}" y2="${yy}"/><text x="${p.l-12}" y="${yy+3}" text-anchor="end">${formatNum(v,m.digits)}</text>`;}
- const indices=[...new Set(e.length>5?[0,Math.floor((e.length-1)/4),Math.floor((e.length-1)/2),Math.floor(3*(e.length-1)/4),e.length-1]:e.map((_,i)=>i))];
- const labels=indices.map(i=>`<text x="${x(e[i].at)}" y="${h-8}" text-anchor="middle">${dayLabel(e[i].at)}</text>`).join('');
- return `<svg class="chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="${m.label}: ${e.length} readings over the past ${chartRange} days, ranging from ${formatNum(Math.min(...e.map(d=>d[chartMetric])),m.digits)} to ${formatNum(Math.max(...e.map(d=>d[chartMetric])),m.digits)} ${m.unit}">${grid}<path class="plot-area" d="${path} L${x(e.at(-1).at)},${h-p.b} L${x(e[0].at)},${h-p.b} Z"/><path class="plot-line" d="${path}"/>${e.map((d,i)=>`<circle cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="3.3"/><circle class="point-hit" data-point="${i}" cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="12"><title>${dayLabel(d.at)}: ${d[chartMetric]} ${m.unit}</title></circle>`).join('')}${labels}</svg>`;
+ const ticks=Math.max(2,Math.min(5,Math.floor((w-p.l-p.r)/110)+1));
+ const labels=Array.from({length:ticks},(_,i)=>{
+  const at=new Date(start+(end-start)*i/(ticks-1)),xx=p.l+(w-p.l-p.r)*i/(ticks-1);
+  const date=at.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
+  const time=at.toISOString().slice(11,16);
+  return `<text class="chart-axis-tick" x="${xx}" y="${h-30}" text-anchor="${i===0?'start':i===ticks-1?'end':'middle'}"><tspan x="${xx}">${date}</tspan>${historicalView()?`<tspan x="${xx}" dy="16">${time}</tspan>`:''}</text>`;
+ }).join('');
+ return `<svg class="chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${m.label}: ${e.length} readings ${historicalView()?'across the mission':'over the past '+chartRange+' days'}, ranging from ${formatNum(Math.min(...e.map(d=>d[chartMetric])),m.digits)} to ${formatNum(Math.max(...e.map(d=>d[chartMetric])),m.digits)} ${m.unit}">${grid}<path class="plot-area" d="${path} L${x(e.at(-1).at)},${h-p.b} L${x(e[0].at)},${h-p.b} Z"/><path class="plot-line" d="${path}"/>${e.map((d,i)=>`<circle cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="3.3"/><circle class="point-hit" data-point="${i}" cx="${x(d.at)}" cy="${y(d[chartMetric])}" r="12"><title>${dayLabel(d.at)}: ${d[chartMetric]} ${m.unit}</title></circle>`).join('')}${labels}</svg>`;
 }
-function chartPanel(large=false){const d=chartData(),m=META[chartMetric],avg=d.length?d.reduce((a,e)=>a+e[chartMetric],0)/d.length:null;return `<section class="panel chart-card ${large?'large-chart':''}"><div class="panel-head"><div><h2>${large?m.label:'Health trends'}</h2><p>${large?'Recorded values over time':'Your indicators over the past '+chartRange+' days'}</p></div>${rangeButtons()}</div>${!large?`<div class="chart-metric-tabs" role="group" aria-label="Trend indicator">${['hr','sleep','temp'].map(k=>`<button data-chart="${k}" class="${chartMetric===k?'active':''}" aria-pressed="${chartMetric===k}">${META[k].short}</button>`).join('')}</div>`:''}<div class="chart-summary"><strong>${d.length?formatNum(d.at(-1)[chartMetric],m.digits):'—'}</strong><span>${m.unit}</span><span class="chart-average">AVG ${avg===null?'—':formatNum(avg,m.digits)} ${m.unit}</span></div><div class="chart-area">${chartSVG(large)}<div class="chart-tooltip"></div></div><div class="chart-foot"><span></span>${esc(m.label)}${large?`<button class="text-button chart-foot-link" data-action="jump-records">View source readings →</button>`:`<a href="#trends">View all trends →</a>`}</div></section>`;}
-function rangeButtons(){return `<div class="segmented" role="group" aria-label="Chart time range">${[7,14,30].map(d=>`<button data-range="${d}" class="${chartRange===d?'active':''}" aria-pressed="${chartRange===d}">${d}D</button>`).join('')}</div>`;}
+function chartPanel(large=false){const d=chartData(),m=META[chartMetric],avg=d.length?d.reduce((a,e)=>a+e[chartMetric],0)/d.length:null;return `<section class="panel chart-card ${large?'large-chart':''}"><div class="panel-head"><div><h2>${large?m.label:'Health trends'}</h2><p>${large?'Recorded values over time':'Your indicators over the past '+chartRange+' days'}</p></div>${rangeButtons()}</div>${!large?`<div class="chart-metric-tabs" role="group" aria-label="Trend indicator">${['hr','sleep','temp'].map(k=>`<button data-chart="${k}" class="${chartMetric===k?'active':''}" aria-pressed="${chartMetric===k}">${META[k].short}</button>`).join('')}</div>`:''}<div class="chart-summary"><strong>${d.length?formatNum(d.at(-1)[chartMetric],m.digits):'—'}</strong><span>${m.unit}</span><span class="chart-average">AVG ${avg===null?'—':formatNum(avg,m.digits)} ${m.unit}</span></div><div class="chart-area"><div class="chart-plot" data-large="${large}">${chartSVG(large)}</div><div class="chart-tooltip"></div></div>${historicalView()?`<p class="chart-time-note">${new Date(d[0]?.at||activeCrew().missionDate).getUTCFullYear()} · Approximate mission times (UTC)</p>`:''}<div class="chart-foot"><span></span>${esc(m.label)}${large?`<button class="text-button chart-foot-link" data-action="jump-records">View source readings →</button>`:`<a href="#trends">View all trends →</a>`}</div></section>`;}
+function rangeButtons(){if(historicalView())return `<span class="eyebrow">WHOLE MISSION</span>`;return `<div class="segmented" role="group" aria-label="Chart time range">${[7,14,30].map(d=>`<button data-range="${d}" class="${chartRange===d?'active':''}" aria-pressed="${chartRange===d}">${d}D</button>`).join('')}</div>`;}
 
 
 function routineList(full=false){const done=checks();return `<div class="routine-list ${full?'routine-full':''}">${ROUTINES.map(r=>`<div class="routine-item ${done.includes(r.id)?'done':''}"><button class="check-box" data-check="${r.id}" role="checkbox" aria-checked="${done.includes(r.id)}" aria-label="${esc(r.title)}">${icon('check')}</button><div class="routine-item-text">${r.title}<small>${full?r.description:r.short}</small></div><span class="routine-time">${done.includes(r.id)?'COMPLETE':(carePlan().schedule?.[r.id]||r.time)}</span></div>`).join('')}</div><div class="routine-progress" aria-label="${done.length} of 5 routine tasks complete"><div style="width:${done.length*20}%"></div></div>`;}
 function observations(){const s=latest('sleep'),m=latest('mood'),notes=[];if(s&&s.sleep<state.settings.sleepTarget)notes.push({ic:'moon',title:'Sleep below your planned target',text:`Your latest entry is ${formatNum(s.sleep,1)} hours, ${formatNum(state.settings.sleepTarget-s.sleep,1)} hours below your ${state.settings.sleepTarget} hour target. Review your schedule and note persistent fatigue.`,action:'sleep-guide',label:'Review sleep guidance'});if(m&&m.mood<=2)notes.push({ic:'brain',title:'Make time for a wellbeing check',text:'You recorded a low mood. Check in with your crew medical officer, especially if the change persists or affects daily tasks.',action:'mood-guide',label:'Review wellbeing guidance'});if(!notes.length)notes.push({ic:'clipboard',title:entries().length?'Keep your record consistent':'Start with a baseline',text:entries().length?'Compare readings taken under similar conditions. A recorded value alone does not establish that you are medically well.':'Record a health check to begin your personal history. Your medical team defines your individual baseline and action limits.',action:'log',label:'Log a health check'});notes.push({ic:'document',title:'Prepare for your medical check-in',text:'Export your recorded indicators and notes for review through your approved medical communication channel.',action:'export-summary',label:'Export health summary',blue:true});return notes.slice(0,2).map(n=>`<article class="observation"><div class="observation-icon ${n.blue?'blue':''}">${icon(n.ic)}</div><div><h3>${n.title}</h3><p>${n.text}</p><button class="text-button" data-action="${n.action}">${n.label} ${icon('arrowright')}</button></div></article>`).join('');}
 
-function logPage(){const all=entries().reverse(),shown=all.filter(e=>(e.notes+' '+dayLabel(e.at)+' '+new Date(e.at).toLocaleDateString('en-US')).toLowerCase().includes(filterQuery.toLowerCase())),d=chartData(),m=META[chartMetric],values=d.map(e=>e[chartMetric]);return `${pageHeading('Health log & trends','Your recorded measurements, and how each indicator changes over time.',button('Log health data','log','primary','plus'))}${demoNotice()}<div class="stat-strip"><div class="stat-box"><span class="eyebrow">RECORDED CHECKS</span><strong>${all.length}</strong><small>${state.mode==='demo'?'Sample health entries':'Manual health entries'}</small></div><div class="stat-box"><span class="eyebrow">LATEST CHECK</span><strong style="font-size:22px">${all.length?dayLabel(all[0].at):'—'}</strong><small>${all.length?new Date(all[0].at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'No records yet'}</small></div><div class="stat-box"><span class="eyebrow">RECORD LOCATION</span><strong style="font-size:22px">Local</strong><small>This browser, on this device</small></div></div><nav class="log-jump" aria-label="On this page"><button class="log-jump-link" data-action="jump-trends">${icon('chart')}Trends</button><button class="log-jump-link" data-action="jump-records">${icon('clipboard')}Records</button></nav><section id="health-trends" class="log-section" aria-labelledby="health-trends-title"><div class="section-label log-section-label"><h2 id="health-trends-title">Trends</h2><div class="trends-top"><label for="trend-metric" class="eyebrow">INDICATOR</label><select class="field-input trends-select" id="trend-metric">${Object.entries(META).map(([k,v])=>`<option value="${k}" ${k===chartMetric?'selected':''}>${v.label}</option>`).join('')}</select><span class="eyebrow">${state.mode==='demo'?'SAMPLE HISTORY':'YOUR RECORDS'}</span></div></div>${chartPanel(true)}<div class="trends-grid"><article class="panel insight-card"><h3>LOWEST RECORDED</h3><strong>${values.length?formatNum(Math.min(...values),m.digits):'—'} <small style="font-size:12px;color:var(--muted)">${m.unit}</small></strong><p>Minimum in the selected ${chartRange} day period.</p></article><article class="panel insight-card"><h3>HIGHEST RECORDED</h3><strong>${values.length?formatNum(Math.max(...values),m.digits):'—'} <small style="font-size:12px;color:var(--muted)">${m.unit}</small></strong><p>Maximum in the selected ${chartRange} day period.</p></article><article class="panel insight-card"><h3>DATA POINTS</h3><strong>${values.length}</strong><p>${m.label} readings in this period.</p></article></div>${missionTrendPanel()}<div class="notice">${icon('info')}<p>These charts show recorded values, not a clinical risk score. Compare measurements taken with the same method, context, and equipment. Your medical team defines your personal action limits.</p></div></section><section id="health-records" class="log-section" aria-labelledby="health-records-title"><div class="section-label log-section-label"><h2 id="health-records-title">Records</h2></div><section class="panel content-panel"><div class="filters"><label for="log-search">Filter records</label><input id="log-search" class="field-input" type="search" placeholder="Search dates or notes…" value="${esc(filterQuery)}"><button class="button small" data-action="export-csv" style="margin-left:auto">${icon('download')}Export CSV</button></div>${all.length?`<p class="workspace-table-hint">Scroll across the table to see all indicators.</p><div class="table-wrap" tabindex="0" aria-label="Health measurements. Scroll horizontally to view all columns."><table class="data-table"><thead><tr><th>DATE / LOCAL TIME</th><th>HR<br>bpm</th><th>BP<br>mmHg</th><th>TEMP<br>°C</th><th>SLEEP<br>hrs</th><th>GLUCOSE<br>mg/dL</th><th>MOOD<br>/ 5</th><th>NOTES</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody>${shown.slice(0,logLimit).map(e=>`<tr><td><button class="text-button" data-entry="${esc(e.id)}">${dayLabel(e.at)}</button><span class="small-sub">${new Date(e.at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</span></td><td>${formatNum(e.hr)}</td><td>${Number.isFinite(e.sys)?formatNum(e.sys)+'/'+formatNum(e.dia):'—'}</td><td>${formatNum(e.temp,1)}</td><td>${formatNum(e.sleep,1)}</td><td>${formatNum(e.glucose)}<span class="small-sub">${esc(e.glucoseContext||'')}</span></td><td>${hiddenCell(e,'mood')||formatNum(e.mood)}</td><td class="log-note" title="${esc(e.notes)}">${hiddenCell(e,'notes')||esc(e.notes)||'—'}</td><td><button class="table-delete" data-delete="${esc(e.id)}" aria-label="Delete record from ${dayLabel(e.at)}">${icon('trash')}</button></td></tr>`).join('')}</tbody></table></div>${!shown.length?'<div class="empty-state" style="padding:35px">No records match your search.</div>':''}${shown.length>logLimit?`<button class="text-button" style="margin-top:20px" data-action="more-log">Show more records</button>`:''}`:emptyState()} </section><div class="notice">${icon('lock')}<p>Records stay in this browser. Clearing browser storage removes them. Use CSV or the health summary export to keep a copy; no data is sent to a medical team. The optional Crew assistant receives only the records you explicitly review and share.</p></div></section>`;}
+function logPage(){const all=entries().reverse(),extra=['rr','spo2'].filter(k=>all.some(e=>Number.isFinite(e[k]))),shown=all.filter(e=>(e.notes+' '+dayLabel(e.at)+' '+new Date(e.at).toLocaleDateString('en-US')).toLowerCase().includes(filterQuery.toLowerCase())),d=chartData(),m=META[chartMetric],values=d.map(e=>e[chartMetric]);return `${pageHeading('Health log & trends','Your recorded measurements, and how each indicator changes over time.',button('Log health data','log','primary','plus'))}${demoNotice()}<div class="stat-strip"><div class="stat-box"><span class="eyebrow">RECORDED CHECKS</span><strong>${all.length}</strong><small>${state.mode==='demo'?'Sample health entries':'Manual health entries'}</small></div><div class="stat-box"><span class="eyebrow">LATEST CHECK</span><strong style="font-size:22px">${all.length?dayLabel(all[0].at):'—'}</strong><small>${all.length?new Date(all[0].at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'No records yet'}</small></div><div class="stat-box"><span class="eyebrow">RECORD LOCATION</span><strong style="font-size:22px">Local</strong><small>This browser, on this device</small></div></div><nav class="log-jump" aria-label="On this page"><button class="log-jump-link" data-action="jump-trends">${icon('chart')}Trends</button><button class="log-jump-link" data-action="jump-records">${icon('clipboard')}Records</button></nav><section id="health-trends" class="log-section" aria-labelledby="health-trends-title"><div class="section-label log-section-label"><h2 id="health-trends-title">Trends</h2><div class="trends-top"><label for="trend-metric" class="eyebrow">INDICATOR</label><select class="field-input trends-select" id="trend-metric">${Object.entries(META).map(([k,v])=>`<option value="${k}" ${k===chartMetric?'selected':''}>${v.label}</option>`).join('')}</select><span class="eyebrow">${state.mode==='demo'?'SAMPLE HISTORY':'YOUR RECORDS'}</span></div></div>${chartPanel(true)}<div class="trends-grid"><article class="panel insight-card"><h3>LOWEST RECORDED</h3><strong>${values.length?formatNum(Math.min(...values),m.digits):'—'} <small style="font-size:12px;color:var(--muted)">${m.unit}</small></strong><p>Minimum ${chartPeriod()}.</p></article><article class="panel insight-card"><h3>HIGHEST RECORDED</h3><strong>${values.length?formatNum(Math.max(...values),m.digits):'—'} <small style="font-size:12px;color:var(--muted)">${m.unit}</small></strong><p>Maximum ${chartPeriod()}.</p></article><article class="panel insight-card"><h3>DATA POINTS</h3><strong>${values.length}</strong><p>${m.label} readings ${historicalView()?'across the mission':'in this period'}.</p></article></div>${historicalView()?`<div class="notice">${icon('document')}<p>${esc(activeCrew().name)}’s readings are historical NASA records from ${esc(activeCrew().mission||'a past mission')}. Trend alerts compare recent days, so they do not apply. Each record’s notes give its mission phase and source.</p></div>`:missionTrendPanel()}<div class="notice">${icon('info')}<p>These charts show recorded values, not a clinical risk score. Compare measurements taken with the same method, context, and equipment. Your medical team defines your personal action limits.</p></div></section><section id="health-records" class="log-section" aria-labelledby="health-records-title"><div class="section-label log-section-label"><h2 id="health-records-title">Records</h2></div><section class="panel content-panel"><div class="filters"><label for="log-search">Filter records</label><input id="log-search" class="field-input" type="search" placeholder="Search dates or notes…" value="${esc(filterQuery)}"><button class="button small" data-action="export-csv" style="margin-left:auto">${icon('download')}Export CSV</button></div>${all.length?`<p class="workspace-table-hint">Scroll across the table to see all indicators.</p><div class="table-wrap" tabindex="0" aria-label="Health measurements. Scroll horizontally to view all columns."><table class="data-table"><thead><tr><th>DATE / LOCAL TIME</th><th>HR<br>bpm</th><th>BP<br>mmHg</th><th>TEMP<br>°C</th><th>SLEEP<br>hrs</th><th>GLUCOSE<br>mg/dL</th><th>MOOD<br>/ 5</th>${extra.map(k=>`<th>${k==='rr'?'RESP':'SpO₂'}<br>${esc(META[k].unit)}</th>`).join('')}<th>NOTES</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody>${shown.slice(0,logLimit).map(e=>`<tr><td><button class="text-button" data-entry="${esc(e.id)}">${dayLabel(e.at)}</button><span class="small-sub">${new Date(e.at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</span></td><td>${formatNum(e.hr)}</td><td>${Number.isFinite(e.sys)?formatNum(e.sys)+'/'+formatNum(e.dia):'—'}</td><td>${formatNum(e.temp,1)}</td><td>${formatNum(e.sleep,1)}</td><td>${formatNum(e.glucose)}<span class="small-sub">${esc(e.glucoseContext||'')}</span></td><td>${hiddenCell(e,'mood')||formatNum(e.mood)}</td>${extra.map(k=>`<td>${formatNum(e[k])}</td>`).join('')}<td class="log-note" title="${esc(e.notes)}">${hiddenCell(e,'notes')||esc(e.notes)||'—'}</td><td><button class="table-delete" data-delete="${esc(e.id)}" aria-label="Delete record from ${dayLabel(e.at)}">${icon('trash')}</button></td></tr>`).join('')}</tbody></table></div>${!shown.length?'<div class="empty-state" style="padding:35px">No records match your search.</div>':''}${shown.length>logLimit?`<button class="text-button" style="margin-top:20px" data-action="more-log">Show more records</button>`:''}`:emptyState()} </section><div class="notice">${icon('lock')}<p>Records stay in this browser. Clearing browser storage removes them. Use CSV or the health summary export to keep a copy; no data is sent to a medical team. The optional Crew assistant receives only the records you explicitly review and share.</p></div></section>`;}
 function emptyState(){return `<div class="empty-state">${icon('clipboard')}<h2>Your health record starts here.</h2><p>Add a measurement, sleep entry, or mood check-in.</p>${button('Log a health check','log','primary','plus')}</div>`;}
 /* Health trends now lives inside the health log page; kept so older callers still render it. */
 function trendsPage(){return logPage();}
@@ -193,7 +262,28 @@ function hrpStudiesLine(riskId){const list=HrpLinks.studiesFor(riskId);return li
 
 
 
+/* A link such as #log?crew=hist-ma9 opens the page for that crew member. The parameter is then removed, so a later choice in the crew selector is not undone on the next render. */
+/* The voice assistant may name the person instead ("Gordon Cooper", "Cooper", "Atlas 9"): match the id, then the full name, then one profile whose name or mission contains it. */
+function crewFromLink(text){
+ const all=crewProfiles(),t=String(text||'').trim().toLowerCase().replace(/\s+/g,' ');
+ if(!t)return null;
+ const exact=all.find(p=>p.id.toLowerCase()===t||p.name.toLowerCase()===t);if(exact)return exact;
+ const partial=all.filter(p=>`${p.name} ${p.mission||''}`.toLowerCase().includes(t));
+ return partial.length===1?partial[0]:null;
+}
+function applyCrewFromHash(){
+ const [page,query='']=location.hash.slice(1).split('?'),params=new URLSearchParams(query),asked=params.get('crew');
+ if(!asked)return;
+ const id=crewFromLink(asked)?.id;
+ if(!id)toast(`No crew profile matches “${asked}”.`);
+ else if(db().activeCrewId!==id){db().activeCrewId=id;focusedConditionId=null;filterQuery='';logLimit=20;persist();}
+ params.delete('crew');const rest=params.toString();
+ history.replaceState(null,'',`#${page}${rest?'?'+rest:''}`);
+}
+/* Opening a different collection walkthrough starts at the top of the page. */
+let lastCollectHash='';
 function render(){
+ applyCrewFromHash();
  window.dispatchEvent(new Event('orbit:scope-check'));
  anatomyLastSelection=null;anatomyLastState=null;
  const pendingAlias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(pendingAlias?.tab)careTab=pendingAlias.tab;
@@ -203,18 +293,38 @@ function render(){
  const keepVoice=p==='voice'&&main.dataset.page==='voice'&&!!main.querySelector('#voice-frame');
  const parkedVoice=document.getElementById('voice-frame');
  const voiceOutside=parkedVoice&&!main.contains(parkedVoice);
- main.dataset.page=p;const scroll=window.scrollY;cleanupHealthInputs();disposeCrewViewer();
+ main.dataset.page=p;let scroll=window.scrollY;cleanupHealthInputs();disposeCrewViewer();CollectionPage.dispose();
+ if(p==='collect'&&location.hash!==lastCollectHash){scroll=0;}lastCollectHash=p==='collect'?location.hash:'';
  if(!keepVoice){
-  main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,risks:missionRisksPage,research:missionResearchPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,voice:voicePage,log:logPage,routine:routinePage}[p])();
+  main.innerHTML=(!storageAvailable?'<div class="save-warning">Local saving is unavailable. Export your data before leaving this page.</div>':'')+({status:missionStatusPage,risks:missionRisksPage,research:missionResearchPage,care:carePage,crew:crewDashboardPage,anatomy:anatomyLabPage,voice:voicePage,log:logPage,routine:routinePage,collect:()=>CollectionPage.render()}[p])();
   if(p==='voice'&&voiceOutside&&parkedVoice.isConnected){const slot=main.querySelector('#voice-slot');if(slot){parkedVoice.classList.remove('assistant-local-frame');parkedVoice.classList.add('voice-frame');slot.append(parkedVoice);}}
  }
  $$('.main-nav a').forEach(a=>{a.classList.toggle('active',a.dataset.nav===p);if(a.dataset.nav===p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
  $('#header-page').textContent=PAGE_NAMES[p];$('#data-mode').textContent=state.mode==='demo'?'DEMO MISSION':'MY HEALTH LOG';$('#rail-environment').textContent=state.settings.environment.toUpperCase();document.title=`${PAGE_NAMES[p]} | ORBIT`;
- syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();window.scrollTo(0,scroll);
+ syncCrewHeader();hydrateIcons(main);bindChart();if(p==='crew')attachCrewViewer();if(p==='anatomy')attachAnatomyLab();if(p==='collect')CollectionPage.attach();if(p==='care')attachCarePage();if(p==='research')attachOnboardAssistant();window.scrollTo(0,scroll);
  const alias=PAGE_ALIASES[location.hash.slice(1).split('?')[0]];if(alias){history.replaceState(null,'','#'+alias.page);if(alias.section)requestAnimationFrame(()=>scrollToLogSection(alias.section));}
  window.dispatchEvent(new Event('orbit:context-change'));
 }
-function bindChart(){const tip=$('.chart-tooltip');if(!tip)return;$$('[data-point]').forEach(el=>{el.addEventListener('pointerenter',()=>{const d=chartData()[+el.dataset.point];tip.textContent=`${dayLabel(d.at)} · ${formatNum(d[chartMetric],META[chartMetric].digits)} ${META[chartMetric].unit}`;tip.classList.add('visible');});el.addEventListener('pointerleave',()=>tip.classList.remove('visible'));});}
+let chartResizeObserver;
+function bindChart(){
+ chartResizeObserver?.disconnect();
+ const plot=$('.chart-plot'),tip=$('.chart-tooltip');if(!plot||!tip)return;
+ const draw=width=>{
+  if(width<=0)return;
+  plot.innerHTML=chartSVG(plot.dataset.large==='true',width);
+  plot.querySelectorAll('[data-point]').forEach(el=>{
+   const show=()=>{const d=chartData()[+el.dataset.point];if(!d)return;tip.textContent=`${new Date(d.at).toISOString().slice(0,16).replace('T',' ')} UTC · ${formatNum(d[chartMetric],META[chartMetric].digits)} ${META[chartMetric].unit}`;tip.classList.add('visible');};
+   el.setAttribute('tabindex','0');el.addEventListener('pointerenter',show);el.addEventListener('focus',show);
+   el.addEventListener('pointerleave',()=>tip.classList.remove('visible'));el.addEventListener('blur',()=>tip.classList.remove('visible'));
+  });
+ };
+ draw(plot.clientWidth);
+ if(typeof ResizeObserver!=='undefined'){
+  let previous=plot.clientWidth;
+  chartResizeObserver=new ResizeObserver(items=>{const width=items[0]?.contentRect.width;if(width&&Math.abs(width-previous)>=1){previous=width;draw(width);}});
+  chartResizeObserver.observe(plot);
+ }
+}
 function modal(title,subtitle,body,footer=''){disposeInputModal();const d=$('#modal');d.innerHTML=`<div class="modal-head"><div><h2 id="modal-title">${title}</h2>${subtitle?`<p>${subtitle}</p>`:''}</div><button class="icon-button" data-action="close-modal" aria-label="Close dialog">${icon('close')}</button></div><div class="modal-body">${body}</div>${footer?`<div class="modal-foot">${footer}</div>`:''}`;hydrateIcons(d);if(!d.open)d.showModal();d.scrollTop=0;window.dispatchEvent(new Event('orbit:modal-open'));}
 function announceFormSaved(form,node,persistent=storageAvailable){window.dispatchEvent(new CustomEvent('orbit:form-saved',{detail:{form,save_id:node?.dataset.assistantSaveId||'',persistent,workspace:state.mode,crewId:activeCrewId()}}));}
 function closeModal(){disposeInputModal();$('#modal').close();}
@@ -290,3 +400,11 @@ let lastDay=todayKey();setInterval(()=>{if(todayKey()!==lastDay){lastDay=todayKe
 OrbitNeuralLogic.validateModel(OrbitNeuralModel);
 OrbitNeural.connect(() => OrbitNeural.assessRecords({records:entries(),baseline:activeCrew().neuralBaseline,model:OrbitNeuralModel,allowed:canSeeWellbeing(),workspace:state.mode}));
 hydrateIcons();persist();render();if(storageNotice)toast(storageNotice);
+syncConnectivityUI();
+window.addEventListener('online',syncConnectivityUI);window.addEventListener('offline',syncConnectivityUI);
+/* On phones the switch shows only the current mode, so tapping it toggles. */
+$('#connectivity-switch')?.addEventListener('click',e=>{const b=e.target.closest('#connectivity-switch [data-connectivity]');if(!b)return;const compact=matchMedia('(max-width:620px)').matches;setOfflineMode(compact&&b.getAttribute('aria-checked')==='true'?!offlineMode:b.dataset.connectivity==='offline');});
+$('#connectivity-switch')?.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();setOfflineMode(!offlineMode);$(`#connectivity-switch [data-connectivity="${offlineMode?'offline':'online'}"]`)?.focus();});
+$('#offline-banner-action')?.addEventListener('click',()=>setOfflineMode(connectivityState()!=='offline-mode'));
+/* In offline mode, links to other websites stay closed so nothing is requested off the device. */
+document.addEventListener('click',e=>{if(!offlineMode)return;const a=e.target.closest('a[href]');if(!a)return;let url;try{url=new URL(a.href,location.href);}catch{return;}if(url.origin===location.origin||!/^https?:$/.test(url.protocol))return;e.preventDefault();e.stopPropagation();toast(`Offline mode: external links are off. Switch to Online to open ${url.hostname}.`);},true);

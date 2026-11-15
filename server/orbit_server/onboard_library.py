@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 from .config import LLM_MODEL, OLLAMA_URL
 from .store import store
+from .evidence_guidance import HISTORICAL_GUIDANCE
 
 router = APIRouter(prefix="/api/assistant")
 
@@ -36,7 +37,7 @@ SYSTEM = (
     "If the passages do not answer the question, say so plainly instead of guessing. "
     "Never add facts, numbers or advice that are not in the passages. "
     "Do not diagnose or give medical instructions; this is background reading, not clinical advice. "
-    "Use plain, everyday words."
+    "Use plain, everyday words. " + HISTORICAL_GUIDANCE
 )
 
 
