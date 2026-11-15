@@ -263,7 +263,8 @@ function Scene({
     const center = box.getCenter(new Vector3());
     const size = box.getSize(new Vector3()).length();
     const fit = size / (2 * Math.tan((camera.fov * Math.PI) / 360));
-    const distance = Math.min(MAX_DISTANCE, Math.max(0.35, fit * 1.6));
+    // Leave room around the structure so its neighbours give context.
+    const distance = Math.min(MAX_DISTANCE, Math.max(1.1, fit * 4));
     const dir = camera.position.clone().sub(c.target).normalize();
     moveTo(center.clone().add(dir.multiplyScalar(distance)), center);
   }, [state.frameRequest]); // eslint-disable-line react-hooks/exhaustive-deps
