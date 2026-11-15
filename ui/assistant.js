@@ -33,17 +33,18 @@
   host.id = 'orbit-assistant';
   host.innerHTML = `
     <aside class="crew-companion" id="assistant-panel" aria-labelledby="assistant-title" data-expanded="false">
-      <div class="companion-dock-top">
-        <div class="companion-tabs" role="tablist" aria-label="Crew assistant sections">
-          <button type="button" id="assistant-tab-chat" role="tab" aria-controls="assistant-room" aria-selected="true">Assistant</button>
-          <button type="button" id="assistant-tab-appearance" role="tab" aria-controls="assistant-appearance" aria-selected="false" tabindex="-1">Appearance</button>
-        </div>
-      </div>
       <header class="companion-head">
         <div class="companion-portrait" id="assistant-avatar-canvas" aria-label="3D crew avatar">
           <p class="companion-loading" id="assistant-avatar-loading">Preparing your avatar…</p>
         </div>
-        <span class="companion-portrait-note">Drag to turn · 3D avatar</span>
+        <fieldset class="companion-avatar-choice" id="assistant-avatar-tools">
+          <legend class="sr-only">Avatar</legend>
+          <div class="companion-personas">
+            <label><input class="sr-only" type="radio" name="assistant-persona" value="male" data-doctor-persona="male" ${doctorPersona==='male'?'checked':''}><span>Male</span></label>
+            <label><input class="sr-only" type="radio" name="assistant-persona" value="female" data-doctor-persona="female" ${doctorPersona==='female'?'checked':''}><span>Female</span></label>
+          </div>
+          <p class="sr-only" id="assistant-avatar-state">Ready</p>
+        </fieldset>
         <div class="companion-identity">
           <button class="companion-launch" id="assistant-launch" aria-expanded="false" aria-controls="assistant-room" aria-describedby="assistant-status">
             <span id="assistant-title">Crew assistant</span>${icon('chevrondown')}
@@ -56,37 +57,26 @@
         <button class="companion-end" id="assistant-end" type="button" aria-label="End assistant session" hidden>End</button>
       </header>
       <div id="assistant-local-host" hidden></div>
-      <div class="companion-room" id="assistant-room" role="tabpanel" aria-labelledby="assistant-tab-chat" hidden>
+      <div class="companion-room" id="assistant-room" hidden>
         <div class="assistant-content" id="assistant-content">
-        <div class="companion-connect"><span>Voice and connected text use ElevenLabs.</span><button class="text-button" id="assistant-text">Connect text ${icon('arrowright')}</button></div>
-        <div class="assistant-context"><div><small>WITH YOU ON</small><strong id="assistant-page"></strong></div><button class="text-button" id="assistant-explain" disabled>Explain ${icon('arrowright')}</button></div>
+        <div class="companion-connect"><button class="button small" id="assistant-text" title="Text chat with the ElevenLabs crew assistant">Connect text</button></div>
+        <div class="assistant-context" hidden><div><small>WITH YOU ON</small><strong id="assistant-page"></strong></div><button class="text-button" id="assistant-explain" disabled>Explain ${icon('arrowright')}</button></div>
         <p class="assistant-sharing" id="assistant-sharing">No health record or image shared.</p>
         <p class="assistant-error" id="assistant-error" role="alert"></p>
-        <div class="assistant-transcript" id="assistant-transcript" role="log" aria-label="Conversation" aria-live="polite"><div class="assistant-empty"><h3>A little guidance, within reach.</h3><p>Navigate your workspace or explore a health topic. Local commands are ready to use.</p><div class="companion-suggestions"><button type="button" data-assistant-command="Open health log">Open health log ${icon('arrowright')}</button><button type="button" data-assistant-command="Open anatomy lab">Explore anatomy ${icon('arrowright')}</button></div></div></div>
-        <fieldset class="companion-avatar-choice" id="assistant-avatar-tools">
-          <legend>Avatar</legend>
-          <div class="companion-personas">
-            <label><input class="sr-only" type="radio" name="assistant-persona" value="male" data-doctor-persona="male" ${doctorPersona==='male'?'checked':''}><span>Male</span></label>
-            <label><input class="sr-only" type="radio" name="assistant-persona" value="female" data-doctor-persona="female" ${doctorPersona==='female'?'checked':''}><span>Female</span></label>
-          </div>
-          <p class="companion-choice-note">Your choice is saved for this device.</p>
-          <p class="sr-only" id="assistant-avatar-state">Ready</p>
-        </fieldset>
-        <details class="assistant-command-help" id="assistant-commands"><summary>Site access & controls</summary><p><strong>Full site control.</strong> Ask me to navigate, enter and save data, manage records, export files, or control anatomy. Confirm deletion by voice. Record access and image sharing have their own permission reviews.</p><p>Say a command during a voice session, or type it below. Typed site commands also work without a connection. Describe a concern to highlight related reference anatomy. Reports stay temporary. Say Save this form to commit a draft, or Confirm action for a pending local review.</p><div>${['My left knee hurts','I have asthma','Clear condition highlights','Open feature directory','Open latest health check','Open tissue models','Show sagittal section','Open health log','Show sleep trends for 30 days','Open vital entry'].map(c=>`<button type="button" data-assistant-command="${c}">${c}</button>`).join('')}</div></details>
+        <div class="assistant-transcript" id="assistant-transcript" role="log" aria-label="Conversation" aria-live="polite"><div class="assistant-empty"><div class="companion-suggestions"><button type="button" data-assistant-command="Open health log">Open health log ${icon('arrowright')}</button><button type="button" data-assistant-command="Open anatomy lab">Explore anatomy ${icon('arrowright')}</button></div></div></div>
+        <details class="assistant-command-help" id="assistant-commands" hidden><summary>Site access & controls</summary><p><strong>Full site control.</strong> Ask me to navigate, enter and save data, manage records, export files, or control anatomy. Confirm deletion by voice. Record access and image sharing have their own permission reviews.</p><p>Say a command during a voice session, or type it below. Typed site commands also work without a connection. Describe a concern to highlight related reference anatomy. Reports stay temporary. Say Save this form to commit a draft, or Confirm action for a pending local review.</p><div>${['My left knee hurts','I have asthma','Clear condition highlights','Open feature directory','Open latest health check','Open tissue models','Show sagittal section','Open health log','Show sleep trends for 30 days','Open vital entry'].map(c=>`<button type="button" data-assistant-command="${c}">${c}</button>`).join('')}</div></details>
         <details class="assistant-command-help assistant-share-details" id="assistant-share-details"><summary>Sharing & privacy</summary>
           <p class="assistant-disclosure">Voice or text is sent to ElevenLabs and its model provider, along with the page and selected reference anatomy. Health records and images are shared only after you review them. <a href="https://elevenlabs.io/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy policy</a></p>
           <div class="assistant-privacy"><button id="assistant-records" disabled>${icon('lock')}<span><strong>Allow record access</strong><small>Current conversation and workspace</small></span></button><button id="assistant-revoke-records" hidden>${icon('lock')}<span><strong>Revoke record access</strong><small>Stop future record reads</small></span></button><button id="assistant-health" disabled>${icon('clipboard')}<span><strong>Share crew summary</strong><small>Review readings and notes</small></span></button><button id="assistant-image" disabled>${icon('body')}<span><strong>Review selected image</strong><small id="assistant-image-hint">Select an image record first</small></span></button></div>
         </details>
       </div>
-      <div class="assistant-bottom"><form class="assistant-compose" id="assistant-compose"><label><span class="sr-only">Message the crew assistant</span><textarea id="assistant-message" maxlength="2000" rows="1" placeholder="Start a session to ask a question…" disabled></textarea></label><button class="button primary" id="assistant-send" disabled>Send</button></form><div class="assistant-foot"><span>VOICE ASSISTANT REQUIRES INTERNET</span><button class="assistant-emergency" id="assistant-emergency">${icon('alert')}Medical response</button></div></div>
+      <div class="assistant-bottom"><form class="assistant-compose" id="assistant-compose"><label><span class="sr-only">Message the crew assistant</span><textarea id="assistant-message" maxlength="2000" rows="1" placeholder="Start a session to ask a question…" disabled></textarea></label><button class="button primary" id="assistant-send" disabled>Send</button></form><div class="assistant-foot"><button class="assistant-emergency" id="assistant-emergency">${icon('alert')}Medical response</button></div></div>
       </div>
-      <div class="companion-appearance" id="assistant-appearance" role="tabpanel" aria-labelledby="assistant-tab-appearance" hidden></div>
     </aside>
     <button class="assistant-reopen" id="assistant-reopen" type="button" hidden>Open assistant</button>
     <dialog class="assistant-consent" id="assistant-consent" aria-labelledby="assistant-consent-title"><header><h2 id="assistant-consent-title"></h2><p id="assistant-consent-subtitle"></p></header><div class="assistant-consent-body" id="assistant-consent-body"></div><p class="assistant-consent-status" id="assistant-consent-status" role="status"></p><footer><button class="button" id="assistant-consent-cancel">Keep private</button><button class="button primary" id="assistant-consent-approve">Share with agent</button></footer></dialog>`;
   document.body.append(host); hydrateIcons(host);
   const el = id => document.getElementById(`assistant-${id}`);
-  el('appearance').append(el('avatar-tools'));
   const loadSdk = () => sdkPromise ||= import('./vendor/elevenlabs-client.js').catch(error => { sdkPromise = null; throw error; });
   const isOpen = () => !el('panel').hidden;
 
@@ -432,7 +422,7 @@
     if((navigating||privacyReview)&&$('#modal').open&&!dirtyForm())closeModal();
     if(emergency)closeConsent();
     if(action.kind==='help'){
-      el('commands').open=true;el('commands').scrollIntoView({block:'nearest'});
+      el('commands').hidden=false;el('commands').open=true;el('commands').scrollIntoView({block:'nearest'});
       return siteReply('opened','Site controls are open. Try “Open health log”, “Show sleep trends for 30 days”, “Isolate bones”, or “Log heart rate 72 bpm”. Health values stay in a draft until you choose Save health check.');
     }
     if(action.kind==='avatar'){
@@ -633,6 +623,8 @@
     el('message').placeholder = connected ? 'Ask a question or give a site command…' : 'Try: Open anatomy lab';
     const sharing = [bridge.hasHealth() ? 'Crew summary shared as a snapshot.' : 'No health record shared.', bridge.sharedImage() ? 'Selected image sent for review.' : 'No image shared.'];
     el('revoke-records').hidden=!permissions.hasRecords();
+    el('sharing').hidden = !(permissions.hasRecords() || bridge.hasHealth() || bridge.sharedImage());
+    el('share-details').hidden = !connected;
     el('sharing').textContent = (permissions.hasRecords()?'Workspace record access allowed for this conversation. ':'')+sharing.join(' ') + (bridge.hasHealth() ? ' Review again to share newer readings.' : '');
     document.querySelector('.local-status small').textContent = connected ? 'AGENT ONLINE' : 'LOCAL RECORDS';
     updateDoctorState();
@@ -641,16 +633,14 @@
   function setExpanded() {
     const expanded = true;
     if (!expanded && el('panel').contains(document.activeElement)) el('launch').focus({preventScroll:true});
-    el('room').hidden = !expanded||assistantTab!=='chat';
-    el('appearance').hidden = !expanded||assistantTab!=='appearance';
+    el('room').hidden = !expanded;
     el('panel').dataset.expanded=String(expanded);
     document.body.dataset.assistantExpanded=String(expanded);
     el('launch').setAttribute('aria-expanded',String(expanded));
     el('launch').setAttribute('aria-label','Crew assistant');
   }
   function setAssistantTab(tab) {
-    assistantTab=tab==='appearance'?'appearance':'chat';
-    for(const name of ['chat','appearance']){const selected=name===assistantTab;el('tab-'+name).setAttribute('aria-selected',String(selected));el('tab-'+name).tabIndex=selected?0:-1;}
+    assistantTab='chat';
     setExpanded(true);
   }
   function openPanel() {
@@ -723,7 +713,7 @@
     doctorSpeech?.reset();doctorSpeech=null;
     clearTimeout(startTimer); closeConsent();setDoctorMode('idle');
     const closing = bridge.close(); clearTranscript();
-    notice('Session ended. Sharing permissions were reset. Ending a session does not delete the provider’s conversation history.');
+    notice('Session ended. Sharing permissions were reset.');
     setStatus(message); paint(); await closing;
   }
   function connectionError(error) {
@@ -885,11 +875,6 @@
   }
 
   el('panel').dataset.corner='right';
-  for(const tab of ['chat','appearance'])el('tab-'+tab).addEventListener('click',()=>setAssistantTab(tab));
-  host.querySelector('[role="tablist"]').addEventListener('keydown',event=>{
-    if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
-    event.preventDefault();setAssistantTab(event.key==='Home'?'chat':event.key==='End'?'appearance':assistantTab==='chat'?'appearance':'chat');el('tab-'+assistantTab).focus();
-  });
   el('launch').addEventListener('click',()=>setExpanded(true));
   el('reopen').addEventListener('click',()=>{openPanel();el('launch').focus({preventScroll:true});});
   host.addEventListener('click',event=>{const command=event.target.closest('[data-assistant-command]');if(command)void send(command.dataset.assistantCommand);});
@@ -937,7 +922,7 @@
     const target = event.target.closest('[data-assistant-photo]');
     if (!target) return;
     selectedImage = {id:target.dataset.assistantPhoto,scope:scope()};
-    if ($('#modal').open) closeModal(); openPanel();el('share-details').open=true;
+    if ($('#modal').open) closeModal(); openPanel();el('share-details').hidden=false;el('share-details').open=true;
     if (bridge.active()) void reviewPhoto(); else showError('Start a voice or text session, then choose Review selected image. Nothing has been uploaded.');
   });
   document.addEventListener('visibilitychange',() => {
