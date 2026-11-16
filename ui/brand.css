@@ -97,9 +97,13 @@ h1, h2, h3, h4, h5, h6, button, .button, summary, [role=tab], legend, .main-nav 
 /* The feature search stays available to the crew assistant ("find a feature") and the ⌘K / Ctrl K shortcut, but its top bar button is hidden. */
 .topbar .feature-finder-trigger { display: none !important; }
 
-/* Desktop: the top bar is just the orbit-ring line (the sidebar is always visible, so no menu button is needed).
+/* Desktop: no top bar. The orbit-ring line runs across the full window top instead
+   (over the sidebar, page and assistant), a little thicker with a soft cyan glow.
    Tablets and phones keep the bar for the menu button. */
 @media (min-width: 1100px) {
-  .topbar { height: 3px; min-height: 0; padding: 0; border-bottom: 0; overflow: hidden; background-size: 100% 3px; }
+  .topbar { height: 0; min-height: 0; padding: 0; border: 0; overflow: hidden; background: none; }
   .topbar > * { display: none !important; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto 0; height: 4px; z-index: 60; pointer-events: none;
+    background: linear-gradient(90deg, #0f2345 0%, #16305a 22%, #1a5a8a 52%, #2f8fb6 78%, #4eaecd 100%);
+    box-shadow: 0 1px 8px rgba(78, 174, 205, .35); }
 }
