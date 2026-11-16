@@ -216,3 +216,4 @@ body[data-assistant-expanded=false] .anatomy-tool-dialog { right: calc(var(--ass
 .lab-profile-conditions button:hover:not(:disabled) { background: #fdeccd; }
 .lab-profile .text-button { font-size: 12px; white-space: nowrap; }
 .lab-wide .lab-viewer .anatomy-stage { height: calc(100dvh - 196px - var(--offline-banner-h, 0px)); }
+@media (min-width: 1100px) { .lab-wide .lab-viewer .anatomy-stage { height: calc(100dvh - 130px - var(--offline-banner-h, 0px)); } }
