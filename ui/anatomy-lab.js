@@ -19,7 +19,7 @@ function labLayout(catalog){
  return `<div class="anatomy-workspace lab-wide" id="lab-workspace">
   <div class="lab-top">
    <div class="lab-views" role="group" aria-label="Viewing angle">${views.map(([v,n],i)=>`<button data-anatomy-view="${v}" class="${i===0?'active':''}">${n}</button>`).join('')}</div>
-   <div class="lab-workspace-toolbar"><button data-anatomy-action="body">Full body</button><button data-anatomy-action="fit">Fit view</button><button data-anatomy-action="labels" aria-pressed="true">Labels</button><button data-anatomy-action="fullscreen">Expand</button><button data-action="anatomy-credits">Model details</button></div>
+   <div class="lab-workspace-toolbar"><button data-anatomy-action="body">Full body</button><button data-anatomy-action="fit">Fit view</button><button data-anatomy-action="labels" aria-pressed="true">Labels</button><button data-action="anatomy-credits">Model details</button></div>
   </div>
   <div class="lab-stage-grid">
    <nav class="lab-rail lab-rail-left" aria-label="Anatomy tools">${tools.slice(0,4).map(tool).join('')}</nav>
