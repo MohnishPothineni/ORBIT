@@ -8,7 +8,6 @@ function seedCrewWorkspace(w,mode){
    w.entries.forEach(e=>{if(!e.crewId)e.crewId='crew-01';});
    w.crew=[primary];
    if(mode==='demo'){
-    primary.conditions=[{id:'sample-lumbar',title:'Lumbar discomfort',region:'lumbar',status:'Monitoring',source:'Sample scenario',date:todayKey(),notes:'Training record: lower back discomfort after exercise. Follow-up listed for the next crew medical review.'}];
     const templates=[
      {id:'crew-02',name:'Crew 02',role:'Pilot',shift:-4,sleep:7.8,conditions:[{id:'sample-knee',title:'Previous left knee injury',region:'leftKnee',status:'History',source:'Sample scenario',date:todayKey(),notes:'Training record: previous left knee injury. History retained for exercise planning.'}]},
      {id:'crew-03',name:'Crew 03',role:'Mission specialist',shift:7,sleep:7.2,conditions:[{id:'sample-migraine',title:'Migraine history',region:'skull',status:'History',source:'Sample scenario',date:todayKey(),notes:'Training record: episodic migraine history. No current symptoms entered.'}]},
@@ -41,6 +40,8 @@ function initCrewData(){
    }
    if(HistoricalCrew.PROFILES.some(p=>!w.crew.some(c=>c.id===p.profile.id)))delete w.historicalCrewVersion;
    HistoricalCrew.addTo(w);
+   // The lumbar discomfort sample was retired; remove it from saved demo profiles.
+   for(const p of w.crew)if(p.sample&&Array.isArray(p.conditions))p.conditions=p.conditions.filter(c=>c.id!=='sample-lumbar');
    w.crewDataVersion=3;
   }else{
    if(!w.crewDataVersion){
@@ -70,7 +71,7 @@ function crewRecords(id,{raw=false}={}){const list=[...db().entries].filter(e=>(
 function crewLatest(id,key){return crewRecords(id).filter(e=>Number.isFinite(e[key])).at(-1);}
 function crewCheckKey(){return activeCrewId()==='crew-01'?todayKey():activeCrewId()+':'+todayKey();}
 function crewInitial(p){return p.name.match(/\d+/)?.[0]?.padStart(2,'0')||p.name.split(/\s+/).slice(0,2).map(t=>t[0]).join('').toUpperCase();}
-function selectCrew(id){if(!crewProfiles().some(p=>p.id===id))return;db().activeCrewId=id;focusedConditionId=null;filterQuery='';logLimit=20;persist();render();}
+function selectCrew(id,{quiet=false}={}){if(!crewProfiles().some(p=>p.id===id))return;db().activeCrewId=id;focusedConditionId=null;filterQuery='';logLimit=20;persist();if(!quiet)render();}
 function crewFieldMarkup(){return `<label class="field full"><span>Crew member</span><select class="field-input" name="crewId" required>${crewProfiles().map(p=>`<option value="${esc(p.id)}" ${p.id===activeCrewId()?'selected':''}>${esc(p.name)} · ${esc(p.role)}</option>`).join('')}</select></label>`;}
 function syncCrewHeader(){const p=activeCrew(),avatar=$('.crew-avatar'),name=$('.crew-name');if(avatar){avatar.textContent=crewInitial(p);avatar.setAttribute('aria-label','Select crew member, current: '+p.name);}if(name)name.innerHTML=`${esc(p.name)}<small>${esc(p.role).toUpperCase()}</small>`;const v=viewerProfile(),tag=$('.viewer-tag');if(tag){$('.viewer-tag-name',tag).textContent=v?v.name:'Choose';$('.viewer-tag-short',tag).textContent=v?crewInitial(v):'?';tag.classList.toggle('unset',!v);tag.setAttribute('aria-label',v?`Viewing as ${v.name}${AccessLogic.roleLabel(v)?', '+AccessLogic.roleLabel(v):''}. Change who is using ORBIT`:'No one chosen. Choose who is using ORBIT');}}
 function crewCard(p){const hr=crewLatest(p.id,'hr'),bp=crewLatest(p.id,'sys'),record=crewRecords(p.id).at(-1);return `<button class="crew-roster-card ${p.id===activeCrewId()?'selected':''}" data-select-crew="${esc(p.id)}" aria-pressed="${p.id===activeCrewId()}"><div class="roster-identity"><span class="roster-avatar">${esc(crewInitial(p))}</span><span><strong>${esc(p.name)}</strong><small>${esc(p.role)}${AccessLogic.roleLabel(p)?' · '+esc(AccessLogic.roleLabel(p)):''}</small></span>${icon('chevronright')}</div><div class="roster-values"><span>HR <b>${hr?formatNum(hr.hr):'—'}</b><small>bpm</small></span><span>BP <b>${bp?formatNum(bp.sys)+'/'+formatNum(bp.dia):'—'}</b></span></div><div class="roster-foot"><span>${record?dayLabel(record.at)+' · '+new Date(record.at).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'No health checks yet'}</span><span>${p.conditions.length} ${p.conditions.length===1?'note':'notes'}</span></div></button>`;}
@@ -91,7 +92,7 @@ function disposeCrewViewer(){crewViewerToken++;if(crewViewer){crewViewer.destroy
 async function attachCrewViewer(){const token=crewViewerToken,p=activeCrew(),host=$('#anatomy-canvas-host');if(!host)return;$('#anatomy-find-form')?.addEventListener('submit',e=>{e.preventDefault();if(crewViewer)crewViewer.findStructure($('#anatomy-find').value);else toast('The anatomy viewer is still loading.');});try{const module=await import('./anatomy3d.js');if(token!==crewViewerToken||!host.isConnected)return;const v=await module.mountAnatomy({host,stage:$('#anatomy-stage'),conditions:p.conditions,onStateChange:syncAnatomyControls,onSelect:updateAnatomySelection,onSelectCondition:id=>focusCondition(id)});if(token!==crewViewerToken||!host.isConnected){v.destroy();return;}crewViewer=v;initAnatomyControls(v);if(focusedConditionId)v.highlightCondition(focusedConditionId,false);}catch(error){if(token!==crewViewerToken)return;const load=$('#anatomy-loading');if(load)load.innerHTML=`<strong>3D view unavailable</strong><p>The geometry could not be rendered in this browser. Health records and condition notes remain available.</p><button class="button small" data-action="anatomy-retry">Retry 3D view</button>`;$('#anatomy-load-label').textContent='3D VIEW UNAVAILABLE';console.error('ORBIT anatomy viewer:',error);}}
 function handleCrewControl(t){
  if(t.dataset.viewer){const p=crewProfiles().find(c=>c.id===t.dataset.viewer);if(!p)return true;setViewer(p.id);closeModal();selectCrew(p.id);toast(`Viewing as ${p.name}.`);return true;}
- if(t.dataset.selectCrew){selectCrew(t.dataset.selectCrew);if($('#modal').open)closeModal();return true;}
+ if(t.dataset.selectCrew){if($('#modal').open){selectCrew(t.dataset.selectCrew);closeModal();}else if(currentPage()==='crew'){selectCrew(t.dataset.selectCrew,{quiet:true});location.hash='anatomy';}else selectCrew(t.dataset.selectCrew);return true;}
  if(t.dataset.condition){focusCondition(t.dataset.condition,false);return true;}
  if(t.dataset.focusCondition){focusCondition(t.dataset.focusCondition,true);return true;}
  if(t.dataset.editCondition){conditionModal(t.dataset.editCondition);return true;}
