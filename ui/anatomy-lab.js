@@ -10,6 +10,8 @@ function systemMenuMarkup(catalog){
 function anatomyLabPage(){return `${pageHeading('Anatomy lab','Explore the body. Keep every structure in context.',`<button class="button" data-action="anatomy-credits">${icon('info')}Model details</button>`)}<div id="anatomy-lab-root" class="lab-loading">Loading the anatomy catalog…</div>`;}
 function anatomyToolDialog(id,title,description,content){return `<dialog class="anatomy-tool-dialog" id="anatomy-dialog-${id}" aria-labelledby="anatomy-title-${id}"><header><div><span class="eyebrow">ANATOMY WORKSPACE</span><h2 id="anatomy-title-${id}">${title}</h2></div><button data-close-anatomy-dialog aria-label="Close ${title}" autofocus>${icon('close')}</button></header><p class="anatomy-dialog-description">${description}</p><div class="anatomy-dialog-content">${content}</div><footer><button class="button primary" data-close-anatomy-dialog>Done</button><span>Changes appear on the model.</span></footer></dialog>`;}
 function anatomyStepControl(id,label,value,step=10){return `<label class="anatomy-step-label" for="${id}">${label}</label><div class="anatomy-stepper"><button data-step-target="${id}" data-step-amount="-${step}" aria-label="Decrease ${label}">−</button><input id="${id}" type="number" min="0" max="100" step="${step}" value="${value}" aria-label="${label}"><span>%</span><button data-step-target="${id}" data-step-amount="${step}" aria-label="Increase ${label}">+</button></div>`;}
+/* The crew member shown on the body, with their recorded conditions (click one to locate it). */
+function labProfileBar(){const p=activeCrew(),c=p.conditions||[];return `<div class="lab-profile" aria-label="Crew member shown"><span class="lab-profile-avatar">${esc(crewInitial(p))}</span><div class="lab-profile-who"><strong>${esc(p.name)}</strong><small>${esc(p.role)}</small></div><div class="lab-profile-conditions">${c.length?c.map((x,i)=>`<button data-focus-condition="${esc(x.id)}" ${x.region==='none'?'disabled':''}><b>C${String(i+1).padStart(2,'0')}</b>${esc(x.title)}</button>`).join(''):'<span>No conditions recorded</span>'}</div><a class="text-button" href="#crew">Change crew ${icon('arrowright')}</a></div>`;}
 function labLayout(catalog){
  const presets=[[5,'Systems'],[4,'Skeleton'],[3,'Organs'],[2,'Vessels & nerves'],[1,'Muscles']];
  const tools=[['layers','Layers','layers'],['regions','Regions','body'],['views','Views','eye'],['dissection','Dissection','settings'],['motion','Motion','play'],['library','Library','search'],['conditions','Conditions','activity']];
@@ -21,6 +23,7 @@ function labLayout(catalog){
    <div class="lab-views" role="group" aria-label="Viewing angle">${views.map(([v,n],i)=>`<button data-anatomy-view="${v}" class="${i===0?'active':''}">${n}</button>`).join('')}</div>
    <div class="lab-workspace-toolbar"><button data-anatomy-action="body">Full body</button><button data-anatomy-action="fit">Fit view</button><button data-anatomy-action="labels" aria-pressed="true">Labels</button><button data-action="anatomy-credits">Model details</button></div>
   </div>
+  ${labProfileBar()}
   <div class="lab-stage-grid">
    <nav class="lab-rail lab-rail-left" aria-label="Anatomy tools">${tools.slice(0,4).map(tool).join('')}</nav>
    <div class="lab-viewer">${anatomyPanel()}</div>

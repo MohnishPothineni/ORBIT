@@ -202,3 +202,17 @@ body[data-assistant-expanded=false] .anatomy-tool-dialog { right: calc(var(--ass
 .lab-rail-zoom > button > i, .lab-rail-zoom > button svg { width: 18px; height: 18px; }
 .lab-rail-zoom > button:hover { background: var(--orbit-cyan-soft, #e6f4f9); border-color: #9fcfe0; }
 @container content (max-width: 700px) { .lab-rail-zoom { flex-direction: row; width: 100%; border-top: 0; margin-top: 0; padding-top: 0; } .lab-rail-zoom > .lab-rail-label { display: none; } .lab-rail-zoom > button { flex: 1; } }
+
+/* Crew member shown in the lab */
+.lab-profile { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.lab-profile-avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--orbit-cyan-soft, #e6f4f9); color: var(--orbit-navy, #0f2345); font-size: 12px; font-weight: 700; flex: none; }
+.lab-profile-who { display: grid; line-height: 1.25; }
+.lab-profile-who strong { font-size: 14px; color: var(--ink); }
+.lab-profile-who small { font-size: 11px; color: var(--muted); }
+.lab-profile-conditions { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+.lab-profile-conditions > span { font-size: 12px; color: var(--muted); }
+.lab-profile-conditions button { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 4px 10px; border: 1px solid #f0d3a2; border-radius: 999px; background: #fff8ec; color: #6b4610; font-size: 12px; }
+.lab-profile-conditions button b { font-size: 10px; color: #a56a14; }
+.lab-profile-conditions button:hover:not(:disabled) { background: #fdeccd; }
+.lab-profile .text-button { font-size: 12px; white-space: nowrap; }
+.lab-wide .lab-viewer .anatomy-stage { height: calc(100dvh - 196px - var(--offline-banner-h, 0px)); }
