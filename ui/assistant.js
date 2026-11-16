@@ -2,7 +2,9 @@
 
 (() => {
   /* The public ElevenLabs agent the crew assistant connects to directly, with no sign-in or server (as on GitHub's dhruv branch). */
-  const AGENT_ID = 'agent_3801m7fw0fbvf95969qwr52phbpd';
+  /* One ElevenLabs agent per avatar, so the voice matches the model you see. */
+  const AGENT_IDS = { male: 'agent_3801m7fw0fbvf95969qwr52phbpd', female: 'agent_3601m7h1smjqfmabpmw9yy8tyd35' };
+  const agentId = () => AGENT_IDS[doctorPersona] || AGENT_IDS.male;
   let doctorQuality='balanced';try{doctorQuality=localStorage.getItem('orbit-doctor-quality')==='high'?'high':'balanced';}catch{}
   let doctorPersona='male';try{doctorPersona=localStorage.getItem('orbit-doctor-persona-v2')==='female'?'female':'male';localStorage.removeItem('orbit-doctor-persona');}catch{}
   let assistantTab='chat';
@@ -758,7 +760,7 @@
       if (thisRun !== run) return;
       doctorSpeech=kind==='voice'?new DoctorSpeechSignal():null;
       const session = await Conversation.startSession({
-        agentId: AGENT_ID, connectionType: kind === 'text' ? 'websocket' : 'webrtc', textOnly: kind === 'text',
+        agentId: agentId(), connectionType: kind === 'text' ? 'websocket' : 'webrtc', textOnly: kind === 'text',
         clientTools: {
           get_site_records:async params=>JSON.stringify(thisRun===run?await readSiteRecords(params):{status:'session_ended'}),
           use_site_feature:params=>siteTool({kind:'feature',feature:params?.feature,query:params?.query,item:params?.item}),
@@ -904,6 +906,8 @@
   host.querySelectorAll('[data-doctor-persona]').forEach(input=>input.addEventListener('change',()=>{
     const next=input.value;if(!input.checked||next===doctorPersona)return;
     doctorPersona=next;try{localStorage.setItem('orbit-doctor-persona-v2',next);}catch{}
+    // A connected session keeps its voice, so end it; the next one uses the new avatar's voice.
+    if(bridge.active()||starting)void stop(`Switched to the ${next} voice. Start again to talk.`);
     doctorEpoch++;doctorAvatar?.destroy();doctorAvatar=null;doctorPromise=null;
     const target=el('avatar-canvas');delete target.dataset.loaded;target.replaceChildren();
     const loading=document.createElement('p');loading.id='assistant-avatar-loading';loading.className='companion-loading';loading.textContent='Loading 3D avatar…';target.append(loading);
