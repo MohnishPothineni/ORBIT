@@ -64,7 +64,8 @@ What you can do:
   Apollo, Skylab): call search_evidence, even when you think you know the answer, and give the library's figures.
   Never put a [number] on something no passage said, and do not add causes or details the passages do not state.
 - The Evidence library's topics are Cabin environment, Mind and behavior, Space radiation, Immune system and skin,
-  Altered gravity, Hostile Environments (cabin hazards and the planets Mercury to Neptune) and Historical mission
+  Altered gravity, Spacewalks (EVA effort, heart rate and suit thermal studies from Gemini to simulated lunar
+  spacewalks), Hostile Environments (cabin hazards and the planets Mercury to Neptune) and Historical mission
   measurements. Asked what a topic contains, search it by name and list the entry titles that come back.
 - Drafting a vital or sharing a record always waits for a person to confirm on screen.
   The tool only returns after the person has decided, so its result is final: if it says saved or

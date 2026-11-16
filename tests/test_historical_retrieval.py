@@ -62,6 +62,9 @@ class HistoricalRetrieval(unittest.TestCase):
             'How much radiation did the Apollo 10 crew get?': 'Radiation dose (Apollo 10)',
             'Why does morale drop in the third quarter of a mission?': 'Morale in the third quarter',
             'What are hostile environments?': 'Fiberglass in the cabin (Apollo 10)',
+            'How hard did the Apollo moonwalks work?': 'Effort on the Apollo moonwalks',
+            'Can heart rate predict metabolic rate on a spacewalk?': 'Heart rate as a workload estimate',
+            'What happened on Gemini XI?': 'Overexertion on Gemini spacewalks',
         }
         for question, title in cases.items():
             hits = namespace['search_evidence'](self.store, question, 3)

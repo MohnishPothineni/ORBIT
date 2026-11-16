@@ -138,8 +138,9 @@ SCHEMAS = [
         name="search_evidence",
         description=(
             "Search the local Evidence library: spaceflight medicine papers, NASA hazard pages and mission reports "
-            "(Mercury, Apollo 10, Skylab), and NASA facts on the planets (Hostile Environments). Use it for any "
-            "medical, research, space environment or planet question, then answer from the passages and cite them "
+            "(Mercury, Apollo 10, Skylab), spacewalk (EVA) effort and suit studies, and NASA facts on the planets "
+            "(Hostile Environments). Use it for any medical, research, spacewalk, space environment or planet "
+            "question, then answer from the passages and cite them "
             "by number, like [1]."
         ),
         properties={

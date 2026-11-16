@@ -116,6 +116,40 @@
    ]
   },
   {
+   "documentId": "environment",
+   "chunkId": "calories-in-early-spaceflight",
+   "title": "Calories in early spaceflight (Altman & Fisher, 1986)",
+   "excerpt": "Early missions assumed weightlessness needed fewer calories, but tasks that use friction on Earth take muscular effort in space. Apollo crews averaged 1,877 kcal a day against about 2,900 recommended and lost a mean 3.9 kg. U.S. space diets rose from about 2,500 to about 3,000 kcal a day. Unpalatable early foods were often not fully eaten.",
+   "evidence": "Research review",
+   "topic": "Cabin environment",
+   "tracking": "Record what is actually eaten, including snacks.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "environment",
+   "chunkId": "diet-and-weight-loss-on-skylab",
+   "title": "Diet and weight loss on Skylab (Altman & Fisher, 1986)",
+   "excerpt": "Of the nine Skylab crew, the five who ate less in flight lost 75% more weight than those who kept their preflight intake. About 60% of the weight lost was lean body mass. Skylab 4, with the most food and exercise, was the only flight with no net tissue loss. Analyses suggest losses can be prevented with about 46 to 50 kcal per kg of body weight a day, plus 5 to 6 kcal per kg of exercise.",
+   "evidence": "Astronaut data",
+   "topic": "Cabin environment",
+   "tracking": "Track body mass and food intake together.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
    "documentId": "behavior",
    "chunkId": "short-sleep",
    "title": "Short sleep (Jones et al., 2022; Flynn-Evans et al., 2016)",
@@ -1006,6 +1040,176 @@
      "title": "Results of the Second United States Manned Orbital Space Flight, May 24, 1962",
      "journal": "NASA SP-6",
      "url": "https://ntrs.nasa.gov/api/citations/19620004691/downloads/19620004691.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "calcium-and-vitamin-d",
+   "title": "Calcium and vitamin D (Altman & Fisher, 1986)",
+   "excerpt": "On Skylab 4 calcium loss rose to almost 300 mg a day by day 84, and one projection put the loss at 25% of the body’s calcium over a year. The 1986 review suggested 1,200 to 1,500 mg of calcium a day instead of the Shuttle’s 800 mg, and noted that without sunlight vitamin D may run short, with no safe intake range yet set for long flights.",
+   "evidence": "Research review",
+   "topic": "Altered gravity",
+   "tracking": "Follow the calcium and vitamin D plan.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "why-spacewalk-effort-is-monitored",
+   "title": "Why spacewalk effort is monitored (Paul, 2012)",
+   "excerpt": "Tracking metabolic rate in real time during a spacewalk protects the crew member, shows how fast oxygen and cooling water are used, and lets planners change tasks. The laboratory method, open-circuit spirometry, is impractical in a suit. Heart rate, suit oxygen pressure decay and cooling-garment water temperatures have all been used, but none is reliable alone: heart rate also rises with stress, and oxygen decay includes suit leakage.",
+   "evidence": "Research review",
+   "topic": "Spacewalks",
+   "tracking": "Log heart rate and how hard suited work feels.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "overexertion-on-gemini-spacewalks",
+   "title": "Overexertion on Gemini spacewalks (Paul, 2012)",
+   "excerpt": "Gemini spacewalks took more effort than expected and at times exceeded the suit’s cooling. High exertion fogged the visor on Gemini IV and IX-A, and IX-A ended early. On Gemini XI sweat ran into the astronaut’s eyes and the spacewalk was ended early. For Gemini XII, NASA added restraints, underwater training and closer heart rate monitoring, advising the crew member when heart rate stayed at or above 140 beats per minute.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Rest when heart rate stays high during suited work.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "effort-on-the-apollo-moonwalks",
+   "title": "Effort on the Apollo moonwalks (Paul, 2012)",
+   "excerpt": "Average metabolic rates on the 14 Apollo lunar surface spacewalks ranged from 780 to 1,200 Btu/hr, with a mean of about 930 Btu/hr (980 kJ/hr), lower than predicted. Moving equipment, climbing in and out of the lander and drilling cost the most, and riding the Lunar Roving Vehicle the least, about 392 Btu/hr. On Apollo 14 a crew member’s heart rate reached 150 bpm while hauling a cart toward Cone Crater, and the task was abandoned.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Plan rest stops between heavy surface tasks.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "apollo-spacewalks-in-weightlessness",
+   "title": "Apollo spacewalks in weightlessness (Paul, 2012)",
+   "excerpt": "Four Apollo spacewalks in weightlessness, mainly to retrieve film, averaged 63 minutes. The suits had only gas cooling, which could not sustain more than about 995 Btu/hr, yet the crew did not overheat. The low work rates were credited to good restraints, underwater training and the short duration.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Use restraints and rehearse tasks to keep effort down.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "energy-cost-of-spacewalks",
+   "title": "Energy cost of spacewalks (Altman & Fisher, 1986)",
+   "excerpt": "Apollo lunar spacewalks averaged 234 kcal per hour over almost 159 hours, Skylab spacewalks 230 kcal per hour over more than 83 hours, and Shuttle spacewalks 196 kcal per hour measured by oxygen use. The peak, 500 kcal per hour, came when the Skylab 2 commander cut a strap jamming a solar panel. Riding the lunar rover cost about 123 kcal per hour; climbing in and out of the vehicle about 270.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Allow extra food after a spacewalk.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "water-during-spacewalks",
+   "title": "Water during spacewalks (Altman & Fisher, 1986)",
+   "excerpt": "A 1986 review for NASA warned that breathing dry 100% oxygen for up to 6 hours on a spacewalk risks dehydration, that thirst is not a reliable guide to water needs, and recommended working out how much water the suit should carry. Electrolyte loss from sweat is highest in the first few minutes of sweating.",
+   "evidence": "Research review",
+   "topic": "Spacewalks",
+   "tracking": "Drink before and after a spacewalk and log the amount.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "heart-rate-as-a-workload-estimate",
+   "title": "Heart rate as a workload estimate (EVA dissertation, ch. 5)",
+   "excerpt": "In 132 Shuttle and ISS spacewalks of five hours or more, heart rate and metabolic rate fell together over the spacewalk, from about 117 bpm and 1,040 Btu/hr at the start to about 100 bpm and 813 Btu/hr at hour four. One regression across all spacewalks explained 40% of the variation, but one fitted to each crew member explained over 82% and kept prediction error within the 200 Btu/hr accepted during Apollo. On average each heartbeat corresponded to about 0.14 Btu.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Compare suited heart rate with the crew member’s own baseline.",
+   "sources": [
+    {
+     "cite": "EVA dissertation, ch. 5",
+     "title": "Extravehicular Activity Metabolic Rate Model: Metabolic Rate Estimated From Heart Rate",
+     "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
+     "url": "./assets/evidence/eva-metabolic-rate-from-heart-rate.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "simulated-lunar-spacewalks",
+   "title": "Simulated lunar spacewalks (EVA dissertation, ch. 6)",
+   "excerpt": "Two suited operators in NASA’s Mark III suit did 3- to 5-hour simulated lunar spacewalks at one-sixth gravity on NASA’s ARGOS offload rig, walking graded treadmills, sampling geology and moving objects. Heart-rate models predicted metabolic rate within 200 Btu/hr, and adding suit cooling and humidity readings cut the error below 180 Btu/hr. Models predicted core temperature within 0.12 to 0.46 °C, similar to NASA’s METMAN thermal model, and skin temperature better than it. Only two people were tested.",
+   "evidence": "Ground study",
+   "topic": "Spacewalks",
+   "tracking": "Watch core temperature during long suited work.",
+   "sources": [
+    {
+     "cite": "EVA dissertation, ch. 6",
+     "title": "Evaluation of Cardiothermal Model Prediction of Simulated Lunar Extravehicular Activity",
+     "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
+     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "heart-rhythm-under-spacewalk-load",
+   "title": "Heart rhythm under spacewalk load (EVA dissertation, ch. 6)",
+   "excerpt": "In the same simulated lunar spacewalks, harder tasks raised the ratio of low- to high-frequency heart rate variability (LF/HF), which the author reads as a shift toward stress-type sympathetic control. Metabolic rates ranged from about 480 Btu/hr while adjusting suit settings to about 1,400 Btu/hr walking a 30% grade.",
+   "evidence": "Ground study",
+   "topic": "Spacewalks",
+   "tracking": "Note which tasks bring the highest strain.",
+   "sources": [
+    {
+     "cite": "EVA dissertation, ch. 6",
+     "title": "Evaluation of Cardiothermal Model Prediction of Simulated Lunar Extravehicular Activity",
+     "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
+     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf"
     }
    ]
   },
