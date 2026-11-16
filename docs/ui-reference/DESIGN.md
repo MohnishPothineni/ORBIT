@@ -169,7 +169,7 @@ The skin, eyes, hair, fabric and equipment each have distinct material responses
 
 Motion serves feedback. One 240-ms companion opening uses a short scale/translation; controls use 160-ms colour and press feedback. Reduced-motion removes spatial animation and follows the existing avatar pause preference. Typography is at least 12 pixels in the added theme. Touch targets are at least 44 pixels on coarse-pointer devices.
 
-The current stylesheet is `dist/studio.css`. Graphics and validation limits are documented in `docs/AVATAR_STUDIO_UPGRADE.md`.
+The current stylesheet is `ui/studio.css` (copied to `dist/studio.css` by the build). Its graphics and validation limits were described in a `docs/AVATAR_STUDIO_UPGRADE.md` that was not carried over into this repository.
 
 ---
 
@@ -246,7 +246,7 @@ Status colours appear in pills, priority banners and the left edge of crew cards
 ### Named Rules
 **The Tabular Rule.** Every number in the app uses tabular numerals (`font-variant-numeric: tabular-nums` on body), so columns of readings line up.
 
-**The 12px Floor Rule.** No visible text is smaller than 12px. `scripts/build-theme-scale.py` raises smaller source sizes to 12px; run it after editing the older stylesheets.
+**The 12px Floor Rule.** No visible text is smaller than 12px. The original `scripts/build-theme-scale.py`, which raised smaller source sizes to 12px, was not carried over into this repository; `ui/theme-scale.css` holds its output, so keep new text at 12px or larger by hand.
 
 **The Unit Beside the Value Rule.** A value is always followed by its unit in smaller muted text ("64 bpm", "7.9 hrs average"). It never stands alone.
 

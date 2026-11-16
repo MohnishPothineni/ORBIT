@@ -26,7 +26,7 @@ supplies inventory, standalone neural-model screen, overview, body-systems
 explainer, mission brief, and account/service integration screens were removed.
 Health tracking includes profiles, vitals, trends, wellbeing, exercise, skin and
 wounds, assessments, daily routines, and entered health risk readings.
-Existing browser records are preserved. The floating ElevenLabs assistant and
+Existing browser records are preserved. Pages added since the import (Collect Vitals and SCOPE) are listed in the root README. The floating ElevenLabs assistant and
 onboard-assistant API contracts remain separate from ORBIT's local voice API.
 The existing Pipecat voice workspace remains at `/voice/` in the production
 build. Development and preview proxy `/api/*` to https://localhost:8443.

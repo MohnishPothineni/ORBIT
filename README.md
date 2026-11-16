@@ -4,13 +4,51 @@ A local-first, offline-capable crew medical and mission operations console. Afte
 
 The app does not diagnose, does not assess fitness for duty and is not clinically validated.
 
-## Shared website design
+## Documentation
 
-The NASA-TEST design is tracked in `ui/` and is the default website. The app
-contains Anatomy Lab, crew status and health tracking, the crew voice assistant,
-and the offline evidence library, with their supporting fonts, images and 3D models.
+| Guide | Covers |
+|---|---|
+| [docs/OFFLINE-ASSISTANT.md](docs/OFFLINE-ASSISTANT.md) | Setting up and running the offline voice assistant: Ollama, Whisper, Kokoro, the Python server |
+| [docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md) | The online ElevenLabs assistant: agent, client tools, record access |
+| [docs/SCOPE-SETUP.md](docs/SCOPE-SETUP.md) | Setting up SCOPE's Gemini photo check |
+| [docs/CONDITION_SOURCES.md](docs/CONDITION_SOURCES.md) | The bundled MedlinePlus condition reference |
+| [docs/ui-reference/README.md](docs/ui-reference/README.md) | Where the website design came from |
+| [docs/ui-reference/DESIGN.md](docs/ui-reference/DESIGN.md) | The design system |
+| [docs/ui-reference/THIRD_PARTY_NOTICES.md](docs/ui-reference/THIRD_PARTY_NOTICES.md) | Third-party licenses |
+| [src/modules/evidence/README.md](src/modules/evidence/README.md) | The React evidence module |
+
+## Website (`ui/`)
+
+The website is plain HTML, CSS and JavaScript in `ui/` (no framework). It is the default site.
 Run `npm ci` and `npm run dev`, then open http://localhost:5173.
-Edit `ui/` to change the design; do not edit the generated `dist/` folder.
+Edit `ui/` to change it; do not edit the generated `dist/` folder.
+Pages use hash navigation (`#status`, `#log`, …), and records are kept in the browser's local storage.
+
+| Page | Hash | What it does |
+|---|---|---|
+| Crew Status | `#status` | Who needs attention first, across the whole crew |
+| Crew Profiles | `#crew` | Each crew member's profile, conditions and health record |
+| Health Log & Trends | `#log` | Logged health checks and trend charts |
+| Collect Vitals | `#collect` | Guided, animated walkthroughs for taking each measurement |
+| SCOPE | `#scope` | Photo check: Gemini describes a visible concern. Online only; see [docs/SCOPE-SETUP.md](docs/SCOPE-SETUP.md) |
+| Health Assessment | `#care` | Guided assessment, plus sections for sleep and wellbeing, exercise, and skin and wounds |
+| Daily Routine | `#routine` | The day's health tasks |
+| Health Risk Readings | `#risks` | Entered mission health risk readings, such as radiation dose |
+| Anatomy Lab | `#anatomy` | 3D body atlas: skeleton, organs, vessels and nerves, muscles, with regions, views, dissection and conditions |
+| Crew Voice AI Assistant | `#voice` | The full-page offline voice assistant (the React workspace at `/voice/`) |
+| Offline Evidence Library | `#research` | Sourced research entries by topic, Ask the onboard library, and Prepare offline package |
+
+Across every page:
+
+- **Crew Assistant panel** (right). The avatar's microphone and **Connect Text** start the **online** ElevenLabs assistant ([docs/ELEVENLABS_SETUP.md](docs/ELEVENLABS_SETUP.md)). The Wi-Fi icon opens the **offline** assistant, which stays docked while you change pages ([docs/OFFLINE-ASSISTANT.md](docs/OFFLINE-ASSISTANT.md)).
+- **Online / Offline switch** (top bar). Offline turns off the online assistant, SCOPE and external links, so nothing leaves the device.
+- **Workspace Settings** (bottom of the sidebar). Choose who is using ORBIT, switch between the **demo** workspace and a **personal** one, and export or clear data.
+- **Workspaces.** The demo workspace has four fictional crew (Crew 01–04) and two historical profiles built from NASA records: Scott Carpenter (Mercury-Atlas 7) and Gordon Cooper (Mercury-Atlas 9), in `ui/historical-crew.js`. A personal workspace starts with one empty profile and no sample data.
+
+**Evidence library** (`ui/research-library.js`). Every entry states only what its sources say. Each has an evidence label, tracking guidance, a link into the site, and its sources; most of the newer NASA sources also show a full APA 7 reference. Topics: Cabin Environment, Mind and Behavior, Space Radiation, Immune System and Skin, Altered Gravity, Spacewalks, Hostile Environments (cabin hazards and the planets), and Historical Mission Measurements (generated from `ui/assets/ALL_NUMERIC_METRICS_LONG.csv` by `scripts/import-historical-evidence.py`). Two unpublished dissertation chapters are bundled as PDFs in `ui/assets/evidence/`. Both voice assistants search the same library.
+
+**Service worker** (`ui/sw.js`). It caches the site for offline use. After changing any file in `ui/`, bump `CACHE` in `ui/sw.js` so browsers pick up the change.
+
 See [UI setup and provenance](docs/ui-reference/README.md) and the retained
 [design system](docs/ui-reference/DESIGN.md).
 
@@ -33,19 +71,26 @@ The backend (Python, FastAPI, Uvicorn, Pipecat) serves the built frontend and `/
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Build the voice workspace, then serve the core UI at http://localhost:5173. |
-| `npm run dev:live` | Same UI, with `/api` proxied to the local server. |
+| `npm run dev` | Build everything, then serve the website at http://localhost:5173. Requests to `/api/*` go to the Python server on https://localhost:8443, except `/api/scope/*` (SCOPE), which this server answers itself. |
+| `npm run dev:live` | Same as `npm run dev`. |
 | `npm run dev:voice` | Vite development server for the React voice workspace in live mode. |
 | `npm run server` | Starts the local Python server (`server/run.py`) on `https://localhost:8443`. |
 | `npm run build` | Typecheck; copy `ui/` to `dist/`; build React at `dist/voice/`. |
 | `npm run preview` | Serve the complete production build at http://localhost:5173. |
 | `npm run typecheck` | `tsc -b --noEmit` |
 | `npm run lint` | ESLint |
-| `npm test` | Regression tests for microphone races, session cleanup, tool history, and input validation. |
+| `npm test` | The React crew module's Vitest tests, then every `tests/*.test.mjs` (voice assistant, evidence library and its export, historical crew, SCOPE photo analysis, website). |
+| `npm run test:crew` | Only the React crew module's Vitest tests. |
+| `npm run test:evidence` | Only `tests/evidence.test.mjs`. |
+| `npm run dev:crew` | Vite development server for the React crew module (see **React crew development**). |
+
+The Python server's tests run separately, with the server's Python environment: `python tests/test_emergency.py` and `python tests/test_historical_retrieval.py`.
 
 ## Local server (`server/`)
 
-FastAPI + Pipecat, all on this machine. It implements the React voice workspace?s `/api/*` routes and serves `dist/` after `npm run build`.
+FastAPI + Pipecat, all on this machine. It implements the React voice workspace's `/api/*` routes and serves `dist/` after `npm run build`.
+
+For a step-by-step guide to setting up and running the offline voice assistant (Ollama, Whisper speech to text, Kokoro text to speech), see [docs/OFFLINE-ASSISTANT.md](docs/OFFLINE-ASSISTANT.md).
 
 **One-time setup**
 
@@ -57,18 +102,36 @@ FastAPI + Pipecat, all on this machine. It implements the React voice workspace?
 
 ```
 npm run server        # terminal 1: https://localhost:8443
-npm run dev:voice     # terminal 2: http://localhost:5173, proxies /api to the server
+npm run dev           # terminal 2: the website at http://localhost:5173, proxies /api to the server
 ```
+
+Use `npm run dev:voice` instead of `npm run dev` to work on the React voice workspace on its own (Vite, also http://localhost:5173).
 
 Or `npm run build` and open `https://localhost:8443` directly (also from other devices on the LAN). The HTTPS certificate is self-signed and created on first run (`server/certs/`); accept it once in the browser. Browsers only allow the microphone over HTTPS or on `localhost`.
 
 **Pipeline:** SmallWebRTC → Silero VAD → fixed-silence end of turn (`ORBIT_SILENCE_SECONDS`, default 1 s) → faster-whisper `base.en` → Ollama `qwen3:8b` (thinking off) → Kokoro. The server reports this as its turn detection ("Silence timer · 1 s"), and the status panel shows that rather than Smart Turn.
 
-**Tools** run in the browser. The server advertises them to the model (`server/orbit_server/tools.py`) and relays each call to the page and its result back. `log_vital` and `share_record_with_assistant` survive interruptions and wait for a person. The browser gives up after 4 min 45 s and tells the model nothing was saved or shared, before the server's 5-minute backstop, so no Save button outlives the request.
+**Tools** run in the browser. The server advertises them to the model (`server/orbit_server/tools.py`) and relays each call to the page and its result back:
+
+| Tool | What it does |
+|---|---|
+| `get_current_context` | The page, crew member and open form |
+| `get_crew_summary` | A crew member's latest readings |
+| `navigate` | Opens a website page, optionally for a named crew member |
+| `open_form` | Opens one of the website's forms (health check, wellbeing check-in, workout, risk reading, skin check, wound, condition note, flight surgeon report and others) |
+| `fill_form` | Types values into the open form. It never saves; the person checks the form and presses **Save** |
+| `log_vital` | Drafts a vital sign reading that waits for a person to confirm |
+| `control_anatomy` | Drives the Anatomy lab |
+| `search_evidence` | Searches the Evidence library and returns cited passages |
+| `share_record_with_assistant` | Asks the person to share a record with the session |
+
+`log_vital` and `share_record_with_assistant` survive interruptions and wait for a person. The browser gives up after 4 min 45 s and tells the model nothing was saved or shared, before the server's 5-minute backstop, so no Save button outlives the request.
+
+**Emergencies** (`server/orbit_server/emergency.py`). When someone says or types something that sounds like bleeding, choking, trouble breathing, chest pain, an unresponsive crew member or a burn, the server adds reviewed first-response steps to that turn before the model answers. The steps include "alert the medical officer and the rest of the crew now". The assistant says them first. It cannot contact anyone itself. Follow-up guidance stays in effect for 10 minutes.
 
 **Data:** the voice assistant's crew are the website's demo crew, with the same ids: Crew 01 to 04 (`crew-01`…`crew-04`, fictional sample crew whose readings the server dates today) and the historical profiles Gordon Cooper (`hist-ma9`) and Scott Carpenter (`hist-ma7`). `node scripts/seed-voice-crew.cjs` rebuilds `server/data/seed.json` from the website's own scripts, and `npm test` fails if the two drift apart. The React mock mode keeps its own synthetic crew (`src/shared/mocks/crew.ts`). Saved vitals and voice settings go to `server/data/runtime/` (gitignored).
 
-**Evidence:** the assistant searches the website's Evidence library. `scripts/export-research.mjs` exports `ui/research-library.js` to `server/data/research-library.json` (run by `npm run build`; the file is committed, and `npm test` fails if it falls out of date). Each passage carries its evidence type, tracking guidance and source papers. Citations link to `#research?doc=<topic>&chunk=<entry>`, which opens that entry. Search is keyword matching; there is no FAISS index yet, so the status bar reports the index as missing.
+**Evidence:** the assistant searches the website's Evidence library. `scripts/export-research.mjs` exports `ui/research-library.js` to `server/data/research-library.json` (run by `npm run build`; the file is committed, and `npm test` fails if it falls out of date). Each passage carries its evidence type, tracking guidance and source papers. Citations link to `#research?doc=<topic>&chunk=<entry>`, which opens that entry. Search is keyword matching (`store.py`, `search_evidence`): question words are ignored, everyday words map to the entries' terms ("hot" to temperature), topic names are searchable, and a named mission ("Apollo 10", "MA-9") or crew role ranks its own records first. The online assistant uses the same rules (`rank` in `ui/research-library.js`). There is no FAISS index yet, so the status bar reports the index as missing.
 
 **Anatomy lab** (`/api/anatomy/*`, `server/orbit_server/anatomy.py`) serves the React Anatomy lab module. Regions come from the module's own `src/modules/anatomy/mocks/regions.json`. Pins start from the synthetic `server/data/anatomy-pins.json`, and changes are saved to `server/data/runtime/anatomy-pins.json`. Region references list pin notes only.
 
@@ -92,6 +155,7 @@ src/
     crew/         Module 1 — Crew status and health tracking (built)
     anatomy/      Module 2 — Anatomy lab (built)
     assistant/    Module 3 — Crew assistant (built)
+    evidence/     Module 4 — Offline evidence library (built)
 ```
 
 All four modules are registered in the React application. Modules never import from each other; they link through routes.
@@ -133,9 +197,9 @@ With `VITE_USE_MOCKS=true`, a `MockVoiceSession` plays a scripted conversation w
 
 A **Demo controls** card can step the script, force any turn state, simulate errors, say the share approval phrase and cycle the status-bar states. Append `?state=loading|empty|error` to the URL in development to see those page states.
 
-## Offline evidence library
+## Offline evidence library (React module)
 
-Module 4 is implemented at `/evidence`, with cited search/Ask, a passage viewer,
+This is the React workspace's evidence module, separate from the website's Offline Evidence Library page (`#research`, described above). Module 4 is implemented at `/evidence`, with cited search/Ask, a passage viewer,
 Offline center, import/indexing jobs, and a separate historical CSV reference view.
 Production builds include a Workbox service worker; live API responses are never
 cached. See [the module guide](src/modules/evidence/README.md) for API contracts,

@@ -12,7 +12,7 @@ ORBIT presents the source as a head and shoulders portrait in its original blue 
 
 Source GLB SHA-256: `042795c3b91e8036a31ec392ce798b49a7ea65f704a7957ed524bc7ef7904942`
 
-To rebuild: `npm ci`, then `node scripts/prepare-doctor-avatar.mjs /path/to/White_M_1_Medi.glb`. The build tools are pinned in package-lock.json. The full upstream body is not included in this project. Three.js and GLTFLoader are version 0.170.0 under the retained Three.js MIT license.
+The rebuild script (`scripts/prepare-doctor-avatar.mjs`) was not carried over into this repository, so the model cannot currently be rebuilt from source here. The full upstream body is not included in this project. Three.js and GLTFLoader are version 0.170.0 under the retained Three.js MIT license.
 
 ## Motion
 
@@ -39,11 +39,11 @@ The original ORBIT headset now uses an ear pad and curved ear hook fitted over t
 
 `space-doctor-female.glb` derives from `White_F_1_Medi.glb` in the same MIT-licensed VALID collection: https://github.com/c-frame/valid-avatars-glb/blob/main/avatars/White/White_F_1_Medi.glb. Copyright (c) 2022 Tiffany Do. The source includes the female face, eyes and brown hair geometry. ORBIT applies the same portrait extraction, retained facial shapes, arm skeleton, and procedural headset/watch. A runtime material colors the scrubs pink. Embedded source texture images remain unchanged. The hair follows the head pivot. This is a fictional virtual interface character.
 
-Rebuild with `node scripts/prepare-doctor-avatar.mjs /path/to/White_F_1_Medi.glb dist/models/doctor/space-doctor-female.glb`.
+It was built with the same `scripts/prepare-doctor-avatar.mjs`, which is not in this repository.
 
 ## Studio material update in 1.17
 
-The original embedded base-colour and normal atlas images remain unchanged. Runtime `doctor-materials.js` adds separate physically based responses for skin, cloth, eyes, hair and enamel, plus a generated local pore microdetail texture. Studio lighting and reflections are built locally in Three.js. Equipment finishes and software texture sampling are refined. These additions do not replace the licensed source geometry or expression shapes. See `docs/AVATAR_STUDIO_UPGRADE.md` for generation provenance and rendering limits.
+The original embedded base-colour and normal atlas images remain unchanged. Runtime `doctor-materials.js` adds separate physically based responses for skin, cloth, eyes, hair and enamel, plus a generated local pore microdetail texture. Studio lighting and reflections are built locally in Three.js. Equipment finishes and software texture sampling are refined. These additions do not replace the licensed source geometry or expression shapes. The generation provenance and rendering limits were described in a `docs/AVATAR_STUDIO_UPGRADE.md` that was not carried over into this repository.
 
 ## Open-stage avatar refinement (1.18)
 

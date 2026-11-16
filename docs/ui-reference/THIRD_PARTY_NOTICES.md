@@ -45,11 +45,11 @@ Catalog source links point to OpenStax *Anatomy and Physiology 2e*, including th
 
 ## ElevenLabs client SDK
 
-`dist/vendor/elevenlabs-client.js` bundles `@elevenlabs/client` 1.32.1 and its browser dependencies. Full available notices and license texts are retained in `dist/vendor/ELEVENLABS-NOTICES.txt`, including ElevenLabs, LiveKit, protobuf, and browser support libraries. The original SDK package is MIT licensed; individual bundled dependencies retain their listed licenses. The source and exact development versions are declared in `package.json`, `package-lock.json`, and `scripts/bundle-voice.mjs`.
+`ui/vendor/elevenlabs-client.js` (copied to `dist/vendor/` by the build) bundles `@elevenlabs/client` 1.32.1 and its browser dependencies. Full available notices and license texts are retained in `ui/vendor/ELEVENLABS-NOTICES.txt`, including ElevenLabs, LiveKit, protobuf, and browser support libraries. The original SDK package is MIT licensed; individual bundled dependencies retain their listed licenses. The bundle was built in the original NASA-TEST project; its bundling script (`scripts/bundle-voice.mjs`) and package declarations were not carried over into this repository.
 
 ## Virtual space doctor avatar
 
-The head and shoulders in blue scrubs derive from `White_M_1_Medi.glb` in [c-frame/valid-avatars-glb](https://github.com/c-frame/valid-avatars-glb), part of the VALID avatar collection. Copyright (c) 2022 Tiffany Do, MIT License. Full source provenance, hash, the retained license, and adaptation details are in `dist/models/doctor/`.
+The head and shoulders in blue scrubs derive from `White_M_1_Medi.glb` in [c-frame/valid-avatars-glb](https://github.com/c-frame/valid-avatars-glb), part of the VALID avatar collection. Copyright (c) 2022 Tiffany Do, MIT License. Full source provenance, hash, the retained license, and adaptation details are in `ui/models/doctor/`.
 
 The matching Three.js r170 GLTFLoader and BufferGeometryUtils retain Three.js' MIT license in `dist/vendor/THREE-LICENSE.txt`. ORBIT's procedural flight-medical collar, earpiece, motion controller, and software 3D rendering changes form part of its original application code.
 
