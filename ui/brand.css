@@ -93,3 +93,6 @@ h1, h2, h3, h4, h5, h6, button, .button, summary, [role=tab], legend, .main-nav 
 .sidebar .brand { display: flex; align-items: flex-start; gap: 1px; }
 .sidebar .brand-logo { min-width: 0; flex: 0 1 auto; max-width: min(184px, calc(100% - 9px)); }
 .si-mark { flex: none; margin-top: 12px; font: 600 6px/1 var(--sans); letter-spacing: .06em; color: #000; opacity: .75; pointer-events: none; user-select: none; text-transform: none; }
+
+/* The feature search stays available to the crew assistant ("find a feature") and the ⌘K / Ctrl K shortcut, but its top bar button is hidden. */
+.topbar .feature-finder-trigger { display: none !important; }
