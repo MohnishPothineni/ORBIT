@@ -54,5 +54,21 @@ class HistoricalRetrieval(unittest.TestCase):
         for file in ['voice.py', 'onboard_library.py']:
             self.assertIn('HISTORICAL_GUIDANCE', (ROOT / 'server/orbit_server' / file).read_text())
 
+    def test_nasa_sources_and_hostile_environments(self):
+        cases = {
+            'How hot is Venus?': 'Planet Venus',
+            'How cold does Mercury get?': 'Planet Mercury',
+            'What is Mars like for astronauts?': 'Planet Mars',
+            'How much radiation did the Apollo 10 crew get?': 'Radiation dose (Apollo 10)',
+            'Why does morale drop in the third quarter of a mission?': 'Morale in the third quarter',
+            'What are hostile environments?': 'Fiberglass in the cabin (Apollo 10)',
+        }
+        for question, title in cases.items():
+            hits = namespace['search_evidence'](self.store, question, 3)
+            self.assertTrue(hits[0]['title'].startswith(title), f'{question} -> {hits[0]["title"]}')
+        # The Mercury program still means the missions, not the planet.
+        hits = namespace['search_evidence'](self.store, 'Tell me about the Mercury mission crew', 3)
+        self.assertNotIn('Planet Mercury', hits[0]['title'])
+
 if __name__ == '__main__':
     unittest.main()

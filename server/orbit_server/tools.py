@@ -137,8 +137,10 @@ SCHEMAS = [
     FunctionSchema(
         name="search_evidence",
         description=(
-            "Search the local Evidence library of spaceflight medicine papers. Use it for any medical or research "
-            "question, then answer from the passages and cite them by number, like [1]."
+            "Search the local Evidence library: spaceflight medicine papers, NASA hazard pages and mission reports "
+            "(Mercury, Apollo 10, Skylab), and NASA facts on the planets (Hostile Environments). Use it for any "
+            "medical, research, space environment or planet question, then answer from the passages and cite them "
+            "by number, like [1]."
         ),
         properties={
             "query": {"type": "string", "description": "What to look for."},

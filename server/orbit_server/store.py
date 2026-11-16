@@ -156,8 +156,13 @@ class Store:
     def search_evidence(self, query: str, k: int) -> list[dict[str, Any]]:
         """Keyword search over the local passages (no embeddings yet)."""
         # Keep short numerical record identifiers (e.g. 001, 9) and ignore question filler.
-        stop = {"what", "was", "were", "the", "for", "and", "with", "does", "this", "that", "show", "tell", "about", "during"}
-        terms = {_stem(w) for w in _WORD.findall(query.lower()) if (len(w) > 2 or w.isdigit()) and w not in stop}
+        stop = {"what", "was", "were", "the", "for", "and", "with", "does", "this", "that", "show", "tell", "about", "during",
+                "how", "why", "who", "when", "where", "which", "did", "are", "much", "many", "like", "can", "you", "its", "there"}
+        # Everyday words for what an entry states in other terms ("How hot is Venus?" asks about temperature).
+        synonyms = {"hot": "temperature", "cold": "temperature", "heat": "temperature", "warm": "temperature",
+                    "air": "atmosphere", "windy": "winds", "wind": "winds"}
+        words_in = [w for w in _WORD.findall(query.lower()) if (len(w) > 2 or w.isdigit()) and w not in stop]
+        terms = {_stem(synonyms.get(w, w)) for w in words_in}
         if not terms:
             return []
         q = query.lower()
@@ -176,14 +181,22 @@ class Store:
         asked_measures = {m for word, names in measure_words.items() if re.search(rf"\b{word}\b", q) for m in names}
         scored = []
         for chunk in self.evidence:
-            words = {_stem(w) for w in _WORD.findall(f"{chunk['title']} {chunk['excerpt']}".lower())}
+            # The website topic (e.g. "Hostile Environments") is searchable too.
+            words = {_stem(w) for w in _WORD.findall(f"{chunk['title']} {chunk.get('topic', '')} {chunk['excerpt']}".lower())}
             words |= {_stem(w) for w in chunk.get("keywords", [])}
             hits = len(terms & words)
             if hits:
                 # Exact record ids outrank incidental word matches in other records.
                 record_ids = re.findall(r"\b(?:NASA-VITAL-\d+|SKYLAB[\w-]+)\b", query, re.IGNORECASE)
                 exact = any(record_id.lower() in chunk["title"].lower() for record_id in record_ids)
-                score = hits / len(terms) + (1 if exact else 0)
+                # A word in the entry's title (a planet, a mission) says more than one in passing.
+                title_hits = len(terms & {_stem(w) for w in _WORD.findall(chunk["title"].lower())})
+                score = hits / len(terms) + 0.25 * title_hits / len(terms) + (1 if exact else 0)
+                # "Mercury" is a planet and a mission program: without mission words, mean the planet.
+                planet = re.match(r"Planet (\w+)", chunk["title"])
+                if planet and re.search(rf"\b{planet.group(1).lower()}\b", q):
+                    mission_words = re.search(r"atlas|mission|cooper|carpenter|pilot|astronaut|crew|flight|\bma-?\d", q)
+                    score += -0.5 if mission_words and planet.group(1) == "Mercury" else 1
                 role = re.search(r"Crew role: ([^;.]+)", chunk["excerpt"])
                 if asked_role and role:
                     score += 0.5 if role.group(1).strip().lower() == asked_role else -0.5
