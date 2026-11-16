@@ -66,10 +66,12 @@ input, textarea { caret-color: var(--orbit-cyan-ink); }
 }
 
 /* Assistant panel spacing: avatar lower, then name and controls, toggle, and Connect text, evenly spaced */
-#assistant-panel .companion-head { padding-top: 40px; row-gap: 18px; }
+#assistant-panel .companion-head { padding-top: 68px; row-gap: 18px; }
 #assistant-panel .companion-avatar-choice { margin-top: 4px; }
-#assistant-panel .companion-connect { padding: 22px 0 10px; }
-#assistant-panel .assistant-empty { padding-top: 18px; }
+#assistant-panel .companion-connect { padding: 22px 0 12px; }
+#assistant-panel .assistant-empty { padding-top: 0; }
+#assistant-panel .assistant-transcript { padding-top: 0; }
+#assistant-panel .assistant-empty .companion-suggestions { margin-top: 0; }
 
 /* Buttons and headings use title case: every word starts with a capital.
    Descriptions inside buttons (small print, paragraphs) keep their normal case. */
