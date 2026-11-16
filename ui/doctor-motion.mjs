@@ -84,7 +84,7 @@ export class DoctorMotion {
   preview(now){if(!this.paused&&this.visible){this.previewStart=now;this.previewUntil=now+3.2;this.gesture.wait=.15;}}
   previewYawn(now){if(this.paused||!this.visible||!['idle','text'].includes(this.mode)||now<this.previewUntil||this.watch.active)return false;return this.yawn.start(true);}
   /* Starts a specific gesture now (used for previews and checks). Side: left, right or both; kind 0–2. */
-  previewGesture(side,kind){if(this.paused||!this.visible)return false;this.gesture.active=false;return this.gesture.start(side,kind);}
+  previewGesture(){return false;}
   /* The watch-check animation is turned off: the avatar never raises its wrist to look at the watch. */
   previewWatch(){return false;}
   sample(now,dt,volume=0,centroid=.5){
@@ -114,7 +114,8 @@ export class DoctorMotion {
     const fy=this.followYaw*this.follow,fp=this.followPitch*this.follow;
     const look=this.idleLook.sample(step,idle&&!yawn.active&&!watch.active&&this.follow<.05);
     // Hands gesture while explaining; nods land on stressed syllables.
-    const gesture=this.gesture.sample(step,speaking&&!yawn.active&&(preview||this.phrase>.18));
+    // Hand gestures are turned off: the hands stay at rest while the avatar talks.
+    const gesture=this.gesture.sample(step,false);
     this.gestureLeft+=(gesture.left-this.gestureLeft)*(1-Math.exp(-step/.08));this.gestureRight+=(gesture.right-this.gestureRight)*(1-Math.exp(-step/.08));
     this.slowAmp+=(this.amplitude-this.slowAmp)*(1-Math.exp(-step/.35));
     const accent=speaking?clamp((this.amplitude-this.slowAmp)*2.2):0;
