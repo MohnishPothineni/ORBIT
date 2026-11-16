@@ -373,9 +373,16 @@ const missionLinkKey = () => missionLinkDelay || MissionLogic.linkDelayFor(state
 
 /* Evidence library */
 let missionResearchQuery = '';
+/* Full APA 7 references for sources that have one. Escaped, then only the <i> italics are restored. */
+function missionApaReferences(item) {
+  const refs = item.sources.map(id => ResearchLibrary.SOURCES[id].apa).filter(Boolean);
+  if (!refs.length) return '';
+  const italic = ref => esc(ref).replace(/&lt;i&gt;/g, '<i>').replace(/&lt;\/i&gt;/g, '</i>');
+  return `<details class="mission-evidence-apa"><summary>APA reference${refs.length > 1 ? 's' : ''}</summary>${refs.map(ref => `<p>${italic(ref)}</p>`).join('')}</details>`;
+}
 function missionResearchCard(item, showTopic) {
   const R = ResearchLibrary;
-  return `<article class="panel mission-evidence"><div class="mission-evidence-top"><h3>${esc(item.title)}</h3><span class="mission-pill due">${esc(R.EVIDENCE[item.evidence])}</span></div>${showTopic ? `<p class="mission-evidence-topic">${esc(item.topicTitle)}</p>` : ''}<p>${esc(item.text)}</p><p class="mission-evidence-watch"><strong>Tracking guidance:</strong> ${esc(item.watch)}</p><button class="text-button mission-ask-about" type="button" data-onboard-about="${esc(item.title)}" aria-label="Ask the onboard library about ${esc(item.title)}">Ask about this ${icon('arrowright')}</button><div class="mission-evidence-foot"><div>${item.sources.map(id => `<a href="${esc(R.SOURCES[id].url)}" target="_blank" rel="noopener noreferrer" title="${esc(R.SOURCES[id].title)}">${esc(R.SOURCES[id].cite)} ${icon('external')}<span class="sr-only"> (opens in a new tab)</span></a>`).join('')}</div>${item.track ? `<a class="text-button" href="#${item.track[0]}">${esc(item.track[1])} ${icon('arrowright')}</a>` : '<small>Not tracked in ORBIT yet</small>'}</div></article>`;
+  return `<article class="panel mission-evidence"><div class="mission-evidence-top"><h3>${esc(item.title)}</h3><span class="mission-pill due">${esc(R.EVIDENCE[item.evidence])}</span></div>${showTopic ? `<p class="mission-evidence-topic">${esc(item.topicTitle)}</p>` : ''}<p>${esc(item.text)}</p><p class="mission-evidence-watch"><strong>Tracking guidance:</strong> ${esc(item.watch)}</p>${missionApaReferences(item)}<button class="text-button mission-ask-about" type="button" data-onboard-about="${esc(item.title)}" aria-label="Ask the onboard library about ${esc(item.title)}">Ask about this ${icon('arrowright')}</button><div class="mission-evidence-foot"><div>${item.sources.map(id => `<a href="${esc(R.SOURCES[id].url)}" target="_blank" rel="noopener noreferrer" title="${esc(R.SOURCES[id].title)}">${esc(R.SOURCES[id].cite)} ${icon('external')}<span class="sr-only"> (opens in a new tab)</span></a>`).join('')}</div>${item.track ? `<a class="text-button" href="#${item.track[0]}">${esc(item.track[1])} ${icon('arrowright')}</a>` : '<small>Not tracked in ORBIT yet</small>'}</div></article>`;
 }
 /* Search stays inside the chosen topic, so say when other topics also match instead of showing a silent zero. */
 function missionResearchElsewhere(topic) {

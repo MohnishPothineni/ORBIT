@@ -119,7 +119,7 @@
    "documentId": "environment",
    "chunkId": "calories-in-early-spaceflight",
    "title": "Calories in early spaceflight (Altman & Fisher, 1986)",
-   "excerpt": "Early missions assumed weightlessness needed fewer calories, but tasks that use friction on Earth take muscular effort in space. Apollo crews averaged 1,877 kcal a day against about 2,900 recommended and lost a mean 3.9 kg. U.S. space diets rose from about 2,500 to about 3,000 kcal a day. Unpalatable early foods were often not fully eaten.",
+   "excerpt": "Early missions assumed weightlessness needed fewer calories, but tasks that use friction on Earth take muscular effort in space. Apollo crews averaged 1,877 kcal a day against about 2,900 recommended and lost a mean 3.9 kg. U.S. space diets rose from about 2,500 to about 3,000 kcal a day. On the 13-day Apollo 17, intake fell short of needs and each crew member lost a mean 1 kg of lean body mass and 2.3 kg of fat. Unpalatable early foods were often not fully eaten.",
    "evidence": "Research review",
    "topic": "Cabin environment",
    "tracking": "Record what is actually eaten, including snacks.",
@@ -128,7 +128,8 @@
      "cite": "Altman & Fisher, 1986",
      "title": "Research Opportunities in Nutrition and Metabolism in Space",
      "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
-     "url": "https://ntrs.nasa.gov/citations/19930074290"
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
     }
    ]
   },
@@ -145,7 +146,8 @@
      "cite": "Altman & Fisher, 1986",
      "title": "Research Opportunities in Nutrition and Metabolism in Space",
      "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
-     "url": "https://ntrs.nasa.gov/citations/19930074290"
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
     }
    ]
   },
@@ -299,7 +301,8 @@
      "cite": "NASA, 2024",
      "title": "Hazard: Isolation and Confinement",
      "journal": "NASA Human Research Program",
-     "url": "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
+     "url": "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/",
+     "apa": "National Aeronautics and Space Administration. (2024, August 1). <i>Hazard: Isolation and confinement</i>. NASA Human Research Program. https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
     }
    ]
   },
@@ -316,7 +319,8 @@
      "cite": "Bell et al., 2026",
      "title": "Summary Results from the Assessment of Psychology in Extreme Environments (APEX) Standardized Suite",
      "journal": "Aerospace Medical Association Annual Scientific Meeting (abstract, NASA NTRS)",
-     "url": "https://ntrs.nasa.gov/citations/20250011721"
+     "url": "https://ntrs.nasa.gov/citations/20250011721",
+     "apa": "Bell, S. T., Landon Blackwell, L., Dev, S., Miller, J., Begerowski, S., Anderson, S. R., & Stosic, M. (2026). <i>Summary results from the Assessment of Psychology in Extreme Environments (APEX) standardized suite</i> [Conference abstract]. Aerospace Medical Association Annual Scientific Meeting, Denver, CO, United States. https://ntrs.nasa.gov/citations/20250011721"
     }
    ]
   },
@@ -333,7 +337,8 @@
      "cite": "Stuster, 2010",
      "title": "Behavioral Issues Associated With Long Duration Space Expeditions: Review and Analysis of Astronaut Journals",
      "journal": "NASA contractor report JSC-CN-21128",
-     "url": "https://ntrs.nasa.gov/citations/20100026549"
+     "url": "https://ntrs.nasa.gov/citations/20100026549",
+     "apa": "Stuster, J. (2010). <i>Behavioral issues associated with long duration space expeditions: Review and analysis of astronaut journals</i> (Report No. JSC-CN-21128). NASA Johnson Space Center. https://ntrs.nasa.gov/citations/20100026549"
     }
    ]
   },
@@ -350,13 +355,15 @@
      "cite": "NASA, 2024",
      "title": "Hazard: Distance From Earth",
      "journal": "NASA Human Research Program",
-     "url": "https://www.nasa.gov/hrp/hazard-distance-from-earth/"
+     "url": "https://www.nasa.gov/hrp/hazard-distance-from-earth/",
+     "apa": "National Aeronautics and Space Administration. (2024, August 1). <i>Hazard: Distance from Earth</i>. NASA Human Research Program. https://www.nasa.gov/hrp/hazard-distance-from-earth/"
     },
     {
      "cite": "McBrayer et al., 2022",
      "title": "Communication Delays, Disruptions, and Blackouts for Crewed Mars Missions",
      "journal": "AIAA ASCEND 2022 (NASA NTRS)",
-     "url": "https://ntrs.nasa.gov/citations/20220013418"
+     "url": "https://ntrs.nasa.gov/citations/20220013418",
+     "apa": "McBrayer, K. T., Chai, P. R., & Judd, E. L. (2022). <i>Communication delays, disruptions, and blackouts for crewed Mars missions</i> [Conference paper]. ASCEND 2022, Las Vegas, NV, United States. https://ntrs.nasa.gov/citations/20220013418"
     }
    ]
   },
@@ -373,7 +380,8 @@
      "cite": "Parisi et al., 2023",
      "title": "Effects of Communication Delay on Human Spaceflight Missions",
      "journal": "Applied Human Factors and Ergonomics (AHFE) 2023 (NASA NTRS)",
-     "url": "https://ntrs.nasa.gov/citations/20230002268"
+     "url": "https://ntrs.nasa.gov/citations/20230002268",
+     "apa": "Parisi, M., Panontin, T., Wu, S., Mctigue, K., & Vera, A. (2023). <i>Effects of communication delay on human spaceflight missions</i> [Conference paper]. 14th International Conference on Applied Human Factors and Ergonomics, San Francisco, CA, United States. https://ntrs.nasa.gov/citations/20230002268"
     }
    ]
   },
@@ -556,7 +564,8 @@
      "cite": "NASA, 1969",
      "title": "Apollo 10 Mission Report",
      "journal": "NASA Manned Spacecraft Center, MSC-00126",
-     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
     }
    ]
   },
@@ -937,7 +946,8 @@
      "cite": "NASA, 2024",
      "title": "Hazard: Gravity Fields",
      "journal": "NASA Human Research Program",
-     "url": "https://www.nasa.gov/hrp/hazard-gravity-fields/"
+     "url": "https://www.nasa.gov/hrp/hazard-gravity-fields/",
+     "apa": "National Aeronautics and Space Administration. (2024, August 1). <i>Hazard: Gravity fields</i>. NASA Human Research Program. https://www.nasa.gov/hrp/hazard-gravity-fields/"
     }
    ]
   },
@@ -954,7 +964,8 @@
      "cite": "Hoffler & Johnson, 1975",
      "title": "Apollo flight crew cardiovascular evaluations",
      "journal": "Biomedical Results of Apollo, NASA SP-368",
-     "url": "https://ntrs.nasa.gov/citations/19760005591"
+     "url": "https://ntrs.nasa.gov/citations/19760005591",
+     "apa": "Hoffler, G. W., & Johnson, R. L. (1975). Apollo flight crew cardiovascular evaluations. In R. S. Johnston, L. F. Dietlein, & C. A. Berry (Eds.), <i>Biomedical results of Apollo</i> (NASA SP-368). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19760005591"
     }
    ]
   },
@@ -971,7 +982,8 @@
      "cite": "Homick & Miller, 1975",
      "title": "Apollo flight crew vestibular assessment",
      "journal": "Biomedical Results of Apollo, NASA SP-368",
-     "url": "https://ntrs.nasa.gov/citations/19760005595"
+     "url": "https://ntrs.nasa.gov/citations/19760005595",
+     "apa": "Homick, J. L., & Miller, E. F., II. (1975). Apollo flight crew vestibular assessment. In R. S. Johnston, L. F. Dietlein, & C. A. Berry (Eds.), <i>Biomedical results of Apollo</i> (NASA SP-368). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19760005595"
     }
    ]
   },
@@ -988,7 +1000,8 @@
      "cite": "NASA, 1969",
      "title": "Apollo 10 Mission Report",
      "journal": "NASA Manned Spacecraft Center, MSC-00126",
-     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
     }
    ]
   },
@@ -1005,7 +1018,8 @@
      "cite": "Johnston & Dietlein, 1975",
      "title": "Medical Support and Findings of the Skylab Program",
      "journal": "NASA TM X-58160",
-     "url": "https://ntrs.nasa.gov/api/citations/19750017465/downloads/19750017465.pdf"
+     "url": "https://ntrs.nasa.gov/api/citations/19750017465/downloads/19750017465.pdf",
+     "apa": "Johnston, R. S., & Dietlein, L. F. (1975). <i>Medical support and findings of the Skylab program</i> (NASA TM X-58160). NASA Johnson Space Center. https://ntrs.nasa.gov/api/citations/19750017465/downloads/19750017465.pdf"
     }
    ]
   },
@@ -1022,7 +1036,8 @@
      "cite": "Johnston & Dietlein, 1977",
      "title": "Biomedical Results from Skylab",
      "journal": "NASA SP-377",
-     "url": "https://ntrs.nasa.gov/citations/19770026836"
+     "url": "https://ntrs.nasa.gov/citations/19770026836",
+     "apa": "Johnston, R. S., & Dietlein, L. F. (Eds.). (1977). <i>Biomedical results from Skylab</i> (NASA SP-377). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19770026836"
     }
    ]
   },
@@ -1039,7 +1054,8 @@
      "cite": "NASA, 1962",
      "title": "Results of the Second United States Manned Orbital Space Flight, May 24, 1962",
      "journal": "NASA SP-6",
-     "url": "https://ntrs.nasa.gov/api/citations/19620004691/downloads/19620004691.pdf"
+     "url": "https://ntrs.nasa.gov/api/citations/19620004691/downloads/19620004691.pdf",
+     "apa": "National Aeronautics and Space Administration. (1962). <i>Results of the second United States manned orbital space flight, May 24, 1962</i> (NASA SP-6). https://ntrs.nasa.gov/api/citations/19620004691/downloads/19620004691.pdf"
     }
    ]
   },
@@ -1056,7 +1072,8 @@
      "cite": "Altman & Fisher, 1986",
      "title": "Research Opportunities in Nutrition and Metabolism in Space",
      "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
-     "url": "https://ntrs.nasa.gov/citations/19930074290"
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
     }
    ]
   },
@@ -1073,7 +1090,8 @@
      "cite": "Paul, 2012",
      "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
      "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
-     "url": "https://ntrs.nasa.gov/citations/20120003917"
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
     }
    ]
   },
@@ -1090,7 +1108,8 @@
      "cite": "Paul, 2012",
      "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
      "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
-     "url": "https://ntrs.nasa.gov/citations/20120003917"
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
     }
    ]
   },
@@ -1107,7 +1126,8 @@
      "cite": "Paul, 2012",
      "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
      "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
-     "url": "https://ntrs.nasa.gov/citations/20120003917"
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
     }
    ]
   },
@@ -1124,7 +1144,8 @@
      "cite": "Paul, 2012",
      "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
      "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
-     "url": "https://ntrs.nasa.gov/citations/20120003917"
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
     }
    ]
   },
@@ -1141,7 +1162,8 @@
      "cite": "Altman & Fisher, 1986",
      "title": "Research Opportunities in Nutrition and Metabolism in Space",
      "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
-     "url": "https://ntrs.nasa.gov/citations/19930074290"
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
     }
    ]
   },
@@ -1158,7 +1180,8 @@
      "cite": "Altman & Fisher, 1986",
      "title": "Research Opportunities in Nutrition and Metabolism in Space",
      "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
-     "url": "https://ntrs.nasa.gov/citations/19930074290"
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
     }
    ]
   },
@@ -1175,7 +1198,8 @@
      "cite": "EVA dissertation, ch. 5",
      "title": "Extravehicular Activity Metabolic Rate Model: Metabolic Rate Estimated From Heart Rate",
      "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
-     "url": "./assets/evidence/eva-metabolic-rate-from-heart-rate.pdf"
+     "url": "./assets/evidence/eva-metabolic-rate-from-heart-rate.pdf",
+     "apa": "<i>Extravehicular activity metabolic rate model: Metabolic rate estimated from heart rate</i> (Chapter 5). (n.d.). [Unpublished doctoral dissertation chapter; author not stated]."
     }
    ]
   },
@@ -1192,7 +1216,8 @@
      "cite": "EVA dissertation, ch. 6",
      "title": "Evaluation of Cardiothermal Model Prediction of Simulated Lunar Extravehicular Activity",
      "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
-     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf"
+     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf",
+     "apa": "<i>Evaluation of cardiothermal model prediction of simulated lunar extravehicular activity</i> (Chapter 6). (n.d.). [Unpublished doctoral dissertation chapter; author not stated]."
     }
    ]
   },
@@ -1209,7 +1234,33 @@
      "cite": "EVA dissertation, ch. 6",
      "title": "Evaluation of Cardiothermal Model Prediction of Simulated Lunar Extravehicular Activity",
      "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
-     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf"
+     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf",
+     "apa": "<i>Evaluation of cardiothermal model prediction of simulated lunar extravehicular activity</i> (Chapter 6). (n.d.). [Unpublished doctoral dissertation chapter; author not stated]."
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "irregular-heartbeats-on-apollo-15",
+   "title": "Irregular heartbeats on Apollo 15 (Paul, 2012; Altman & Fisher, 1986)",
+   "excerpt": "On Apollo 15, the first mission with the Lunar Roving Vehicle and 7- to 8-hour moonwalks, flight doctors saw irregular heartbeats in the moonwalking crew, continuing on the way home. The cause was uncertain: low potassium and workload may have contributed, and one crew member may have had undetected coronary artery disease. NASA added potassium to drinks on later flights, and no irregular heartbeats were recorded on Apollo 16.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Report palpitations or an irregular pulse.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
+    },
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
     }
    ]
   },
@@ -1226,7 +1277,8 @@
      "cite": "NASA, 1969",
      "title": "Apollo 10 Mission Report",
      "journal": "NASA Manned Spacecraft Center, MSC-00126",
-     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
     }
    ]
   },
@@ -1243,7 +1295,8 @@
      "cite": "NASA, 1969",
      "title": "Apollo 10 Mission Report",
      "journal": "NASA Manned Spacecraft Center, MSC-00126",
-     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
     }
    ]
   },
@@ -1260,7 +1313,8 @@
      "cite": "Johnston & Dietlein, 1977",
      "title": "Biomedical Results from Skylab",
      "journal": "NASA SP-377",
-     "url": "https://ntrs.nasa.gov/citations/19770026836"
+     "url": "https://ntrs.nasa.gov/citations/19770026836",
+     "apa": "Johnston, R. S., & Dietlein, L. F. (Eds.). (1977). <i>Biomedical results from Skylab</i> (NASA SP-377). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19770026836"
     }
    ]
   },
@@ -1277,7 +1331,8 @@
      "cite": "NASA Science",
      "title": "Mercury: Facts",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/mercury/facts/"
+     "url": "https://science.nasa.gov/mercury/facts/",
+     "apa": "NASA Science. (n.d.). <i>Mercury: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/mercury/facts/"
     }
    ]
   },
@@ -1294,7 +1349,8 @@
      "cite": "NASA Science",
      "title": "Venus: Facts",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/venus/facts/"
+     "url": "https://science.nasa.gov/venus/facts/",
+     "apa": "NASA Science. (n.d.). <i>Venus: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/venus/facts/"
     }
    ]
   },
@@ -1311,7 +1367,8 @@
      "cite": "NASA Science",
      "title": "Facts About Earth",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/earth/facts/"
+     "url": "https://science.nasa.gov/earth/facts/",
+     "apa": "NASA Science. (n.d.). <i>Facts about Earth</i>. National Aeronautics and Space Administration. https://science.nasa.gov/earth/facts/"
     }
    ]
   },
@@ -1328,7 +1385,8 @@
      "cite": "NASA Science",
      "title": "Mars: Facts",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/mars/facts/"
+     "url": "https://science.nasa.gov/mars/facts/",
+     "apa": "NASA Science. (n.d.). <i>Mars: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/mars/facts/"
     }
    ]
   },
@@ -1345,7 +1403,8 @@
      "cite": "NASA Science",
      "title": "Jupiter: Facts",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/jupiter/facts/"
+     "url": "https://science.nasa.gov/jupiter/facts/",
+     "apa": "NASA Science. (n.d.). <i>Jupiter: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/jupiter/facts/"
     }
    ]
   },
@@ -1362,7 +1421,8 @@
      "cite": "NASA Science",
      "title": "Saturn: Facts",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/saturn/facts/"
+     "url": "https://science.nasa.gov/saturn/facts/",
+     "apa": "NASA Science. (n.d.). <i>Saturn: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/saturn/facts/"
     }
    ]
   },
@@ -1379,7 +1439,8 @@
      "cite": "NASA Science",
      "title": "Uranus: Facts",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/uranus/facts/"
+     "url": "https://science.nasa.gov/uranus/facts/",
+     "apa": "NASA Science. (n.d.). <i>Uranus: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/uranus/facts/"
     }
    ]
   },
@@ -1396,7 +1457,8 @@
      "cite": "NASA Science",
      "title": "Neptune: Facts",
      "journal": "NASA Science",
-     "url": "https://science.nasa.gov/neptune/facts/"
+     "url": "https://science.nasa.gov/neptune/facts/",
+     "apa": "NASA Science. (n.d.). <i>Neptune: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/neptune/facts/"
     }
    ]
   },

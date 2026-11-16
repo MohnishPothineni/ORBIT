@@ -152,7 +152,7 @@
   /* Evidence library entries (ui/research-library.js) that match what the user said, for the online agent.
      The local assistant searches the same entries on its server (server/orbit_server/store.py). */
   function evidenceMatches(text,limit=3){
-    try{return typeof ResearchLibrary==='undefined'?[]:ResearchLibrary.rank(text,limit).filter(e=>e.score>=0.5).map(e=>({title:e.title,topic:e.topicTitle,evidence:ResearchLibrary.EVIDENCE[e.evidence],text:e.text,tracking_guidance:e.watch,sources:e.sources.map(id=>{const s=ResearchLibrary.SOURCES[id];return {cite:s.cite,title:s.title,journal:s.journal,url:s.url};})}));}catch{return [];}
+    try{return typeof ResearchLibrary==='undefined'?[]:ResearchLibrary.rank(text,limit).filter(e=>e.score>=0.5).map(e=>({title:e.title,topic:e.topicTitle,evidence:ResearchLibrary.EVIDENCE[e.evidence],text:e.text,tracking_guidance:e.watch,sources:e.sources.map(id=>{const s=ResearchLibrary.SOURCES[id];return {cite:s.cite,title:s.title,journal:s.journal,url:s.url,...(s.apa?{apa_reference:s.apa.replace(/<\/?i>/g,'')}:{})};})}));}catch{return [];}
   }
   /* A topic named in the request ("Hostile Environments"), with every entry title, so the agent can list it. */
   function evidenceTopics(text){

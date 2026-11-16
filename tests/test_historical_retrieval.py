@@ -12,7 +12,8 @@ store_class = next(n for n in tree.body if isinstance(n, ast.ClassDef))
 search = next(n for n in store_class.body if isinstance(n, ast.FunctionDef) and n.name == 'search_evidence')
 stem = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == '_stem')
 namespace = {'re': re, '_WORD': re.compile(r'[a-z0-9]+'), 'Any': object}
-exec(compile(ast.fix_missing_locations(ast.Module(body=[stem, search], type_ignores=[])), '<actual store search>', 'exec'), namespace)
+missions = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == '_missions')
+exec(compile(ast.fix_missing_locations(ast.Module(body=[stem, missions, search], type_ignores=[])), '<actual store search>', 'exec'), namespace)
 
 class HistoricalRetrieval(unittest.TestCase):
     def setUp(self):
