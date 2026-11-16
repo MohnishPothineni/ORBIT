@@ -18,13 +18,13 @@ const CollectionPlayer=(()=>{
       <img class="cl-poster" src="${rootURL+m.id}.webp" alt="${m.title} on the 3D crew demonstration model" decoding="async">
       <div class="cl-stage-status"><span class="cl-sim-dot"></span><span data-mode-label>Simulation</span></div>${model}
       <div class="cl-player"><button type="button" data-play aria-label="Play ${m.title} animation" aria-pressed="false">${playIcon}<span>Play 3D</span></button>
-      <div class="cl-track" aria-hidden="true"><span></span></div><span class="cl-time">${formatTime(m.seconds)}</span><output class="cl-rate" title="60 frames per second source" aria-label="Animation frame rate" aria-live="off">60 fps</output><button type="button" class="cl-fullscreen" data-fullscreen aria-label="Full screen ${m.title} animation" title="Full screen">${expandIcon}</button></div>
+      <div class="cl-track" aria-hidden="true"><span></span></div><span class="cl-time">${formatTime(m.seconds)}</span><button type="button" class="cl-fullscreen" data-fullscreen aria-label="Full screen ${m.title} animation" title="Full screen">${expandIcon}</button></div>
       <span class="cl-player-notice" role="status" hidden></span></div>`;
   }
   function bind(root,signal){
     const players=[...root.querySelectorAll('[data-scene]')].map(el=>({el,m:CollectionMethods.byId[el.dataset.scene],video:el.querySelector('video'),
-      button:el.querySelector('[data-play]'),track:el.querySelector('.cl-track span'),time:el.querySelector('.cl-time'),rate:el.querySelector('.cl-rate'),notice:el.querySelector('.cl-player-notice'),
-      poster:true,phase:-1,seconds:0,seek:null,firstFrame:null,serial:0,callback:0,controller:null}));
+      button:el.querySelector('[data-play]'),track:el.querySelector('.cl-track span'),time:el.querySelector('.cl-time'),notice:el.querySelector('.cl-player-notice'),
+      poster:true,phase:-1,seconds:0,seek:null,serial:0,callback:0,controller:null}));
     if(!players.length)return ()=>{};
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');let active=null,trigger='';
     const listen=(el,ev,fn)=>el.addEventListener(ev,fn,{signal});
@@ -55,25 +55,13 @@ const CollectionPlayer=(()=>{
     }
     function cancelClock(p){
       if(p.video.cancelVideoFrameCallback)p.video.cancelVideoFrameCallback(p.callback);else cancelAnimationFrame(p.callback);
-      p.callback=0;p.firstFrame=null;
+      p.callback=0;
     }
     function clock(p){
       cancelClock(p);
       function update(now,meta){
         if(active!==p||signal.aborted||p.video.paused)return;
         const sec=meta?.mediaTime??p.video.currentTime;sync(p,sec);p.el.classList.add('cl-show-video');
-        const q=p.video.getVideoPlaybackQuality?.();
-        const frames=meta?.presentedFrames??(q?q.totalVideoFrames-q.droppedVideoFrames:null);
-        if(frames!=null){
-          now=meta?.expectedDisplayTime??now;
-          if(!p.firstFrame)p.firstFrame={now,frames};
-          const elapsed=now-p.firstFrame.now;
-          if(elapsed>=1500){
-            const measured=Math.round((frames-p.firstFrame.frames)*1000/elapsed);
-            p.rate.textContent=measured+' fps';p.rate.title='60 fps source · '+measured+' fps presented'+(q?' · '+q.droppedVideoFrames+(q.droppedVideoFrames===1?' frame dropped':' frames dropped'):'');
-            p.firstFrame={now,frames};
-          }
-        }
         schedule();
       }
       function schedule(){p.callback=p.video.requestVideoFrameCallback?p.video.requestVideoFrameCallback(update):requestAnimationFrame(update);}
@@ -83,7 +71,7 @@ const CollectionPlayer=(()=>{
       if(!p)return;
       p.serial++;cancelClock(p);p.video.pause();if(active===p){active=null;trigger='';}
       if(reset){p.poster=true;p.seek=null;p.el.classList.remove('cl-show-video');sync(p,0);}
-      p.rate.textContent='60 fps';p.rate.title='60 frames per second source';button(p,false);
+      button(p,false);
     }
     async function play(p,reason){
       if(p.controller||document.hidden||active===p||(reason==='hover'&&reduced.matches))return;

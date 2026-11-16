@@ -70,7 +70,7 @@
 .cl-visual>video,.cl-poster{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
 .cl-poster{z-index:1}.cl-show-video>.cl-poster{visibility:hidden}
 .cl-stage-status,.cl-player{z-index:3}.cl-stage-status{pointer-events:none}
-.cl-rate{padding-left:8px;border-left:1px solid #697c8d;color:#c7dce7;font:500 10px/1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:6ch}
+
 .cl-model-toggle,.cl-model-tools button{border:1px solid #728b9d;background:#112634ec;color:#edf5f9;cursor:pointer;font:550 11px/1.25 var(--sans);border-radius:5px;padding:6px 9px}
 .cl-model-toggle{position:absolute;z-index:5;top:9px;right:10px}.cl-model-toggle:hover,.cl-model-tools button:hover{background:#274557}
 .cl-model-stage{position:absolute;inset:0;z-index:2;background:radial-gradient(ellipse at 48% 43%,#274455,#0d202f 83%)}
@@ -103,5 +103,5 @@
 .cl-fullscreen-on .cl-player{padding:28px 24px 18px;gap:14px}
 .cl-fullscreen-on .cl-player button{min-height:40px;padding-inline:12px;font-size:13px}
 .cl-fullscreen-on .cl-player button svg{width:16px;height:16px}
-.cl-fullscreen-on .cl-time,.cl-fullscreen-on .cl-rate{font-size:13px}
+.cl-fullscreen-on .cl-time{font-size:13px}
 .cl-fullscreen-on .cl-stage-status{top:20px;left:20px}
