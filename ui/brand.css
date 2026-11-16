@@ -70,3 +70,8 @@ input, textarea { caret-color: var(--orbit-cyan-ink); }
 #assistant-panel .companion-avatar-choice { margin-top: 4px; }
 #assistant-panel .companion-connect { padding: 22px 0 10px; }
 #assistant-panel .assistant-empty { padding-top: 18px; }
+
+/* Buttons and headings use title case: every word starts with a capital.
+   Descriptions inside buttons (small print, paragraphs) keep their normal case. */
+h1, h2, h3, h4, h5, h6, button, .button, summary, [role=tab], legend, .main-nav a .nav-copy strong, a.text-button, a.cl-open, #header-page { text-transform: capitalize; }
+:is(button, .button, summary, [role=tab], a.text-button) :is(small, p, .small-sub) { text-transform: none; }
