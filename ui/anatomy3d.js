@@ -110,7 +110,7 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
  const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);
  function regionParts(c){return atlas.parts.filter(p=>layerFor(p)&&isRegion(p,c.region));}
  function updateMaterials(){
-  if(shinIllustration && (studyModel || !visibleLayers.skeleton || !isolation?.has(shinIllustration.partId) || !selectionIds.has(shinIllustration.partId) || hiddenIds.has(shinIllustration.partId)))clearShinIllustration();
+  if(shinIllustration && (studyModel || !visibleLayers.skeleton || (isolation&&!isolation.has(shinIllustration.partId)) || !selectionIds.has(shinIllustration.partId) || hiddenIds.has(shinIllustration.partId)))clearShinIllustration();
   if(hasOrganLayers(visibleLayers))skeletalLayers.forEach(id=>visibleLayers[id]=true);stage.dataset.skeletalContext=String(!studyModel&&hasOrganLayers(visibleLayers));group.visible=!studyModel;studio.visible=false;if(studyModel){studyModel.group.traverse(m=>{if(m.isMesh&&!m.userData.studyEntry)m.visible=!isolation;});for(const [id,list]of studyModel.parts)for(const m of list){m.visible=!hiddenIds.has(id)&&(!isolation||isolation.has(id));if(!m.userData.baseColor)m.userData.baseColor=m.material.color.clone();m.material.color.copy(m.userData.baseColor);m.material.emissive.setHex(selectionIds.has(id)?0x253b46:0);if(selectionIds.has(id))m.material.color.setHex(0x8fc5da);}updateCounts();requestRender();return;}for(const [id,m]of meshes){const p=m.userData.part,layer=layerFor(p),matches=conditions.filter(c=>isRegion(p,c.region));let color=baseColors[layer]||baseColors[p.system]||0xaab7c3,emissive=0x000000;
   if(layer==='organs')color=baseColors[p.system]||0xb9a68e;
   if(matches.length){color=0xd4ad70;emissive=matches.some(c=>c.id===activeCondition)?0x5b3610:0x221609;}
@@ -213,9 +213,10 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
   if(!bonePart||!skinPart)return {status:'unavailable',message:'The atlas is missing the left tibia or skin.'};
   clearReportedConcern(false);pause();motion='none';motionPhase=0;explodeAmount=0;applyPose();
   returnToBody(false);selectedId=null;
-  for(const id in baseColors){visibleLayers[id]=id==='skeleton';opacity[id]=1;}
-  await selectStructure(bone.id,{focus:true,isolate:true});
-  const stillSelected=()=>current()&&!studyModel&&isolation?.has(bonePart.id)&&selectionIds.has(bonePart.id)&&visibleLayers.skeleton&&!hiddenIds.has(bonePart.id);
+  // Show the laceration in context: keep the layers in view (skeleton always on) and select the tibia without isolating it.
+  isolation=null;hiddenIds.delete(bonePart.id);if(!visibleLayers.skeleton){visibleLayers.skeleton=true;}opacity.skeleton=1;updateMaterials();await loadLayer('skeleton');
+  await selectStructure(bone.id,{focus:false,isolate:false});
+  const stillSelected=()=>current()&&!studyModel&&(!isolation||isolation.has(bonePart.id))&&selectionIds.has(bonePart.id)&&visibleLayers.skeleton&&!hiddenIds.has(bonePart.id);
   if(!stillSelected())return cancelled();
   setView('front');
   stage.scrollIntoView?.({block:'center'});
@@ -238,7 +239,7 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
    shinIllustration={overlay,legend,partId:bonePart.id};
    stage.dataset.shinIllustration='left-tibia-laceration';
    requestRender();onStateChange(getState());
-   return {status:'applied',message:'Anatomy Lab shows the left tibia with an illustrated laceration on the overlying skin.',page:'anatomy',bone:bone.name,part_id:bonePart.id,illustration:'skin_laceration'};
+   return {status:'applied',message:'Anatomy Lab shows the full model with the left tibia selected and an illustrated laceration on the overlying skin.',page:'anatomy',bone:bone.name,part_id:bonePart.id,illustration:'skin_laceration'};
   }catch{
    return current()?{status:'unavailable',message:'The left tibia is in view, but the skin illustration could not be loaded. Try the tool again.'}:cancelled();
   }
