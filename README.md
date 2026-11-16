@@ -47,6 +47,8 @@ The backend (Python, FastAPI, Uvicorn, Pipecat) serves the built frontend and `/
 
 FastAPI + Pipecat, all on this machine. It implements the React voice workspace?s `/api/*` routes and serves `dist/` after `npm run build`.
 
+For a step-by-step guide to setting up and running the offline voice assistant (Ollama, Whisper speech to text, Kokoro text to speech), see [docs/OFFLINE-ASSISTANT.md](docs/OFFLINE-ASSISTANT.md).
+
 **One-time setup**
 
 1. Install [Ollama](https://ollama.com) and pull the model: `ollama pull qwen3:8b`
