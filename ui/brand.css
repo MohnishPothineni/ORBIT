@@ -85,3 +85,7 @@ h1, h2, h3, h4, h5, h6, button, .button, summary, [role=tab], legend, .main-nav 
 .settings-viewer span { font-size: 12px; color: var(--muted); }
 .settings-viewer strong { font-size: 14px; color: var(--ink); }
 .settings-viewer small { font-size: 11px; color: var(--muted); }
+
+/* A faint "SI" mark set like a trademark beside the wordmark: easy to miss, there if you look. */
+.sidebar .brand { position: relative; }
+.si-mark { position: absolute; top: 19px; left: 185px; font: 600 6px/1 var(--sans); letter-spacing: .06em; color: var(--orbit-navy, #0f2345); opacity: .22; pointer-events: none; user-select: none; text-transform: none; }
