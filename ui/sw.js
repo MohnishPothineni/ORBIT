@@ -1,5 +1,5 @@
 /* Caches public application assets only. Medical records remain in localStorage. */
-const CACHE = 'orbit-assets-shared-design-v87';
+const CACHE = 'orbit-assets-shared-design-v87-tibia-lac1';
 const SHELL = [
   './', './index.html', './studio.css', './assistant-dock.css', './doctor-appearance.mjs', './doctor-materials.js', './assets/avatar/skin-microdetail.png', './style.css', './brand.css', './assets/brand/orbit-logo-sidebar.png', './assets/brand/orbit-mark-32.png', './assets/brand/orbit-mark-180.png', './crew.css', './anatomy-lab.css', './anatomy-workspace.css', './voice.css', './voice.js', './care.css', './theme-scale.css', './design-tokens.css', './theme.css', './mission.css', './touch.css', './trends.css',
 
@@ -11,7 +11,7 @@ const SHELL = [
   './models/doctor/space-doctor.glb', './models/doctor/ATTRIBUTION.md', './models/doctor/VALID-LICENSE.txt',
   './condition-anatomy.js', './condition-reference.js', './condition-panel.js', './bone-report-index.js', './anatomy-conditions.mjs', './models/condition-reference.json', './assistant.js', './assistant-actions.js', './assistant-features.js', './assistant-permissions.js', './assistant-bridge.js', './assistant.css', './workspace.css', './workspace-layout.css', './workspace.js', './vendor/elevenlabs-client.js', './vendor/ELEVENLABS-NOTICES.txt',
   './health-inputs.js', './health-inputs.css', './input-logic.js', './observation-store.js', './state-logic.js', './access-logic.js', './pdf-logic.js', './mission-logic.js', './skin-logic.js', './research-library.js', './assets/ALL_NUMERIC_METRICS_LONG.csv', './hrp-reference.js', './hrp-links.js', './mission.js', './skin.js',    './onboard-assistant.js', './onboard-assistant.css',
-  './anatomy-details.js', './anatomy3d.js', './software3d.js', './anatomy-logic.mjs', './manifest.webmanifest',
+  './anatomy-details.js', './anatomy3d.js', './left-tibia-laceration.mjs', './software3d.js', './anatomy-logic.mjs', './manifest.webmanifest',
   './vendor/three.module.min.js', './vendor/OrbitControls.js', './vendor/THREE-LICENSE.txt',
   './models/expanded-atlas.json', './models/anatomy-studies.json', './models/ANATOMY_SOURCES.md', './models/Z-ANATOMY-LICENSE.txt', './models/Z-ANATOMY-CREDITS.md', './models/atlas.json', './models/catalog.json', './models/bones-206.csv', './models/ATTRIBUTION.txt',
   './assets/earth-orbit.jpg', './assets/orbit.svg', './assets/fonts.css',

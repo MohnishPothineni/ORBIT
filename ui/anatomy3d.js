@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createShinOverlay } from './left-tibia-laceration.mjs';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { SoftwareAnatomyRenderer } from './software3d.js';
 import { leftForearmBoneIds, cacheUntilFailure, skeletalLayers, hasOrganLayers, withSkeletonContext, isSkeletalContext, structureIsVisible } from './anatomy-logic.mjs';
@@ -57,9 +58,10 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
  let alive=true,frame=null,atlas,selectedId=null,activeCondition=null,visibleLayers={skeleton:true,cartilage:true,dental:true};
  const opacity={},selectionIds=new Set(),hiddenIds=new Set();let elbowBoneIds=new Set();let catalog,isolation=null,regionFocus='all',explodeAmount=0,motion='none',motionPhase=0,motionTimer=null;const flowParticles=[];let flowCurve=null;
  const meshes=new Map(),materialList=[],markerNodes=new Map(),requestedLayers=new Map(),loadingLayers=new Set(),rays=new THREE.Raycaster(),pointer=new THREE.Vector2();
+ let shinIllustration=null;
  const labelNode=document.createElement('div');labelNode.className='anatomy-part-label';labelNode.hidden=true;stage.appendChild(labelNode);
  const fullBox=new THREE.Box3(new THREE.Vector3(-.6,0,-.25),new THREE.Vector3(.6,1.75,.25));
- function reportSelection(title,meta,label='SELECTED STRUCTURE'){if(!alive)return;selectedName.textContent=title;selectedMeta.textContent=meta;selectedLabel.textContent=label;}
+ function reportSelection(title,meta,label='SELECTED STRUCTURE'){if(!alive)return;clearShinIllustration();selectedName.textContent=title;selectedMeta.textContent=meta;selectedLabel.textContent=label;}
  /* Smooth camera motion. Drawing ~1,800 parts one by one is too slow to rotate at 60 fps on
     integrated graphics, so a merged copy of the visible body (a few draw calls) is drawn while
     the camera moves. It is rebuilt in the background after anything else changes; the full
@@ -101,13 +103,15 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
  }
  function requestRender(cameraOnly=false){if(cameraOnly!==true){bodyVersion++;scheduleFastBody();}if(!alive||frame!==null)return;frame=requestAnimationFrame(()=>{frame=null;if(!alive)return;controls.update();
   const key=cameraKey(),moved=key!==lastCamera;lastCamera=key;if(moved&&interacting)movedThisDrag=true;
-  const fast=(moved||(interacting&&movedThisDrag))&&!studyModel&&!motionTimer&&fastVersion===bodyVersion&&fastBody.children.length>0;
+  const fast=(moved||(interacting&&movedThisDrag))&&!studyModel&&!motionTimer&&!shinIllustration&&fastVersion===bodyVersion&&fastBody.children.length>0;
   fastBody.visible=fast;group.visible=fast?false:!studyModel;
   renderer.render(scene,camera);if(fast)requestRender(true);stage.dataset.frameRendered='true';updateMarkers();updatePartLabel();});}
  function resize(){if(!alive||!host.isConnected)return;const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(atlas&&stage.dataset.frameRendered)focusBox(currentBox());else requestRender(true);}
  const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);
  function regionParts(c){return atlas.parts.filter(p=>layerFor(p)&&isRegion(p,c.region));}
- function updateMaterials(){if(hasOrganLayers(visibleLayers))skeletalLayers.forEach(id=>visibleLayers[id]=true);stage.dataset.skeletalContext=String(!studyModel&&hasOrganLayers(visibleLayers));group.visible=!studyModel;studio.visible=false;if(studyModel){studyModel.group.traverse(m=>{if(m.isMesh&&!m.userData.studyEntry)m.visible=!isolation;});for(const [id,list]of studyModel.parts)for(const m of list){m.visible=!hiddenIds.has(id)&&(!isolation||isolation.has(id));if(!m.userData.baseColor)m.userData.baseColor=m.material.color.clone();m.material.color.copy(m.userData.baseColor);m.material.emissive.setHex(selectionIds.has(id)?0x253b46:0);if(selectionIds.has(id))m.material.color.setHex(0x8fc5da);}updateCounts();requestRender();return;}for(const [id,m]of meshes){const p=m.userData.part,layer=layerFor(p),matches=conditions.filter(c=>isRegion(p,c.region));let color=baseColors[layer]||baseColors[p.system]||0xaab7c3,emissive=0x000000;
+ function updateMaterials(){
+  if(shinIllustration && (studyModel || !visibleLayers.skeleton || !isolation?.has(shinIllustration.partId) || !selectionIds.has(shinIllustration.partId) || hiddenIds.has(shinIllustration.partId)))clearShinIllustration();
+  if(hasOrganLayers(visibleLayers))skeletalLayers.forEach(id=>visibleLayers[id]=true);stage.dataset.skeletalContext=String(!studyModel&&hasOrganLayers(visibleLayers));group.visible=!studyModel;studio.visible=false;if(studyModel){studyModel.group.traverse(m=>{if(m.isMesh&&!m.userData.studyEntry)m.visible=!isolation;});for(const [id,list]of studyModel.parts)for(const m of list){m.visible=!hiddenIds.has(id)&&(!isolation||isolation.has(id));if(!m.userData.baseColor)m.userData.baseColor=m.material.color.clone();m.material.color.copy(m.userData.baseColor);m.material.emissive.setHex(selectionIds.has(id)?0x253b46:0);if(selectionIds.has(id))m.material.color.setHex(0x8fc5da);}updateCounts();requestRender();return;}for(const [id,m]of meshes){const p=m.userData.part,layer=layerFor(p),matches=conditions.filter(c=>isRegion(p,c.region));let color=baseColors[layer]||baseColors[p.system]||0xaab7c3,emissive=0x000000;
   if(layer==='organs')color=baseColors[p.system]||0xb9a68e;
   if(matches.length){color=0xd4ad70;emissive=matches.some(c=>c.id===activeCondition)?0x5b3610:0x221609;}
   if(id===selectedId||selectionIds.has(id)){color=0x7caed0;emissive=0x132a41;}if(reportIds.has(id)){const fracture=reportHighlight?.concerns.some(c=>c.visual==='fracture'&&c.partIds.includes(id));color=fracture?0xe8ddc6:0xeea66a;emissive=fracture?0x080500:0x47200d;}
@@ -136,9 +140,9 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
  function keyDown(e){if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();const spherical=new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target));if(e.key==='ArrowLeft')spherical.theta-=.13;if(e.key==='ArrowRight')spherical.theta+=.13;if(e.key==='ArrowUp')spherical.phi-=.1;if(e.key==='ArrowDown')spherical.phi+=.1;spherical.makeSafe();camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(spherical));controls.update();requestRender(true);}if(['+','='].includes(e.key)){e.preventDefault();zoom('in');}if(e.key==='-'){e.preventDefault();zoom('out');}}
  canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('keydown',keyDown);canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();status.textContent='3D CONTEXT LOST / RELOAD VIEW';});
  controls.addEventListener('change',()=>requestRender(true));controls.addEventListener('start',()=>{interacting=true;movedThisDrag=false;clearTimeout(fastTimer);});controls.addEventListener('end',()=>{interacting=false;requestRender(true);if(fastVersion!==bodyVersion)scheduleFastBody();});
- function destroy(){if(!alive)return;clearTimeout(fastTimer);for(const old of [...fastBody.children]){old.geometry.dispose();old.material.dispose();}reportEpoch++;for(const mark of reportMarkers)mark.node.remove();stage.querySelector('#anatomy-report-summary')?.replaceChildren();pause();conditionEffects?.dispose();conditionEffects=null;document.removeEventListener('visibilitychange',pauseWhenHidden);reducedMotion.removeEventListener('change',pauseForReducedMotion);alive=false;if(frame!==null)cancelAnimationFrame(frame);resizeObserver.disconnect();controls.dispose();if(studyModel)studyModel.dispose();labelNode.remove();studio.traverse(m=>{if(m.isMesh){m.geometry.dispose();m.material.dispose();}});for(const m of materialList)m.dispose();grid.geometry.dispose();grid.material.dispose();for(const m of flowParticles){m.geometry.dispose();m.material.dispose();}renderer.dispose();canvas.remove();for(const mark of markerNodes.values())mark.node.remove();}
+ function destroy(){if(!alive)return;clearShinIllustration();clearTimeout(fastTimer);for(const old of [...fastBody.children]){old.geometry.dispose();old.material.dispose();}reportEpoch++;for(const mark of reportMarkers)mark.node.remove();stage.querySelector('#anatomy-report-summary')?.replaceChildren();pause();conditionEffects?.dispose();conditionEffects=null;document.removeEventListener('visibilitychange',pauseWhenHidden);reducedMotion.removeEventListener('change',pauseForReducedMotion);alive=false;if(frame!==null)cancelAnimationFrame(frame);resizeObserver.disconnect();controls.dispose();if(studyModel)studyModel.dispose();labelNode.remove();studio.traverse(m=>{if(m.isMesh){m.geometry.dispose();m.material.dispose();}});for(const m of materialList)m.dispose();grid.geometry.dispose();grid.material.dispose();for(const m of flowParticles){m.geometry.dispose();m.material.dispose();}renderer.dispose();canvas.remove();for(const mark of markerNodes.values())mark.node.remove();}
 
- function getState(){return {skeletalContext:!studyModel&&hasOrganLayers(visibleLayers),visibleLayers:{...visibleLayers},opacities:{...opacity},selectedIds:[...selectionIds],hiddenCount:hiddenIds.size,region:regionFocus,isolated:!!isolation,loaded:meshes.size,total:atlas?.parts.length||3237,studyModule:studyModel?.moduleId||null,studyTopic:studyTopic?.id||null,theme:viewTheme,labels:showLabels,sectionAxis,sectionLevel,reportedConcern:reportHighlight?{label:reportHighlight.label,concerns:reportHighlight.concerns,partIds:[...reportIds]}:null,conditionIllustrations:conditionEffects?.descriptions||[],loading:[...loadingLayers],motion,phase:motionPhase,playing:!!motionTimer,explode:explodeAmount};}
+ function getState(){return {leftTibiaLacerationVisible:!!shinIllustration,skeletalContext:!studyModel&&hasOrganLayers(visibleLayers),visibleLayers:{...visibleLayers},opacities:{...opacity},selectedIds:[...selectionIds],hiddenCount:hiddenIds.size,region:regionFocus,isolated:!!isolation,loaded:meshes.size,total:atlas?.parts.length||3237,studyModule:studyModel?.moduleId||null,studyTopic:studyTopic?.id||null,theme:viewTheme,labels:showLabels,sectionAxis,sectionLevel,reportedConcern:reportHighlight?{label:reportHighlight.label,concerns:reportHighlight.concerns,partIds:[...reportIds]}:null,conditionIllustrations:conditionEffects?.descriptions||[],loading:[...loadingLayers],motion,phase:motionPhase,playing:!!motionTimer,explode:explodeAmount};}
  function inRegion(p){if(regionFocus==='all'||!catalog)return true;const r=catalog.regions.find(r=>r.id===regionFocus);if(!r)return true;const [a,b]=r.bounds,[min,max]=p.bounds;if(regionFocus==='upper'&&min[0]>-.15&&max[0]<.15)return false;return min.every((n,i)=>n<=b[i]&&max[i]>=a[i]);}
  async function setSystems(ids){if(studyModel)returnToBody(false);const chosen=new Set(withSkeletonContext(ids));for(const id of Object.keys(baseColors))visibleLayers[id]=chosen.has(id);isolation=null;hiddenIds.clear();updateMaterials();await Promise.all([...chosen].filter(id=>id in baseColors).map(loadLayer));updateMaterials();}
  function setOpacity(id,value){if(!(id in baseColors))return;opacity[id]=THREE.MathUtils.clamp(Number(value),.03,1);updateMaterials();}
@@ -152,7 +156,7 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
   studyModel=buildStudyModel(id,entries,{topic:studyTopic?.title||(id==='kidney'?'Nephron':id)});scene.add(studyModel.group);group.visible=false;studio.visible=false;studyModel.group.traverse(m=>{if(m.isMesh)m.material.clippingPlanes=activeClipPlanes();});const module=catalog.study.modules.find(m=>m.id===id);selectedStudy=null;reportSelection(studyTopic?.title||module.name,'Original 3D teaching model · Not to scale','SCHEMATIC DETAIL');updateMaterials();setSection('off',.5);setView('iso');if(entityId)selectStudyPart(catalog.study.entities.find(e=>e.id===entityId));else onSelect({parts:[],module:id,topic:studyTopic,entries:entries.map(e=>e.id)});return getState();}
  async function showStudyTopic(id){const topic=catalog.study.topics.find(t=>t.id===id);if(!topic)return;const entries=catalog.study.entities.filter(e=>topic.entities.includes(e.id)),sourceIds=[...new Set(entries.flatMap(e=>e.sourceIds))];if(sourceIds.length){studyTopic=topic;await selectSource(sourceIds,topic.title,{isolate:true});studyTopic=topic;onSelect({parts:sourceIds.map(id=>catalog.parts.find(p=>p.id===id)),topic});onStateChange(getState());}else showStudyModule(topic.module,null,id);}
  function activeClipPlanes(){if(sectionAxis==='off')return [];const box=studyModel?.bounds||fullBox,axis={sagittal:'x',coronal:'z',axial:'y'}[sectionAxis]||'x',normal=new THREE.Vector3();normal[axis]=-1;return [new THREE.Plane(normal,box.min[axis]+(box.max[axis]-box.min[axis])*sectionLevel)];}
- function setSection(axis,level=.5){sectionAxis=['sagittal','coronal','axial'].includes(axis)?axis:'off';sectionLevel=THREE.MathUtils.clamp(Number(level),0,1);const planes=activeClipPlanes();for(const m of meshes.values())m.material.clippingPlanes=planes;if(studyModel)studyModel.group.traverse(m=>{if(m.isMesh)m.material.clippingPlanes=planes;});if(conditionEffects)conditionEffects.group.traverse(m=>{if(m.isMesh)m.material.clippingPlanes=planes;});requestRender();onStateChange(getState());}
+ function setSection(axis,level=.5){if(axis!=='off')clearShinIllustration();sectionAxis=['sagittal','coronal','axial'].includes(axis)?axis:'off';sectionLevel=THREE.MathUtils.clamp(Number(level),0,1);const planes=activeClipPlanes();for(const m of meshes.values())m.material.clippingPlanes=planes;if(studyModel)studyModel.group.traverse(m=>{if(m.isMesh)m.material.clippingPlanes=planes;});if(conditionEffects)conditionEffects.group.traverse(m=>{if(m.isMesh)m.material.clippingPlanes=planes;});requestRender();onStateChange(getState());}
  function setEnvironment(theme){viewTheme=theme==='clinical'?'clinical':'studio';renderer.setClearColor(0x000000,0);key.intensity=viewTheme==='clinical'?2.7:2.1;fill.intensity=viewTheme==='clinical'?1.6:2.2;stage.dataset.theme=viewTheme;requestRender();onStateChange(getState());}
  function toggleLabels(){showLabels=!showLabels;requestRender();onStateChange(getState());}
  function paintReportedConcern(){
@@ -190,6 +194,55 @@ export async function mountAnatomy({host,stage,conditions=[],onStateChange=()=>{
  function pauseWhenHidden(){if(document.hidden)pause();}
  function pauseForReducedMotion(event){if(event.matches)pause();}
  document.addEventListener('visibilitychange',pauseWhenHidden);reducedMotion.addEventListener('change',pauseForReducedMotion);
- const controller={highlightReportedConcern,clearReportedConcern,focusReportedConcern,showStudyModule,showStudyTopic,returnToBody,setSection,setEnvironment,toggleLabels,destroy,setLayer,setView,zoom,highlightCondition,findStructure,getState,getCatalog:()=>catalog,setSystems,isolateLayer:id=>{regionFocus='all';return setSystems([id]);},setOpacity,setRegion,selectStructure,hideSelected,isolateSelected,restore,peel,setExplode,setMotion,scrub,play,pause};
+ function clearShinIllustration(){
+  if(!shinIllustration)return;
+  shinIllustration.overlay.dispose();
+  shinIllustration.legend.remove();
+  shinIllustration=null;
+  delete stage.dataset.shinIllustration;
+  requestRender();
+ }
+ async function showLeftTibiaLaceration(isCurrent){
+  const current=()=>alive&&host.isConnected&&isCurrent();
+  const cancelled=()=>({status:'cancelled',message:'The view or conversation changed.'});
+  if(!current())return cancelled();
+  if(shinIllustration){setView('front');return {status:'applied',message:'The left tibia and its skin laceration illustration are in view.',page:'anatomy',bone:'Left tibia',illustration:'skin_laceration'};}
+  const bone=catalog.bones.find(b=>b.name==='Left tibia'&&b.side==='Left');
+  const bonePart=bone?.meshIds.map(id=>catalog.parts.find(p=>p.id===id)).find(p=>p?.name==='Left tibia');
+  const skinPart=catalog.parts.find(p=>p.name==='Skin'&&p.layer==='integumentary');
+  if(!bonePart||!skinPart)return {status:'unavailable',message:'The atlas is missing the left tibia or skin.'};
+  clearReportedConcern(false);pause();motion='none';motionPhase=0;explodeAmount=0;applyPose();
+  returnToBody(false);selectedId=null;
+  for(const id in baseColors){visibleLayers[id]=id==='skeleton';opacity[id]=1;}
+  await selectStructure(bone.id,{focus:true,isolate:true});
+  const stillSelected=()=>current()&&!studyModel&&isolation?.has(bonePart.id)&&selectionIds.has(bonePart.id)&&visibleLayers.skeleton&&!hiddenIds.has(bonePart.id);
+  if(!stillSelected())return cancelled();
+  setView('front');
+  stage.scrollIntoView?.({block:'center'});
+  // Let the isolated tibia appear before the surface illustration is revealed.
+  try{
+   await Promise.all([loadLayer(skinPart.layer),new Promise(resolve=>setTimeout(resolve,420))]);
+   if(!stillSelected())return cancelled();
+   const target=meshes.get(bonePart.id),skin=meshes.get(skinPart.id);
+   if(!target||!skin)throw new Error('Missing atlas surface');
+   const overlay=createShinOverlay(target,skin);
+   const legend=document.createElement('aside');
+   legend.className='shin-illustration-legend';
+   const caption=document.createElement('span');
+   caption.textContent='Skin laceration · left shin';
+   const remove=document.createElement('button');
+   remove.type='button';remove.textContent='Clear';remove.setAttribute('aria-label','Clear left shin laceration illustration');
+   remove.addEventListener('click',()=>{clearShinIllustration();onStateChange(getState());});
+   legend.append(caption,remove);stage.appendChild(legend);
+   target.add(overlay.group);
+   shinIllustration={overlay,legend,partId:bonePart.id};
+   stage.dataset.shinIllustration='left-tibia-laceration';
+   requestRender();onStateChange(getState());
+   return {status:'applied',message:'Anatomy Lab shows the left tibia with an illustrated laceration on the overlying skin.',page:'anatomy',bone:bone.name,part_id:bonePart.id,illustration:'skin_laceration'};
+  }catch{
+   return current()?{status:'unavailable',message:'The left tibia is in view, but the skin illustration could not be loaded. Try the tool again.'}:cancelled();
+  }
+ }
+ const controller={showLeftTibiaLaceration,highlightReportedConcern,clearReportedConcern,focusReportedConcern,showStudyModule,showStudyTopic,returnToBody,setSection,setEnvironment,toggleLabels,destroy,setLayer,setView,zoom,highlightCondition,findStructure,getState,getCatalog:()=>catalog,setSystems,isolateLayer:id=>{regionFocus='all';return setSystems([id]);},setOpacity,setRegion,selectStructure,hideSelected,isolateSelected,restore,peel,setExplode,setMotion,scrub,play,pause};
  try{({atlas,catalog}=await loadData());const tags=new Map(catalog.parts.map(p=>[p.id,p]));for(const p of atlas.parts){p.layer=tags.get(p.id).layer;p.boneId=tags.get(p.id).boneId;}elbowBoneIds=leftForearmBoneIds(catalog);for(const id in baseColors){visibleLayers[id]=['skeleton','cartilage','dental'].includes(id);opacity[id]=1;}if(!alive||!host.isConnected){destroy();return controller;}resize();await Promise.all(['skeleton','cartilage','dental'].map(loadLayer));if(!alive||!host.isConnected){destroy();return controller;}createMarkers();applyPose();updateMaterials();updateCounts();loading.classList.add('hidden');resize();setView('front');requestRender();return controller;}catch(e){destroy();throw e;}
 }

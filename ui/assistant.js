@@ -480,6 +480,23 @@
       if(!form){const opened=await performFeature({kind:'feature',feature:spec.feature},{check,source});if(!check())return siteReply('cancelled','The crew changed.');form=editForm(action.form);if(!form)return opened;}
       try{const fields=OrbitAssistantFeatures.draftInto(form,action);form.scrollIntoView({block:'start'});if(action.commit&&source==='user')return submitSiteForm(form,{check});return siteReply('draft_ready','The form draft is updated. Review the entered values and choose its Save button. Nothing was saved or shared.',{form:action.form,fields});}catch(error){return siteReply('review_required',error.message);}
     }
+    if(action.kind==='tibia-laceration'){
+      if(permissions.describe())return siteReply('review_pending','Finish the open review first.');
+      await navigateSite('anatomy');
+      const current=()=>check()&&currentPage()==='anatomy'&&!el('consent').open&&!permissions.describe()&&!dirtyForm();
+      const until=Date.now()+15000;
+      while(current()&&!crewViewer&&Date.now()<until)await new Promise(resolve=>setTimeout(resolve,80));
+      if(!current())return siteReply('cancelled','The view or conversation changed.');
+      const viewer=crewViewer;
+      if(!viewer?.showLeftTibiaLaceration)return siteReply('not_ready','Anatomy Lab is still loading. Retry when the reference model appears.');
+      closeAnatomyDialog(false);
+      let expired=false,timer;
+      const timeout=new Promise(resolve=>{
+        timer=setTimeout(()=>{expired=true;resolve(siteReply('not_ready','The atlas took too long to load the skin. Retry when ready.'));},18000);
+      });
+      try{return await Promise.race([viewer.showLeftTibiaLaceration(()=>!expired&&current()&&crewViewer===viewer),timeout]);}
+      finally{clearTimeout(timer);}
+    }
     if(action.kind==='navigate'){
       await navigateSite(action.page,action.section,action.input);if(!check())return siteReply('cancelled','The crew changed.');
       return siteReply('opened',OrbitSiteActions.pages[action.page]+(action.section&&!OrbitSiteActions.pages[action.page].includes(' / ')?' / '+CARE_TAB_LABELS[action.section]:'')+(action.input?' / '+action.input:'')+' is open.',{page:action.page,section:action.section||'',input:action.input||''});
@@ -764,6 +781,7 @@
       const session = await Conversation.startSession({
         agentId: agentId(), connectionType: kind === 'text' ? 'websocket' : 'webrtc', textOnly: kind === 'text',
         clientTools: {
+          show_left_tibia_laceration:()=>siteTool({kind:'tibia-laceration'}),
           get_site_records:async params=>JSON.stringify(thisRun===run?await readSiteRecords(params):{status:'session_ended'}),
           use_site_feature:params=>siteTool({kind:'feature',feature:params?.feature,query:params?.query,item:params?.item}),
           draft_site_form:params=>siteTool({kind:'form-draft',form:params?.form,values_json:params?.values_json,replace_existing:params?.replace_existing}),
