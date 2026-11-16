@@ -63,6 +63,19 @@ function notApproved(via: Decision["via"], byPerson: string, verb: "saved" | "sh
   return `${byPerson}. Nothing was ${verb}.`;
 }
 
+/** A compact list of an open form's fields for the model: name (label, unit, range or choices). */
+function describeFields(fields: unknown): string {
+  if (!fields || typeof fields !== "object") return "";
+  return Object.entries(fields as Record<string, { label?: string; type?: string; unit?: string; min?: number; max?: number; options?: string[] }>)
+    .map(([name, f]) => {
+      const detail = [f.label && f.label !== name ? f.label : "", f.unit ?? "", Number.isFinite(f.min) && Number.isFinite(f.max) ? `${f.min}-${f.max}` : "", f.options?.length ? `one of ${f.options.join("/")}` : "", f.type && !["number", "text", "choice", "radio"].includes(f.type) ? f.type : ""]
+        .filter(Boolean)
+        .join(", ");
+      return detail ? `${name} (${detail})` : name;
+    })
+    .join("; ");
+}
+
 const ALLOWED_ROUTES = ["crew", "anatomy", "assistant", "evidence"];
 const ANATOMY_ACTIONS = ["select_region", "focus_region", "reset_view", "rotate", "toggle_layer"];
 
@@ -228,10 +241,34 @@ export function useToolRegistry() {
           const reply = await requestWebsite({ type: "orbit:open-form", form, crew: crew ?? undefined });
           if (!reply.ok) return fail(reply.reason ?? "The form did not open.");
           // Opening is all it does: say so, so the reply does not claim anything was saved.
-          return ok(`Opened the ${String(reply.title)} form for ${String(reply.crew)}. Call it that. Nothing is saved until the person fills it in and presses Save.`, {
-            form,
-            crew: reply.crew,
-          });
+          const fields = describeFields(reply.fields);
+          return ok(
+            `Opened the ${String(reply.title)} form for ${String(reply.crew)}. Call it that. Nothing is saved until the person presses Save.` +
+              (fields ? ` You can fill it with fill_form. Fields: ${fields}` : ""),
+            { form, crew: reply.crew, fields: reply.fields },
+          );
+        }
+
+        case "fill_form": {
+          if (!EMBEDDED) return fail("Forms open only inside the ORBIT website.");
+          const values = args.values;
+          if (!values || typeof values !== "object" || Array.isArray(values)) return fail("Give values as field names and values.");
+          update({ status: "running" });
+          const reply = await requestWebsite({ type: "orbit:fill-form", values });
+          const filled = Array.isArray(reply.filled) ? (reply.filled as string[]) : [];
+          const rejected = Array.isArray(reply.rejected) ? (reply.rejected as { field: string; reason: string }[]) : [];
+          const problems = rejected.map((r) => `${r.field}: ${r.reason}`).join("; ");
+          if (!reply.ok) {
+            const fields = describeFields(reply.fields);
+            return fail(`${reply.reason ?? "Nothing was filled in."}${problems ? ` ${problems}` : ""}${fields ? ` Fields: ${fields}` : ""}`);
+          }
+          // Filling is not saving: say so, so the reply does not claim the reading was logged.
+          return ok(
+            `Filled in ${filled.join(", ")} on the ${String(reply.form)} form. Not saved yet: the person checks it and presses Save. ` +
+              `Say it is filled in and ready to save; never say it was updated, logged or saved.` +
+              (problems ? ` Not filled: ${problems}` : ""),
+            { filled, rejected },
+          );
         }
 
         case "control_anatomy": {

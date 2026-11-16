@@ -149,6 +149,22 @@
     }
   }
   const notice = message => addMessage('notice',message);
+  /* Evidence library entries (ui/research-library.js) that match what the user said, for the online agent.
+     The local assistant searches the same entries on its server (server/orbit_server/store.py). */
+  function evidenceMatches(text,limit=3){
+    try{return typeof ResearchLibrary==='undefined'?[]:ResearchLibrary.rank(text,limit).filter(e=>e.score>=0.5).map(e=>({title:e.title,topic:e.topicTitle,evidence:ResearchLibrary.EVIDENCE[e.evidence],text:e.text,tracking_guidance:e.watch,sources:e.sources.map(id=>{const s=ResearchLibrary.SOURCES[id];return {cite:s.cite,title:s.title,journal:s.journal,url:s.url,...(s.apa?{apa_reference:s.apa.replace(/<\/?i>/g,'')}:{})};})}));}catch{return [];}
+  }
+  /* A topic named in the request ("Hostile Environments"), with every entry title, so the agent can list it. */
+  function evidenceTopics(text){
+    if(typeof ResearchLibrary==='undefined')return [];
+    const q=String(text||'').toLowerCase();
+    return Object.values(ResearchLibrary.TOPICS).filter(t=>q.includes(t.title.toLowerCase())).map(t=>({topic:t.title,entry_count:t.items.length,entries:t.items.map(i=>i.title)}));
+  }
+  function evidenceReference(text,isCurrent=()=>true){
+    const entries=evidenceMatches(text),topics=evidenceTopics(text);if((!entries.length&&!topics.length)||!isCurrent())return;
+    const content={kind:'orbit_evidence_library',entries,topics,instruction:'Entries from ORBIT’s offline Evidence library that match the user’s words. Answer from these when they fit, state only what they say, and name the source (for example “NASA, 1969” or “NASA Science”). Historical and planetary data are reference information, not current crew readings or a diagnosis.'};
+    try{bridge.active()?.sendContextualUpdate(JSON.stringify(content));}catch{}
+  }
   async function conditionReference(text,isCurrent=()=>true,announce=false){
     try{
       const query=/\b(?:fractur\w*|broken|colles|smiths?|boxers?|bennett)\b/i.test(text)?text+' fractures':text;
@@ -747,7 +763,7 @@
           get_site_records:async params=>JSON.stringify(thisRun===run?await readSiteRecords(params):{status:'session_ended'}),
           use_site_feature:params=>siteTool({kind:'feature',feature:params?.feature,query:params?.query,item:params?.item}),
           draft_site_form:params=>siteTool({kind:'form-draft',form:params?.form,values_json:params?.values_json,replace_existing:params?.replace_existing}),
-          get_condition_reference:async params=>{const result=await OrbitConditionReference.lookup(params?.query,{limit:3});return JSON.stringify(thisRun===run?{...result,fracture_patterns:OrbitConditionAnatomy.fracturePatterns}:{status:'session_ended'});},
+          get_condition_reference:async params=>{const result=await OrbitConditionReference.lookup(params?.query,{limit:3});return JSON.stringify(thisRun===run?{...result,evidence_library:evidenceMatches(params?.query),evidence_topics:evidenceTopics(params?.query),fracture_patterns:OrbitConditionAnatomy.fracturePatterns}:{status:'session_ended'});},
           get_site_capabilities:()=>JSON.stringify(thisRun===run?OrbitSiteActions.capabilities():{status:'session_ended'}),
           navigate_page:params=>siteTool({kind:'navigate',page:params?.page,section:params?.section||undefined,input:params?.input||undefined}),
           open_site_panel:params=>siteTool({kind:'panel',target:params?.target}),
@@ -773,7 +789,7 @@
         onMessage: event => {
           if(thisRun!==run)return;
           const user=event.role==='user'||event.source==='user';
-          if(user){if(rememberInput(event.message))return;addMessage('user',event.message);const request=OrbitSiteActions.parse(event.message);if(!request||request.kind==='condition-highlight')void conditionReference(event.message,()=>thisRun===run);if(request)void runSiteAction(request,()=>thisRun===run,'user');}
+          if(user){if(rememberInput(event.message))return;addMessage('user',event.message);evidenceReference(event.message,()=>thisRun===run);const request=OrbitSiteActions.parse(event.message);if(!request||request.kind==='condition-highlight')void conditionReference(event.message,()=>thisRun===run);if(request)void runSiteAction(request,()=>thisRun===run,'user');}
           else addMessage('agent',event.message);
         },
         onAudio: pcm => {if(thisRun===run&&kind==='voice'&&!document.hidden)doctorSpeech?.pushPCM(pcm,performance.now()/1000);},
@@ -804,6 +820,8 @@
     const session=bridge.active(),thisRun=run,request=OrbitSiteActions.parse(value);
     if(!session&&!request){const reference=await OrbitConditionReference.lookup(value,{limit:1});if(reference.status==='found'&&reference.references[0].score>=100){rememberInput(value);addMessage('user',value);showError();await conditionReference(value,()=>thisRun===run,true);return;}showError('Start voice or text for a conversation. Named health topics and site controls also work locally.');return;}
     rememberInput(value);addMessage('user',value);showError();
+    // Before the message reaches the agent, so its reply can use the matching Evidence library entries.
+    if(session)evidenceReference(value,()=>thisRun===run);
     if(request)await runSiteAction(request,()=>thisRun===run,'user');
     if(!request||request.kind==='condition-highlight')await conditionReference(value,()=>thisRun===run,!session);
     if(session&&thisRun===run&&bridge.active()===session){try{pushContext(true);session.sendUserMessage(value);}catch{showError('The message could not be sent. Check the connection and try again.');}}

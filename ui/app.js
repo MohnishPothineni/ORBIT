@@ -141,11 +141,79 @@ function openVoiceForm(m){
  if(!opened)return {ok:false,reason:`${spec.label} did not open.`};
  return {ok:true,label:spec.label,crew:activeCrew().name,title:$('#modal').open?($('#modal h2')?.textContent||spec.label):spec.label};
 }
+/* The fields of the form open on screen, so the voice assistant knows what it may fill in. */
+const voiceFormInputs=form=>[...form.elements].filter(el=>el.name&&!el.disabled&&!['hidden','file','submit','button','reset','password'].includes(el.type));
+function voiceFieldLabel(el){
+ /* A radio or checkbox group is named by its group, not by its first option. */
+ const group=['radio','checkbox'].includes(el.type)?el.closest('[role="group"],fieldset'):null;
+ const text=el.getAttribute('aria-label')||group?.getAttribute('aria-label')||group?.querySelector('legend')?.textContent||el.closest('label')?.querySelector('span')?.textContent||el.closest('.field')?.querySelector(':scope>span')?.textContent||el.name;
+ return text.replace(/\s*\((?:optional|mmHg, optional)[^)]*\)/i,'').replace(/\s+/g,' ').trim();
+}
+function voiceFormFields(form){
+ const out={};
+ for(const el of voiceFormInputs(form)){
+  if(out[el.name]){if(el.type==='radio'||el.type==='checkbox')out[el.name].options?.push(el.value);continue;}
+  const unit=el.closest('.input-with-unit')?.querySelector('em')?.textContent;
+  const f={label:voiceFieldLabel(el),type:el.tagName==='SELECT'?'choice':el.tagName==='TEXTAREA'?'text':el.type};
+  if(unit)f.unit=unit;
+  if(el.min!=='')f.min=Number(el.min);if(el.max!==''&&el.type==='number')f.max=Number(el.max);
+  if(el.tagName==='SELECT')f.options=[...el.options].map(o=>o.value||o.textContent);
+  if(el.type==='radio')f.options=[el.value];
+  if(el.type==='checkbox'&&form.querySelectorAll(`[name="${CSS.escape(el.name)}"]`).length>1)f.options=[el.value];
+  out[el.name]=f;
+ }
+ return out;
+}
+/* Type values the voice assistant heard into the open form. Each value is checked against the field; nothing is saved: the person reviews the form and presses Save. */
+function fillVoiceForm(m){
+ const form=$('#modal').open?$('#modal form'):null;
+ if(!form)return {ok:false,reason:'No form is open on screen. Open one first.'};
+ if(!m.values||typeof m.values!=='object'||Array.isArray(m.values))return {ok:false,reason:'Give the values as field names and values.',fields:voiceFormFields(form)};
+ const fields=voiceFormFields(form),filled=[],rejected=[];
+ for(const [name,raw]of Object.entries(m.values)){
+  const f=fields[name],els=voiceFormInputs(form).filter(el=>el.name===name);
+  if(!f){rejected.push({field:name,reason:'This form has no such field.'});continue;}
+  const value=typeof raw==='string'?raw.trim():raw;
+  if(f.type==='number'){
+   const n=Number(value);
+   if(value===''||!Number.isFinite(n)){rejected.push({field:name,reason:'Needs a number.'});continue;}
+   if((Number.isFinite(f.min)&&n<f.min)||(Number.isFinite(f.max)&&n>f.max)){rejected.push({field:name,reason:`Must be ${f.min} to ${f.max}${f.unit?' '+f.unit:''}.`});continue;}
+   els[0].value=String(n);
+  }else if(f.type==='radio'||(f.type==='checkbox'&&f.options)){
+   const wanted=(Array.isArray(value)?value:[value]).map(String);
+   const match=els.filter(el=>wanted.some(w=>w.toLowerCase()===el.value.toLowerCase()));
+   if(match.length!==wanted.length||(f.type==='radio'&&match.length!==1)){rejected.push({field:name,reason:`Choose from: ${f.options.join(', ')}.`});continue;}
+   if(f.type==='checkbox')els.forEach(el=>{el.checked=match.includes(el);});else match[0].checked=true;
+  }else if(f.type==='checkbox'){
+   if(typeof value!=='boolean'){rejected.push({field:name,reason:'Needs true or false.'});continue;}
+   els[0].checked=value;
+  }else if(f.type==='choice'){
+   const opt=[...els[0].options].find(o=>[o.value,o.textContent].some(v=>v.toLowerCase()===String(value).toLowerCase()));
+   if(!opt){rejected.push({field:name,reason:`Choose from: ${f.options.join(', ')}.`});continue;}
+   els[0].value=opt.value;
+  }else{
+   const max=els[0].maxLength>0?els[0].maxLength:2000;
+   if(typeof value!=='string'||value.length>max){rejected.push({field:name,reason:`Needs text up to ${max} characters.`});continue;}
+   els[0].value=value;
+   /* Date and time fields ignore text they cannot read: check that it took. */
+   if(['date','time','datetime-local'].includes(f.type)&&els[0].value!==value){rejected.push({field:name,reason:'Use the format the field shows, e.g. 2026-11-15T07:30.'});continue;}
+  }
+  for(const el of els){el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}
+  filled.push(`${f.label} ${typeof value==='boolean'?(value?'yes':'no'):value}${f.unit?' '+f.unit:''}`);
+ }
+ if(filled.length)form.dataset.assistantDirty='true';
+ return {ok:filled.length>0,filled,rejected,form:$('#modal h2')?.textContent||'form',...(filled.length?{}:{reason:'Nothing was filled in.',fields})};
+}
 window.addEventListener('message',e=>{
  const m=e.data,frame=document.getElementById('voice-frame');
- if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||m?.type!=='orbit:open-form')return;
- let result;try{result=openVoiceForm(m);}catch(err){result={ok:false,reason:'The form could not be opened.'};console.error('ORBIT voice form:',err);}
- frame.contentWindow.postMessage({type:'orbit:open-form-result',requestId:m.requestId,...result},location.origin);
+ if(e.origin!==location.origin||!frame||e.source!==frame.contentWindow||!['orbit:open-form','orbit:fill-form'].includes(m?.type))return;
+ let result;
+ try{
+  result=m.type==='orbit:fill-form'?fillVoiceForm(m):openVoiceForm(m);
+  /* Tell the assistant what it can fill in on the form it just opened. */
+  if(m.type==='orbit:open-form'&&result.ok&&$('#modal form'))result.fields=voiceFormFields($('#modal form'));
+ }catch(err){result={ok:false,reason:'That did not work on the website.'};console.error('ORBIT voice form:',err);}
+ frame.contentWindow.postMessage({type:`${m.type}-result`,requestId:m.requestId,...result},location.origin);
 });
 function db(){return state.data[state.mode];}
 function entries(){return crewRecords(activeCrewId());}

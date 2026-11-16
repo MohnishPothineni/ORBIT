@@ -12,7 +12,8 @@ store_class = next(n for n in tree.body if isinstance(n, ast.ClassDef))
 search = next(n for n in store_class.body if isinstance(n, ast.FunctionDef) and n.name == 'search_evidence')
 stem = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == '_stem')
 namespace = {'re': re, '_WORD': re.compile(r'[a-z0-9]+'), 'Any': object}
-exec(compile(ast.fix_missing_locations(ast.Module(body=[stem, search], type_ignores=[])), '<actual store search>', 'exec'), namespace)
+missions = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == '_missions')
+exec(compile(ast.fix_missing_locations(ast.Module(body=[stem, missions, search], type_ignores=[])), '<actual store search>', 'exec'), namespace)
 
 class HistoricalRetrieval(unittest.TestCase):
     def setUp(self):
@@ -53,6 +54,25 @@ class HistoricalRetrieval(unittest.TestCase):
             self.assertIn(phrase, guidance)
         for file in ['voice.py', 'onboard_library.py']:
             self.assertIn('HISTORICAL_GUIDANCE', (ROOT / 'server/orbit_server' / file).read_text())
+
+    def test_nasa_sources_and_hostile_environments(self):
+        cases = {
+            'How hot is Venus?': 'Planet Venus',
+            'How cold does Mercury get?': 'Planet Mercury',
+            'What is Mars like for astronauts?': 'Planet Mars',
+            'How much radiation did the Apollo 10 crew get?': 'Radiation dose (Apollo 10)',
+            'Why does morale drop in the third quarter of a mission?': 'Morale in the third quarter',
+            'What are hostile environments?': 'Fiberglass in the cabin (Apollo 10)',
+            'How hard did the Apollo moonwalks work?': 'Effort on the Apollo moonwalks',
+            'Can heart rate predict metabolic rate on a spacewalk?': 'Heart rate as a workload estimate',
+            'What happened on Gemini XI?': 'Overexertion on Gemini spacewalks',
+        }
+        for question, title in cases.items():
+            hits = namespace['search_evidence'](self.store, question, 3)
+            self.assertTrue(hits[0]['title'].startswith(title), f'{question} -> {hits[0]["title"]}')
+        # The Mercury program still means the missions, not the planet.
+        hits = namespace['search_evidence'](self.store, 'Tell me about the Mercury mission crew', 3)
+        self.assertNotIn('Planet Mercury', hits[0]['title'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -116,6 +116,42 @@
    ]
   },
   {
+   "documentId": "environment",
+   "chunkId": "calories-in-early-spaceflight",
+   "title": "Calories in early spaceflight (Altman & Fisher, 1986)",
+   "excerpt": "Early missions assumed weightlessness needed fewer calories, but tasks that use friction on Earth take muscular effort in space. Apollo crews averaged 1,877 kcal a day against about 2,900 recommended and lost a mean 3.9 kg. U.S. space diets rose from about 2,500 to about 3,000 kcal a day. On the 13-day Apollo 17, intake fell short of needs and each crew member lost a mean 1 kg of lean body mass and 2.3 kg of fat. Unpalatable early foods were often not fully eaten.",
+   "evidence": "Research review",
+   "topic": "Cabin environment",
+   "tracking": "Record what is actually eaten, including snacks.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "environment",
+   "chunkId": "diet-and-weight-loss-on-skylab",
+   "title": "Diet and weight loss on Skylab (Altman & Fisher, 1986)",
+   "excerpt": "Of the nine Skylab crew, the five who ate less in flight lost 75% more weight than those who kept their preflight intake. About 60% of the weight lost was lean body mass. Skylab 4, with the most food and exercise, was the only flight with no net tissue loss. Analyses suggest losses can be prevented with about 46 to 50 kcal per kg of body weight a day, plus 5 to 6 kcal per kg of exercise.",
+   "evidence": "Astronaut data",
+   "topic": "Cabin environment",
+   "tracking": "Track body mass and food intake together.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
    "documentId": "behavior",
    "chunkId": "short-sleep",
    "title": "Short sleep (Jones et al., 2022; Flynn-Evans et al., 2016)",
@@ -249,6 +285,103 @@
      "title": "Acceptability of the Cognition Test Battery in astronaut and astronaut-surrogate populations",
      "journal": "Acta Astronautica",
      "url": "https://doi.org/10.1016/j.actaastro.2021.09.035"
+    }
+   ]
+  },
+  {
+   "documentId": "behavior",
+   "chunkId": "isolation-in-analog-habitats",
+   "title": "Isolation in analog habitats (NASA, 2024)",
+   "excerpt": "NASA notes that sleep loss, body-clock disruption and work overload on long, isolated missions may lower performance and harm health, so crews are carefully chosen, trained and supported. Its analogs include HERA, a 650-square-foot habitat where crews live for 45 days, and CHAPEA, a 1,700-square-foot habitat for simulated year-long Mars stays with four crew.",
+   "evidence": "Research review",
+   "topic": "Mind and behavior",
+   "tracking": "Log sleep, workload and mood across the mission.",
+   "sources": [
+    {
+     "cite": "NASA, 2024",
+     "title": "Hazard: Isolation and Confinement",
+     "journal": "NASA Human Research Program",
+     "url": "https://www.nasa.gov/hrp/hazard-isolation-and-confinement/",
+     "apa": "National Aeronautics and Space Administration. (2024, August 1). <i>Hazard: Isolation and confinement</i>. NASA Human Research Program. https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
+    }
+   ]
+  },
+  {
+   "documentId": "behavior",
+   "chunkId": "mood-over-long-stays",
+   "title": "Mood over long stays (Bell et al., 2026)",
+   "excerpt": "The APEX psychology suite was given to 121 people in 40 teams: astronauts in space for 150 to 350 days and analog crews isolated for 45 to 240 days. No one showed clinically elevated depression. Positive mood declined over time, while negative mood and stress varied widely and tracked situational stressors more than time in isolation. These are summary results from a conference abstract.",
+   "evidence": "Astronaut data",
+   "topic": "Mind and behavior",
+   "tracking": "Note stressful events alongside mood check-ins.",
+   "sources": [
+    {
+     "cite": "Bell et al., 2026",
+     "title": "Summary Results from the Assessment of Psychology in Extreme Environments (APEX) Standardized Suite",
+     "journal": "Aerospace Medical Association Annual Scientific Meeting (abstract, NASA NTRS)",
+     "url": "https://ntrs.nasa.gov/citations/20250011721",
+     "apa": "Bell, S. T., Landon Blackwell, L., Dev, S., Miller, J., Begerowski, S., Anderson, S. R., & Stosic, M. (2026). <i>Summary results from the Assessment of Psychology in Extreme Environments (APEX) standardized suite</i> [Conference abstract]. Aerospace Medical Association Annual Scientific Meeting, Denver, CO, United States. https://ntrs.nasa.gov/citations/20250011721"
+    }
+   ]
+  },
+  {
+   "documentId": "behavior",
+   "chunkId": "morale-in-the-third-quarter",
+   "title": "Morale in the third quarter (Stuster, 2010)",
+   "excerpt": "Personal journals from astronauts on six-month ISS expeditions were mostly about work, then outside communications, adjustment, crew interactions and recreation. Morale declined in the third quarter of the missions. Astronauts said journal writing helped them keep perspective, and living on the ISS was less difficult than they had expected.",
+   "evidence": "Astronaut data",
+   "topic": "Mind and behavior",
+   "tracking": "Check in more often during the third quarter of a long mission.",
+   "sources": [
+    {
+     "cite": "Stuster, 2010",
+     "title": "Behavioral Issues Associated With Long Duration Space Expeditions: Review and Analysis of Astronaut Journals",
+     "journal": "NASA contractor report JSC-CN-21128",
+     "url": "https://ntrs.nasa.gov/citations/20100026549",
+     "apa": "Stuster, J. (2010). <i>Behavioral issues associated with long duration space expeditions: Review and analysis of astronaut journals</i> (Report No. JSC-CN-21128). NASA Johnson Space Center. https://ntrs.nasa.gov/citations/20100026549"
+    }
+   ]
+  },
+  {
+   "documentId": "behavior",
+   "chunkId": "distance-from-earth",
+   "title": "Distance from Earth (NASA, 2024; McBrayer et al., 2022)",
+   "excerpt": "Mars is on average 140 million miles from Earth, and a Mars mission would keep crews away for about three years. NASA cites one-way communication delays of up to 20 minutes. A Mars mission analysis found delays of 0 to 22 minutes over a mission, and disruptions lasting from several days to several months depending on the communication band.",
+   "evidence": "Research review",
+   "topic": "Mind and behavior",
+   "tracking": "Keep emergency procedures available without a link to Earth.",
+   "sources": [
+    {
+     "cite": "NASA, 2024",
+     "title": "Hazard: Distance From Earth",
+     "journal": "NASA Human Research Program",
+     "url": "https://www.nasa.gov/hrp/hazard-distance-from-earth/",
+     "apa": "National Aeronautics and Space Administration. (2024, August 1). <i>Hazard: Distance from Earth</i>. NASA Human Research Program. https://www.nasa.gov/hrp/hazard-distance-from-earth/"
+    },
+    {
+     "cite": "McBrayer et al., 2022",
+     "title": "Communication Delays, Disruptions, and Blackouts for Crewed Mars Missions",
+     "journal": "AIAA ASCEND 2022 (NASA NTRS)",
+     "url": "https://ntrs.nasa.gov/citations/20220013418",
+     "apa": "McBrayer, K. T., Chai, P. R., & Judd, E. L. (2022). <i>Communication delays, disruptions, and blackouts for crewed Mars missions</i> [Conference paper]. ASCEND 2022, Las Vegas, NV, United States. https://ntrs.nasa.gov/citations/20220013418"
+    }
+   ]
+  },
+  {
+   "documentId": "behavior",
+   "chunkId": "acting-without-ground-support",
+   "title": "Acting without ground support (Parisi et al., 2023)",
+   "excerpt": "An analysis of real ISS and Apollo anomalies found that even delays of seconds to a minute hamper the ground’s real-time oversight and its ability to catch fast-moving problems. With delays of up to 40 minutes on Mars missions, crews must make time-critical decisions on their own. The authors note that the effectiveness of countermeasures is still a research gap.",
+   "evidence": "Research review",
+   "topic": "Mind and behavior",
+   "tracking": "Rehearse decisions the crew may have to make alone.",
+   "sources": [
+    {
+     "cite": "Parisi et al., 2023",
+     "title": "Effects of Communication Delay on Human Spaceflight Missions",
+     "journal": "Applied Human Factors and Ergonomics (AHFE) 2023 (NASA NTRS)",
+     "url": "https://ntrs.nasa.gov/citations/20230002268",
+     "apa": "Parisi, M., Panontin, T., Wu, S., Mctigue, K., & Vera, A. (2023). <i>Effects of communication delay on human spaceflight missions</i> [Conference paper]. 14th International Conference on Applied Human Factors and Ergonomics, San Francisco, CA, United States. https://ntrs.nasa.gov/citations/20230002268"
     }
    ]
   },
@@ -415,6 +548,24 @@
      "title": "Phosphenes in low Earth orbit: survey responses from 59 astronauts",
      "journal": "Aviation, Space, and Environmental Medicine",
      "url": "https://pubmed.ncbi.nlm.nih.gov/16676658/"
+    }
+   ]
+  },
+  {
+   "documentId": "radiation",
+   "chunkId": "radiation-dose-apollo-10",
+   "title": "Radiation dose (Apollo 10) (NASA, 1969)",
+   "excerpt": "Each Apollo 10 crewman received a total absorbed dose of about 0.5 rad, which the report calls well below the medically significant threshold. Passive dosimeters at the chest, thigh and ankle read 386 to 560 millirads. Passing through the Van Allen belts, the highest rates were 3.63 rad/hr skin dose and 2.09 rad/hr depth dose.",
+   "evidence": "Astronaut data",
+   "topic": "Space radiation",
+   "tracking": "Record dosimeter readings after each pass through high-radiation regions.",
+   "sources": [
+    {
+     "cite": "NASA, 1969",
+     "title": "Apollo 10 Mission Report",
+     "journal": "NASA Manned Spacecraft Center, MSC-00126",
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
     }
    ]
   },
@@ -779,6 +930,535 @@
      "title": "Renal stone formation among astronauts",
      "journal": "Aviation, Space, and Environmental Medicine",
      "url": "https://pubmed.ncbi.nlm.nih.gov/17511294/"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "changing-gravity-fields",
+   "title": "Changing gravity fields (NASA, 2024)",
+   "excerpt": "Without Earth’s gravity, weight-bearing bones lose on average 1% to 1.5% of mineral density per month. Fluid shifts toward the head can press on the eyes and affect vision, and dehydration plus calcium leaving the bones can raise kidney stone risk. Moving between gravity fields affects orientation, coordination and balance and can cause space motion sickness. Returning to gravity can cause lightheadedness and fainting.",
+   "evidence": "Research review",
+   "topic": "Altered gravity",
+   "tracking": "Plan for dizziness and balance problems after each gravity change.",
+   "sources": [
+    {
+     "cite": "NASA, 2024",
+     "title": "Hazard: Gravity Fields",
+     "journal": "NASA Human Research Program",
+     "url": "https://www.nasa.gov/hrp/hazard-gravity-fields/",
+     "apa": "National Aeronautics and Space Administration. (2024, August 1). <i>Hazard: Gravity fields</i>. NASA Human Research Program. https://www.nasa.gov/hrp/hazard-gravity-fields/"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "heart-and-circulation-after-apollo",
+   "title": "Heart and circulation after Apollo (Hoffler & Johnson, 1975)",
+   "excerpt": "Apollo crews had reduced orthostatic tolerance after flight. Heart rate was the most reliable sign: it rose right after flight while systolic and pulse pressure fell. Body weight, calf girth, leg volume and cardiothoracic ratio all decreased and had not fully recovered by the end of postflight testing. Changes varied widely between crew members.",
+   "evidence": "Astronaut data",
+   "topic": "Altered gravity",
+   "tracking": "Compare standing heart rate and blood pressure with preflight values.",
+   "sources": [
+    {
+     "cite": "Hoffler & Johnson, 1975",
+     "title": "Apollo flight crew cardiovascular evaluations",
+     "journal": "Biomedical Results of Apollo, NASA SP-368",
+     "url": "https://ntrs.nasa.gov/citations/19760005591",
+     "apa": "Hoffler, G. W., & Johnson, R. L. (1975). Apollo flight crew cardiovascular evaluations. In R. S. Johnston, L. F. Dietlein, & C. A. Berry (Eds.), <i>Biomedical results of Apollo</i> (NASA SP-368). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19760005591"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "motion-sickness-on-apollo",
+   "title": "Motion sickness on Apollo (Homick & Miller, 1975)",
+   "excerpt": "The larger Apollo command and lunar modules allowed more movement, and vestibular disturbances were more common than on earlier flights. The findings come from motion sickness histories and astronaut reports, because there was no systematic testing program. The authors say in-flight vestibular problems are hard to predict.",
+   "evidence": "Astronaut data",
+   "topic": "Altered gravity",
+   "tracking": "Log nausea or disorientation, especially in the first days of flight.",
+   "sources": [
+    {
+     "cite": "Homick & Miller, 1975",
+     "title": "Apollo flight crew vestibular assessment",
+     "journal": "Biomedical Results of Apollo, NASA SP-368",
+     "url": "https://ntrs.nasa.gov/citations/19760005595",
+     "apa": "Homick, J. L., & Miller, E. F., II. (1975). Apollo flight crew vestibular assessment. In R. S. Johnston, L. F. Dietlein, & C. A. Berry (Eds.), <i>Biomedical results of Apollo</i> (NASA SP-368). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19760005595"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "adapting-to-weightlessness-apollo-10",
+   "title": "Adapting to weightlessness (Apollo 10) (NASA, 1969)",
+   "excerpt": "After orbital insertion, all three Apollo 10 crew felt fullness of the head, lasting about 8, 12 and 24 hours. The Lunar Module Pilot had mild vestibular disturbance for the first 2 days and reached the point of nausea within 2 minutes of head-movement exercises. Heart rates during normal activity ranged from 49 to 93 beats/min, rose in critical phases and quickly returned to baseline. No in-flight illnesses occurred.",
+   "evidence": "Astronaut data",
+   "topic": "Altered gravity",
+   "tracking": "Record head fullness and motion sensitivity in the first days.",
+   "sources": [
+    {
+     "cite": "NASA, 1969",
+     "title": "Apollo 10 Mission Report",
+     "journal": "NASA Manned Spacecraft Center, MSC-00126",
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "long-duration-findings-from-skylab",
+   "title": "Long-duration findings from Skylab (Johnston & Dietlein, 1975)",
+   "excerpt": "On Skylab missions lasting up to 84 days, crews had space motion sickness early in flight, moderate cardiovascular deconditioning, and loss of red cell mass and plasma volume. Calcium loss averaged 6 grams a month, or 0.5% of total body calcium, comparable to bed rest. Orthostatic intolerance appeared early after landing, and recovery was faster after missions with more in-flight exercise. The report concludes crews perform well with proper nutrition, regular exercise and enough sleep.",
+   "evidence": "Astronaut data",
+   "topic": "Altered gravity",
+   "tracking": "Log exercise sessions and recovery after landing.",
+   "sources": [
+    {
+     "cite": "Johnston & Dietlein, 1975",
+     "title": "Medical Support and Findings of the Skylab Program",
+     "journal": "NASA TM X-58160",
+     "url": "https://ntrs.nasa.gov/api/citations/19750017465/downloads/19750017465.pdf",
+     "apa": "Johnston, R. S., & Dietlein, L. F. (1975). <i>Medical support and findings of the Skylab program</i> (NASA TM X-58160). NASA Johnson Space Center. https://ntrs.nasa.gov/api/citations/19750017465/downloads/19750017465.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "skylab-clinical-summary",
+   "title": "Skylab clinical summary (Johnston & Dietlein, 1977)",
+   "excerpt": "Three Skylab crews flew for about 672, 1,427 and 2,017 hours. From a clinical view, all physiological and psychological responses were self-limiting or needed only minimal counteraction, and they did not rule out longer stays in zero gravity.",
+   "evidence": "Astronaut data",
+   "topic": "Altered gravity",
+   "tracking": "Track whether each change settles without treatment.",
+   "sources": [
+    {
+     "cite": "Johnston & Dietlein, 1977",
+     "title": "Biomedical Results from Skylab",
+     "journal": "NASA SP-377",
+     "url": "https://ntrs.nasa.gov/citations/19770026836",
+     "apa": "Johnston, R. S., & Dietlein, L. F. (Eds.). (1977). <i>Biomedical results from Skylab</i> (NASA SP-377). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19770026836"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "early-weightless-flight-mercury-atlas-7",
+   "title": "Early weightless flight (Mercury-Atlas 7) (NASA, 1962)",
+   "excerpt": "Medical examinations of two astronauts who each flew about 4.5 hours weightless found no physical or biochemical evidence of harm: no lung collapse (atelectasis), cosmic-ray damage or psychiatric problems. Despite deliberate efforts to provoke them, no vestibular or related stomach symptoms occurred. On Mercury-Atlas 7, Scott Carpenter lost about 6 pounds although he drank more than he passed.",
+   "evidence": "Astronaut data",
+   "topic": "Altered gravity",
+   "tracking": "Weigh before and after flight to catch dehydration.",
+   "sources": [
+    {
+     "cite": "NASA, 1962",
+     "title": "Results of the Second United States Manned Orbital Space Flight, May 24, 1962",
+     "journal": "NASA SP-6",
+     "url": "https://ntrs.nasa.gov/api/citations/19620004691/downloads/19620004691.pdf",
+     "apa": "National Aeronautics and Space Administration. (1962). <i>Results of the second United States manned orbital space flight, May 24, 1962</i> (NASA SP-6). https://ntrs.nasa.gov/api/citations/19620004691/downloads/19620004691.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "gravity",
+   "chunkId": "calcium-and-vitamin-d",
+   "title": "Calcium and vitamin D (Altman & Fisher, 1986)",
+   "excerpt": "On Skylab 4 calcium loss rose to almost 300 mg a day by day 84, and one projection put the loss at 25% of the body’s calcium over a year. The 1986 review suggested 1,200 to 1,500 mg of calcium a day instead of the Shuttle’s 800 mg, and noted that without sunlight vitamin D may run short, with no safe intake range yet set for long flights.",
+   "evidence": "Research review",
+   "topic": "Altered gravity",
+   "tracking": "Follow the calcium and vitamin D plan.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "why-spacewalk-effort-is-monitored",
+   "title": "Why spacewalk effort is monitored (Paul, 2012)",
+   "excerpt": "Tracking metabolic rate in real time during a spacewalk protects the crew member, shows how fast oxygen and cooling water are used, and lets planners change tasks. The laboratory method, open-circuit spirometry, is impractical in a suit. Heart rate, suit oxygen pressure decay and cooling-garment water temperatures have all been used, but none is reliable alone: heart rate also rises with stress, and oxygen decay includes suit leakage.",
+   "evidence": "Research review",
+   "topic": "Spacewalks",
+   "tracking": "Log heart rate and how hard suited work feels.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "overexertion-on-gemini-spacewalks",
+   "title": "Overexertion on Gemini spacewalks (Paul, 2012)",
+   "excerpt": "Gemini spacewalks took more effort than expected and at times exceeded the suit’s cooling. High exertion fogged the visor on Gemini IV and IX-A, and IX-A ended early. On Gemini XI sweat ran into the astronaut’s eyes and the spacewalk was ended early. For Gemini XII, NASA added restraints, underwater training and closer heart rate monitoring, advising the crew member when heart rate stayed at or above 140 beats per minute.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Rest when heart rate stays high during suited work.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "effort-on-the-apollo-moonwalks",
+   "title": "Effort on the Apollo moonwalks (Paul, 2012)",
+   "excerpt": "Average metabolic rates on the 14 Apollo lunar surface spacewalks ranged from 780 to 1,200 Btu/hr, with a mean of about 930 Btu/hr (980 kJ/hr), lower than predicted. Moving equipment, climbing in and out of the lander and drilling cost the most, and riding the Lunar Roving Vehicle the least, about 392 Btu/hr. On Apollo 14 a crew member’s heart rate reached 150 bpm while hauling a cart toward Cone Crater, and the task was abandoned.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Plan rest stops between heavy surface tasks.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "apollo-spacewalks-in-weightlessness",
+   "title": "Apollo spacewalks in weightlessness (Paul, 2012)",
+   "excerpt": "Four Apollo spacewalks in weightlessness, mainly to retrieve film, averaged 63 minutes. The suits had only gas cooling, which could not sustain more than about 995 Btu/hr, yet the crew did not overheat. The low work rates were credited to good restraints, underwater training and the short duration.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Use restraints and rehearse tasks to keep effort down.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "energy-cost-of-spacewalks",
+   "title": "Energy cost of spacewalks (Altman & Fisher, 1986)",
+   "excerpt": "Apollo lunar spacewalks averaged 234 kcal per hour over almost 159 hours, Skylab spacewalks 230 kcal per hour over more than 83 hours, and Shuttle spacewalks 196 kcal per hour measured by oxygen use. The peak, 500 kcal per hour, came when the Skylab 2 commander cut a strap jamming a solar panel. Riding the lunar rover cost about 123 kcal per hour; climbing in and out of the vehicle about 270.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Allow extra food after a spacewalk.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "water-during-spacewalks",
+   "title": "Water during spacewalks (Altman & Fisher, 1986)",
+   "excerpt": "A 1986 review for NASA warned that breathing dry 100% oxygen for up to 6 hours on a spacewalk risks dehydration, that thirst is not a reliable guide to water needs, and recommended working out how much water the suit should carry. Electrolyte loss from sweat is highest in the first few minutes of sweating.",
+   "evidence": "Research review",
+   "topic": "Spacewalks",
+   "tracking": "Drink before and after a spacewalk and log the amount.",
+   "sources": [
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "heart-rate-as-a-workload-estimate",
+   "title": "Heart rate as a workload estimate (EVA dissertation, ch. 5)",
+   "excerpt": "In 132 Shuttle and ISS spacewalks of five hours or more, heart rate and metabolic rate fell together over the spacewalk, from about 117 bpm and 1,040 Btu/hr at the start to about 100 bpm and 813 Btu/hr at hour four. One regression across all spacewalks explained 40% of the variation, but one fitted to each crew member explained over 82% and kept prediction error within the 200 Btu/hr accepted during Apollo. On average each heartbeat corresponded to about 0.14 Btu.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Compare suited heart rate with the crew member’s own baseline.",
+   "sources": [
+    {
+     "cite": "EVA dissertation, ch. 5",
+     "title": "Extravehicular Activity Metabolic Rate Model: Metabolic Rate Estimated From Heart Rate",
+     "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
+     "url": "./assets/evidence/eva-metabolic-rate-from-heart-rate.pdf",
+     "apa": "<i>Extravehicular activity metabolic rate model: Metabolic rate estimated from heart rate</i> (Chapter 5). (n.d.). [Unpublished doctoral dissertation chapter; author not stated]."
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "simulated-lunar-spacewalks",
+   "title": "Simulated lunar spacewalks (EVA dissertation, ch. 6)",
+   "excerpt": "Two suited operators in NASA’s Mark III suit did 3- to 5-hour simulated lunar spacewalks at one-sixth gravity on NASA’s ARGOS offload rig, walking graded treadmills, sampling geology and moving objects. Heart-rate models predicted metabolic rate within 200 Btu/hr, and adding suit cooling and humidity readings cut the error below 180 Btu/hr. Models predicted core temperature within 0.12 to 0.46 °C, similar to NASA’s METMAN thermal model, and skin temperature better than it. Only two people were tested.",
+   "evidence": "Ground study",
+   "topic": "Spacewalks",
+   "tracking": "Watch core temperature during long suited work.",
+   "sources": [
+    {
+     "cite": "EVA dissertation, ch. 6",
+     "title": "Evaluation of Cardiothermal Model Prediction of Simulated Lunar Extravehicular Activity",
+     "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
+     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf",
+     "apa": "<i>Evaluation of cardiothermal model prediction of simulated lunar extravehicular activity</i> (Chapter 6). (n.d.). [Unpublished doctoral dissertation chapter; author not stated]."
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "heart-rhythm-under-spacewalk-load",
+   "title": "Heart rhythm under spacewalk load (EVA dissertation, ch. 6)",
+   "excerpt": "In the same simulated lunar spacewalks, harder tasks raised the ratio of low- to high-frequency heart rate variability (LF/HF), which the author reads as a shift toward stress-type sympathetic control. Metabolic rates ranged from about 480 Btu/hr while adjusting suit settings to about 1,400 Btu/hr walking a 30% grade.",
+   "evidence": "Ground study",
+   "topic": "Spacewalks",
+   "tracking": "Note which tasks bring the highest strain.",
+   "sources": [
+    {
+     "cite": "EVA dissertation, ch. 6",
+     "title": "Evaluation of Cardiothermal Model Prediction of Simulated Lunar Extravehicular Activity",
+     "journal": "Doctoral dissertation chapter (author and year not stated in the supplied file)",
+     "url": "./assets/evidence/lunar-eva-cardiothermal-model.pdf",
+     "apa": "<i>Evaluation of cardiothermal model prediction of simulated lunar extravehicular activity</i> (Chapter 6). (n.d.). [Unpublished doctoral dissertation chapter; author not stated]."
+    }
+   ]
+  },
+  {
+   "documentId": "spacewalks",
+   "chunkId": "irregular-heartbeats-on-apollo-15",
+   "title": "Irregular heartbeats on Apollo 15 (Paul, 2012; Altman & Fisher, 1986)",
+   "excerpt": "On Apollo 15, the first mission with the Lunar Roving Vehicle and 7- to 8-hour moonwalks, flight doctors saw irregular heartbeats in the moonwalking crew, continuing on the way home. The cause was uncertain: low potassium and workload may have contributed, and one crew member may have had undetected coronary artery disease. NASA added potassium to drinks on later flights, and no irregular heartbeats were recorded on Apollo 16.",
+   "evidence": "Astronaut data",
+   "topic": "Spacewalks",
+   "tracking": "Report palpitations or an irregular pulse.",
+   "sources": [
+    {
+     "cite": "Paul, 2012",
+     "title": "Energy Expenditure During Extravehicular Activity Through Apollo",
+     "journal": "AIAA International Conference on Environmental Systems (AIAA 2012-3504)",
+     "url": "https://ntrs.nasa.gov/citations/20120003917",
+     "apa": "Paul, H. L. (2012). Energy expenditure during extravehicular activity through Apollo. In <i>42nd International Conference on Environmental Systems</i>. American Institute of Aeronautics and Astronautics. https://doi.org/10.2514/6.2012-3504"
+    },
+    {
+     "cite": "Altman & Fisher, 1986",
+     "title": "Research Opportunities in Nutrition and Metabolism in Space",
+     "journal": "Life Sciences Research Office, FASEB, for NASA (NASA CR-190992)",
+     "url": "https://ntrs.nasa.gov/citations/19930074290",
+     "apa": "Altman, P. L., & Fisher, K. D. (Eds.). (1986). <i>Research opportunities in nutrition and metabolism in space</i> (NASA CR-190992). Life Sciences Research Office, Federation of American Societies for Experimental Biology. https://ntrs.nasa.gov/citations/19930074290"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "fiberglass-in-the-cabin-apollo-10",
+   "title": "Fiberglass in the cabin (Apollo 10) (NASA, 1969)",
+   "excerpt": "On Apollo 10, fiberglass insulation blew into the command and lunar modules. It irritates skin and mucous membranes, and the crew had scratchy throats, coughing, nasal stuffiness, mild eye irritation and some skin rash. The nasal stuffiness cleared in about 5 days, and water rinses and eye drops relieved the eye irritation.",
+   "evidence": "Astronaut data",
+   "topic": "Hostile Environments",
+   "tracking": "Record eye, throat or skin irritation after any cabin contamination.",
+   "sources": [
+    {
+     "cite": "NASA, 1969",
+     "title": "Apollo 10 Mission Report",
+     "journal": "NASA Manned Spacecraft Center, MSC-00126",
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "water-and-food-apollo-10",
+   "title": "Water and food (Apollo 10) (NASA, 1969)",
+   "excerpt": "Apollo 10 crew drank about 3 pounds of water per man per day for the first 35 hours, and 75 pounds in total over the first 128 hours. Hydrogen gas in the drinking water caused abdominal rumbling, and the crew took Lomotil against possible diarrhea, which the report says was not medically indicated. Estimated daily food intake was about 1,311 to 1,484 kilocalories.",
+   "evidence": "Astronaut data",
+   "topic": "Hostile Environments",
+   "tracking": "Track fluid and food intake against the plan.",
+   "sources": [
+    {
+     "cite": "NASA, 1969",
+     "title": "Apollo 10 Mission Report",
+     "journal": "NASA Manned Spacecraft Center, MSC-00126",
+     "url": "https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf",
+     "apa": "National Aeronautics and Space Administration. (1969). <i>Apollo 10 mission report</i> (MSC-00126). Manned Spacecraft Center. https://www.nasa.gov/wp-content/uploads/2025/11/a10-missionreport.pdf"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "microbes-on-skylab",
+   "title": "Microbes on Skylab (Johnston & Dietlein, 1977)",
+   "excerpt": "Skylab showed gross microbial contamination of the cabin and several in-flight disease events, presumably microbial, and disease-causing microbes passed between crew members. These events were not shown to be limiting hazards for long flights. None of the in-flight illnesses was tested microbiologically.",
+   "evidence": "Astronaut data",
+   "topic": "Hostile Environments",
+   "tracking": "Log infections and who else on the crew has symptoms.",
+   "sources": [
+    {
+     "cite": "Johnston & Dietlein, 1977",
+     "title": "Biomedical Results from Skylab",
+     "journal": "NASA SP-377",
+     "url": "https://ntrs.nasa.gov/citations/19770026836",
+     "apa": "Johnston, R. S., & Dietlein, L. F. (Eds.). (1977). <i>Biomedical results from Skylab</i> (NASA SP-377). National Aeronautics and Space Administration. https://ntrs.nasa.gov/citations/19770026836"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-mercury",
+   "title": "Planet Mercury (NASA Science)",
+   "excerpt": "Mercury has no true atmosphere, only a thin exosphere. Daytime highs reach 800°F (430°C) and nights fall to -290°F (-180°C). Its magnetic field is about 1% as strong as Earth’s. One full day-night cycle lasts 176 Earth days.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Reference conditions for mission planning, not crew readings.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Mercury: Facts",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/mercury/facts/",
+     "apa": "NASA Science. (n.d.). <i>Mercury: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/mercury/facts/"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-venus",
+   "title": "Planet Venus (NASA Science)",
+   "excerpt": "Venus has surface temperatures of about 872°F (467°C) and surface pressure 93 times Earth’s at sea level. The atmosphere is mostly carbon dioxide, with clouds of sulfuric acid. One day lasts 243 Earth days.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Reference conditions for mission planning, not crew readings.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Venus: Facts",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/venus/facts/",
+     "apa": "NASA Science. (n.d.). <i>Venus: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/venus/facts/"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-earth",
+   "title": "Planet Earth (NASA Science)",
+   "excerpt": "Near the surface, Earth’s air is 78% nitrogen, 21% oxygen and 1% other gases such as argon, carbon dioxide and neon. The atmosphere shields the surface from much of the Sun’s harmful radiation. Earth rotates once every 23.9 hours.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Baseline for comparing other environments.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Facts About Earth",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/earth/facts/",
+     "apa": "NASA Science. (n.d.). <i>Facts about Earth</i>. National Aeronautics and Space Administration. https://science.nasa.gov/earth/facts/"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-mars",
+   "title": "Planet Mars (NASA Science)",
+   "excerpt": "Mars temperatures range from about -225°F (-153°C) to 70°F (20°C). The thin atmosphere is mostly carbon dioxide, nitrogen and argon, and Mars has no global magnetic field today. A day (sol) lasts 24.6 hours. Dust storms can cover much of the planet, and the dust can take months to settle.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Reference conditions for mission planning, not crew readings.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Mars: Facts",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/mars/facts/",
+     "apa": "NASA Science. (n.d.). <i>Mars: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/mars/facts/"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-jupiter",
+   "title": "Planet Jupiter (NASA Science)",
+   "excerpt": "Jupiter has no true surface and is mostly hydrogen and helium. Its magnetic field is 16 to 54 times as powerful as Earth’s, and charged particles trapped near the planet create intense radiation that can damage spacecraft. One day lasts 9.9 hours.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Reference conditions for mission planning, not crew readings.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Jupiter: Facts",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/jupiter/facts/",
+     "apa": "NASA Science. (n.d.). <i>Jupiter: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/jupiter/facts/"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-saturn",
+   "title": "Planet Saturn (NASA Science)",
+   "excerpt": "Saturn has no true surface and is mostly hydrogen and helium. Winds in the upper atmosphere reach 1,600 feet per second (500 meters per second) near the equator. Its magnetic field is 578 times as powerful as Earth’s. One day lasts 10.7 hours.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Reference conditions for mission planning, not crew readings.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Saturn: Facts",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/saturn/facts/",
+     "apa": "NASA Science. (n.d.). <i>Saturn: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/saturn/facts/"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-uranus",
+   "title": "Planet Uranus (NASA Science)",
+   "excerpt": "Uranus has no true surface. Its atmosphere is mostly hydrogen and helium with a little methane and traces of water and ammonia, and reaches a minimum of 49 K (-224.2°C). It is tilted 97.77 degrees, and one day lasts about 17 hours.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Reference conditions for mission planning, not crew readings.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Uranus: Facts",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/uranus/facts/",
+     "apa": "NASA Science. (n.d.). <i>Uranus: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/uranus/facts/"
+    }
+   ]
+  },
+  {
+   "documentId": "hostile",
+   "chunkId": "planet-neptune",
+   "title": "Planet Neptune (NASA Science)",
+   "excerpt": "Neptune has no solid surface. Its atmosphere is mostly hydrogen and helium with a little methane, and winds drive frozen methane clouds at more than 1,200 miles per hour (2,000 km/h). One day lasts about 16 hours.",
+   "evidence": "NASA reference data",
+   "topic": "Hostile Environments",
+   "tracking": "Reference conditions for mission planning, not crew readings.",
+   "sources": [
+    {
+     "cite": "NASA Science",
+     "title": "Neptune: Facts",
+     "journal": "NASA Science",
+     "url": "https://science.nasa.gov/neptune/facts/",
+     "apa": "NASA Science. (n.d.). <i>Neptune: Facts</i>. National Aeronautics and Space Administration. https://science.nasa.gov/neptune/facts/"
     }
    ]
   },

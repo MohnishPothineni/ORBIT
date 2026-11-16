@@ -148,6 +148,9 @@
 .mission-evidence p{margin:0;font-size:13px;line-height:1.55;text-wrap:pretty}
 .mission-evidence p.mission-evidence-topic{font-size:12px;color:var(--muted)}
 .mission-evidence-watch{padding-top:8px;border-top:1px solid var(--line)}
+.mission-evidence-apa{font-size:12px;color:var(--muted)}
+.mission-evidence-apa summary{cursor:pointer;color:var(--blue)}
+.mission-evidence-apa p{margin:6px 0 0;padding-left:1.5em;text-indent:-1.5em;overflow-wrap:anywhere}
 .mission-evidence-foot{margin-top:auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px}
 .mission-evidence-foot>div{display:grid;gap:3px}
 .mission-evidence-foot a:not(.text-button){display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--blue)}

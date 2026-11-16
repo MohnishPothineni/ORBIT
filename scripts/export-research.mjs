@@ -31,7 +31,8 @@ export function exportResearch() {
       evidence: library.EVIDENCE[item.evidence],
       topic: item.topicTitle,
       tracking: item.watch,
-      sources: sources.map((s) => ({ cite: s.cite, title: s.title, journal: s.journal, url: s.url })),
+      // apa: the full APA 7 reference, where the library has one (<i> marks italics).
+      sources: sources.map((s) => ({ cite: s.cite, title: s.title, journal: s.journal, url: s.url, ...(s.apa ? { apa: s.apa } : {}) })),
     };
   });
   return `${JSON.stringify({ generatedFrom: "ui/research-library.js", passages }, null, 1)}\n`;
