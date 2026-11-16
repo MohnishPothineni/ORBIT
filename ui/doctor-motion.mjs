@@ -34,25 +34,27 @@ export class DoctorIdleLook {
 export class DoctorGesture {
   constructor(seed=Math.floor(Math.random()*0xffffffff)){this.seed=(seed>>>0)||1;this.lastSide='left';this.reset();}
   random(){this.seed=(Math.imul(1664525,this.seed)+1013904223)>>>0;return this.seed/0x100000000;}
-  reset(){this.active=false;this.elapsed=0;this.duration=0;this.side='right';this.wait=.9+this.random()*1.6;this.last={left:0,right:0};}
-  start(){
+  reset(){this.active=false;this.elapsed=0;this.duration=0;this.side='right';this.kind=0;this.lastKind=-1;this.wait=.9+this.random()*1.6;this.last={left:0,right:0,kind:0,time:0};}
+  start(side,kind){
     if(this.active)return false;
-    const r=this.random();this.side=r<.22?'both':(this.lastSide==='left'?'right':'left');if(this.side!=='both')this.lastSide=this.side;
-    this.active=true;this.elapsed=0;this.duration=1.9+this.random()*1.7;return true;
+    const r=this.random();this.side=side||(r<.22?'both':(this.lastSide==='left'?'right':'left'));if(this.side!=='both')this.lastSide=this.side;
+    // 0 present (palm up, out to the side), 1 explain (toward the centre), 2 emphasise (lower, firmer beats). Two hands always explain.
+    let pick=Math.floor(this.random()*3);if(pick===this.lastKind)pick=(pick+1)%3;this.kind=Number.isInteger(kind)?kind:this.side==='both'?1:pick;this.lastKind=this.kind;
+    this.active=true;this.elapsed=0;this.duration=2.2+this.random()*1.8;return true;
   }
   sample(dt,enabled){
     const step=clamp(dt,0,.1);
     if(!this.active){
-      if(!enabled)return this.last={left:0,right:0};
-      this.wait-=step;if(this.wait>0)return this.last={left:0,right:0};
+      if(!enabled)return this.last={left:0,right:0,kind:this.kind,time:0};
+      this.wait-=step;if(this.wait>0)return this.last={left:0,right:0,kind:this.kind,time:0};
       this.start();
     }
     this.elapsed+=step;
     // Speech stopped: lower the hand now instead of finishing the hold.
-    if(!enabled&&this.elapsed<this.duration-.6)this.duration=this.elapsed+.6;
-    if(this.elapsed>=this.duration){this.active=false;this.wait=2.4+this.random()*4.2;return this.last={left:0,right:0};}
-    const up=ease(this.elapsed/.5)*(1-ease((this.elapsed-(this.duration-.6))/.6));
-    return this.last={left:this.side!=='right'?up:0,right:this.side!=='left'?up:0};
+    if(!enabled&&this.elapsed<this.duration-.7)this.duration=this.elapsed+.7;
+    if(this.elapsed>=this.duration){this.active=false;this.wait=2.2+this.random()*4;return this.last={left:0,right:0,kind:this.kind,time:0};}
+    const up=ease(this.elapsed/.62)*(1-ease((this.elapsed-(this.duration-.7))/.7));
+    return this.last={left:this.side!=='right'?up:0,right:this.side!=='left'?up:0,kind:this.kind,time:this.elapsed};
   }
 }
 // The pinned ElevenLabs WebRTC client emits 25 ms PCM16 playback samples.
@@ -74,13 +76,15 @@ const previewSyllables=[[.08,.18,.58],[.37,.14,.42],[.61,.23,.72],[1.02,.15,.5],
 export class DoctorMotion {
   constructor({idleSeed}={}){this.idleLook=new DoctorIdleLook(idleSeed);this.yawn=new DoctorYawn({seed:idleSeed===undefined?undefined:idleSeed^0x5f12ad3b});this.watch=new DoctorWatchCheck({seed:idleSeed===undefined?undefined:idleSeed^0x7d30ace1});this.gesture=new DoctorGesture(idleSeed===undefined?undefined:idleSeed^0x2b61f0d5);this.pointer={yaw:0,pitch:0,active:false};this.follow=0;this.followYaw=0;this.followPitch=0;this.slowAmp=0;this.nod=0;this.gestureLeft=0;this.gestureRight=0;this.mode='idle';this.voice=false;this.paused=false;this.visible=false;this.amplitude=0;this.velocity=0;this.envelope=0;this.articulation=.5;this.press=0;this.gazeX=0;this.gazeY=0;this.previewUntil=0;this.previewStart=0;this.blinkAt=2.4;this.phrase=0;this.presence=0;this.posture={headYaw:0,headPitch:0,headRoll:0,shoulderLeft:0,shoulderRight:0,torsoTurn:0,bodyShift:0};}
   /* Where the visitor's pointer is, as a head turn toward it (radians). */
-  setPointer(yaw,pitch,active){this.pointer.yaw=clamp(yaw,-.45,.45);this.pointer.pitch=clamp(pitch,-.14,.2);this.pointer.active=Boolean(active);}
+  setPointer(yaw,pitch,active){this.pointer.yaw=clamp(yaw,-.62,.62);this.pointer.pitch=clamp(pitch,-.2,.26);this.pointer.active=Boolean(active);}
   setMode(mode,voice=false){this.mode=mode;this.voice=voice;this.previewUntil=0;}
   resetSpeech(){this.amplitude=0;this.velocity=0;this.envelope=0;this.press=0;this.gazeX=0;this.gazeY=0;this.previewUntil=0;this.phrase=0;this.presence=0;this.idleLook.reset();this.yawn.reset();this.watch.reset();this.gesture.reset();this.follow=0;this.followYaw=0;this.followPitch=0;this.slowAmp=0;this.nod=0;this.gestureLeft=0;this.gestureRight=0;for(const key in this.posture)this.posture[key]=0;}
   setVisible(visible){this.visible=visible;if(!visible)this.resetSpeech();}
   setPaused(paused){this.paused=paused;if(paused)this.resetSpeech();}
   preview(now){if(!this.paused&&this.visible){this.previewStart=now;this.previewUntil=now+3.2;this.gesture.wait=.15;}}
   previewYawn(now){if(this.paused||!this.visible||!['idle','text'].includes(this.mode)||now<this.previewUntil||this.watch.active)return false;return this.yawn.start(true);}
+  /* Starts a specific gesture now (used for previews and checks). Side: left, right or both; kind 0–2. */
+  previewGesture(side,kind){if(this.paused||!this.visible)return false;this.gesture.active=false;return this.gesture.start(side,kind);}
   /* The watch-check animation is turned off: the avatar never raises its wrist to look at the watch. */
   previewWatch(){return false;}
   sample(now,dt,volume=0,centroid=.5){
@@ -125,11 +129,11 @@ export class DoctorMotion {
     this.presence+=(1-this.presence)*(1-Math.exp(-step/.38));
     const breath=this.presence*(.42+.3*Math.sin(now*1.37)+.06*Math.sin(now*.67+.8))+.12*yawn.face,phrase=this.phrase;
     const gl=this.gestureLeft,gr=this.gestureRight;
-    const targets={headYaw:watch.look*.30+look.headYaw+fy*.72+(gl-gr)*.05+this.presence*(.004*Math.sin(now*.53)+phrase*(.045*Math.sin(now*.83+.6)+.02*Math.sin(now*1.61))),headPitch:watch.look*.38-.055*yawn.face+look.headPitch+fp*.7+this.nod*.055+this.presence*(.003*Math.sin(now*.71)-phrase*.025*(.5+.5*Math.sin(now*1.9))),headRoll:watch.look*.025-.012*yawn.face-look.headYaw*.06-fy*.08+this.presence*(.002*Math.sin(now*.41)+phrase*.028*Math.sin(now*.67+.7)),shoulderLeft:watch.raise*.06+gl*.32+this.presence*(.08*Math.sin(now*.57+.3)+phrase*.42*Math.sin(now*.79+.6))+(breath-this.presence*.42)*.11,shoulderRight:yawn.cover*.06+gr*.32+this.presence*(.065*Math.sin(now*.61+1.4)+phrase*.36*Math.sin(now*.73+1.9))+(breath-this.presence*.42)*.09,torsoTurn:watch.raise*-.008+yawn.cover*.008+fy*.02+(gl-gr)*.006+this.presence*(.002*Math.sin(now*.38)+phrase*.012*Math.sin(now*.63+.5)),bodyShift:this.presence*(.0003*Math.sin(now*.57)+phrase*.0009*Math.sin(now*.71))};
+    const targets={headYaw:watch.look*.30+look.headYaw*1.3+fy*.86+(gl-gr)*.07+this.presence*(.006*Math.sin(now*.53)+phrase*(.068*Math.sin(now*.83+.6)+.03*Math.sin(now*1.61))),headPitch:watch.look*.38-.055*yawn.face+look.headPitch*1.3+fp*.82+this.nod*.08+this.presence*(.005*Math.sin(now*.71)-phrase*.036*(.5+.5*Math.sin(now*1.9))),headRoll:watch.look*.025-.012*yawn.face-look.headYaw*.08-fy*.11+(gr-gl)*.025+this.presence*(.003*Math.sin(now*.41)+phrase*.042*Math.sin(now*.67+.7)),shoulderLeft:watch.raise*.06+gl*.32+this.presence*(.08*Math.sin(now*.57+.3)+phrase*.42*Math.sin(now*.79+.6))+(breath-this.presence*.42)*.11,shoulderRight:yawn.cover*.06+gr*.32+this.presence*(.065*Math.sin(now*.61+1.4)+phrase*.36*Math.sin(now*.73+1.9))+(breath-this.presence*.42)*.09,torsoTurn:watch.raise*-.008+yawn.cover*.008+fy*.02+(gl-gr)*.006+this.presence*(.002*Math.sin(now*.38)+phrase*.012*Math.sin(now*.63+.5)),bodyShift:this.presence*(.0003*Math.sin(now*.57)+phrase*.0009*Math.sin(now*.71))};
     for(const key in targets){const settling=key.startsWith('shoulder')?.62:key==='torsoTurn'||key==='bodyShift'?.48:idle?.16:.26;this.posture[key]+=(targets[key]-this.posture[key])*(1-Math.exp(-step/settling));}
     // Eyes lead the turn, then settle relative to the actual head position.
     const gazeBlend=1-Math.exp(-step/.065);
     this.gazeX+=(watch.look*.52+look.attentionYaw+this.followYaw*this.follow-this.posture.headYaw-this.gazeX)*gazeBlend;this.gazeY+=(watch.look*.66+look.attentionPitch+this.followPitch*this.follow-this.posture.headPitch-this.gazeY)*gazeBlend;
-    return {jaw:this.amplitude+(1-this.amplitude)*yawn.jaw,rounding:(1-this.articulation)*(1-yawn.face*.4),spread:this.articulation,press:this.press,fricative:this.amplitude*Math.max(0,this.articulation-.55)*.22,tongue:this.amplitude*this.articulation*.035,blink:Math.max(blink,yawn.face*.82),yaw:this.presence*Math.sin(now*.48)*.003,pitch:this.presence*Math.sin(now*.71)*.002,roll:this.presence*Math.sin(now*.34)*.002,breath,...this.posture,brow:emphasis*.08+yawn.face*.06,cheek:this.amplitude*.035+yawn.face*.03,squint:emphasis*.025+yawn.face*.45,gazeX:this.gazeX,gazeY:this.gazeY,idleLooking:idle&&!yawn.active&&!watch.active&&this.idleLook.phase!=='forward',yawning:yawn.active,yawnCover:yawn.cover,yawnPreview:yawn.preview,watchChecking:watch.active,watchRaise:watch.raise,watchPreview:watch.preview,gestureLeft:this.gestureLeft,gestureRight:this.gestureRight,gestureBeat:this.nod,following:this.follow>.05,preview,speaking};
+    return {jaw:this.amplitude+(1-this.amplitude)*yawn.jaw,rounding:(1-this.articulation)*(1-yawn.face*.4),spread:this.articulation,press:this.press,fricative:this.amplitude*Math.max(0,this.articulation-.55)*.22,tongue:this.amplitude*this.articulation*.035,blink:Math.max(blink,yawn.face*.82),yaw:this.presence*Math.sin(now*.48)*.003,pitch:this.presence*Math.sin(now*.71)*.002,roll:this.presence*Math.sin(now*.34)*.002,breath,...this.posture,brow:emphasis*.08+yawn.face*.06,cheek:this.amplitude*.035+yawn.face*.03,squint:emphasis*.025+yawn.face*.45,gazeX:this.gazeX,gazeY:this.gazeY,idleLooking:idle&&!yawn.active&&!watch.active&&this.idleLook.phase!=='forward',yawning:yawn.active,yawnCover:yawn.cover,yawnPreview:yawn.preview,watchChecking:watch.active,watchRaise:watch.raise,watchPreview:watch.preview,gestureLeft:this.gestureLeft,gestureRight:this.gestureRight,gestureBeat:this.nod,gestureKind:gesture.kind,gestureTime:gesture.time,following:this.follow>.05,preview,speaking};
   }
 }

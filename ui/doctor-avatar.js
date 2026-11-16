@@ -60,7 +60,7 @@ export async function mountDoctorAvatar({host,persona='male',getVolume=()=>0,onR
     if(wasYawn!==!!pose.yawning)onYawnStateChange();
     host.dataset.watchChecking=String(!!pose.watchChecking);host.dataset.watchRaise=(pose.watchRaise||0).toFixed(3);host.dataset.watchPreview=String(!!pose.watchPreview);
     if(wasWatch!==!!pose.watchChecking)onWatchStateChange();
-    host.dataset.gestureLeft=(pose.gestureLeft||0).toFixed(3);host.dataset.gestureRight=(pose.gestureRight||0).toFixed(3);host.dataset.following=String(!!pose.following);host.dataset.jaw=pose.jaw.toFixed(3);host.dataset.speaking=String(pose.speaking);host.dataset.preview=String(pose.preview);
+    host.dataset.gestureKind=String(pose.gestureKind|0);host.dataset.gestureLeft=(pose.gestureLeft||0).toFixed(3);host.dataset.gestureRight=(pose.gestureRight||0).toFixed(3);host.dataset.following=String(!!pose.following);host.dataset.jaw=pose.jaw.toFixed(3);host.dataset.speaking=String(pose.speaking);host.dataset.preview=String(pose.preview);
     if(wasPreview&&!pose.preview)onPreviewEnd();
   }
   function draw(now=performance.now()){
@@ -91,7 +91,7 @@ export async function mountDoctorAvatar({host,persona='male',getVolume=()=>0,onR
     const r=view.getBoundingClientRect();if(!r.width)return;
     const cx=r.left+r.width/2,cy=r.top+r.height*.3;
     const dx=(e.clientX-cx)/Math.max(320,innerWidth*.5),dy=(e.clientY-cy)/Math.max(320,innerHeight*.6);
-    motion.setPointer(Math.atan(dx*1.1)*.5,Math.atan(dy)*.24,true);schedule();
+    motion.setPointer(Math.atan(dx*1.2)*.64,Math.atan(dy*1.1)*.3,true);schedule();
     clearTimeout(pointerTimer);pointerTimer=setTimeout(()=>motion.setPointer(0,0,false),4000);
   };
   const unfollow=e=>{if(!e.relatedTarget){clearTimeout(pointerTimer);motion.setPointer(0,0,false);}};
@@ -103,6 +103,7 @@ export async function mountDoctorAvatar({host,persona='male',getVolume=()=>0,onR
     setPaused(value){motion.setPaused(value);host.dataset.paused=String(value);if(frame!==null)cancelAnimationFrame(frame);frame=null;if(motion.visible){draw();schedule();}},
     preview(){motion.preview(performance.now()/1000);schedule();},
     previewYawn(){const started=motion.previewYawn(performance.now()/1000);schedule();return started;},
+    previewGesture(side,kind){const started=motion.previewGesture(side,kind);schedule();return started;},
     previewWatch(){const started=motion.previewWatch(performance.now()/1000);schedule();return started;},
     reset(){yaw=0;pitch=0;if(motion.visible)draw();},
     setQuality(value){quality=value==='high'?'high':'balanced';host.dataset.quality=quality;renderer.setPixelRatio(renderer.isSoftwareRenderer?(quality==='high'?1:.85):Math.min(window.devicePixelRatio||1,AVATAR_QUALITY[quality].pixelRatio));studio.setQuality(quality);resize();},
