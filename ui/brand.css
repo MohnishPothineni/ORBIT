@@ -38,8 +38,6 @@ input, textarea { caret-color: var(--orbit-cyan-ink); }
 .main-nav a.active > i { color: var(--orbit-cyan-ink); }
 .main-nav a:not(.active):hover { background: #edf4f8; }
 
-/* Top bar: a thin orbit-ring line along the bottom */
-.topbar { background-image: var(--orbit-ring); background-size: 100% 2px; background-repeat: no-repeat; background-position: bottom; }
 
 /* Headings and labels */
 .page-heading h1 { color: var(--orbit-navy); }
@@ -97,9 +95,9 @@ h1, h2, h3, h4, h5, h6, button, .button, summary, [role=tab], legend, .main-nav 
 /* The feature search stays available to the crew assistant ("find a feature") and the ⌘K / Ctrl K shortcut, but its top bar button is hidden. */
 .topbar .feature-finder-trigger { display: none !important; }
 
-/* Desktop: the top bar is just the orbit-ring line (the sidebar is always visible, so no menu button is needed).
+/* Desktop: no top bar (the sidebar is always visible, so no menu button is needed).
    Tablets and phones keep the bar for the menu button. */
 @media (min-width: 1100px) {
-  .topbar { height: 3px; min-height: 0; padding: 0; border-bottom: 0; overflow: hidden; background-size: 100% 3px; }
+  .topbar { display: none; }
   .topbar > * { display: none !important; }
 }
