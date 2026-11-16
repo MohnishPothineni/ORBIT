@@ -169,3 +169,10 @@ body[data-assistant-closed=true] .assistant-reopen:not([hidden]) { display: bloc
 #assistant-panel .assistant-sharing[hidden] { display: none; }
 #assistant-panel .assistant-empty { padding: 14px 0 6px; border: 0; }
 #assistant-panel .assistant-foot { justify-content: flex-end; }
+
+/* Online / Offline switch in the panel's top-right corner, with both options always shown */
+#assistant-panel > .connectivity-switch { position: absolute; top: 12px; right: 16px; z-index: 5; padding: 3px; border: 1px solid var(--line); background: #fff; }
+#assistant-panel > .connectivity-switch button { min-width: 0; min-height: 32px; padding: 0 11px; border: 0; font-size: 12px; }
+#assistant-panel > .connectivity-switch button span { display: inline; }
+#assistant-panel > .connectivity-switch button[aria-checked=false] { display: inline-flex; }
+@media (max-width: 899px) { #assistant-panel { position: relative; } }

@@ -78,6 +78,8 @@
     <button class="assistant-reopen" id="assistant-reopen" type="button" hidden>Open assistant</button>
     <dialog class="assistant-consent" id="assistant-consent" aria-labelledby="assistant-consent-title"><header><h2 id="assistant-consent-title"></h2><p id="assistant-consent-subtitle"></p></header><div class="assistant-consent-body" id="assistant-consent-body"></div><p class="assistant-consent-status" id="assistant-consent-status" role="status"></p><footer><button class="button" id="assistant-consent-cancel">Keep private</button><button class="button primary" id="assistant-consent-approve">Share with agent</button></footer></dialog>`;
   document.body.append(host); hydrateIcons(host);
+  /* The Online / Offline switch lives in the assistant panel's top-right corner (it keeps its handlers when moved). */
+  { const toggle=document.getElementById('connectivity-switch'); if(toggle) host.querySelector('#assistant-panel').prepend(toggle); }
   const el = id => document.getElementById(`assistant-${id}`);
   const loadSdk = () => sdkPromise ||= import('./vendor/elevenlabs-client.js').catch(error => { sdkPromise = null; throw error; });
   const isOpen = () => !el('panel').hidden;
