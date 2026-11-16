@@ -26,6 +26,7 @@ function labLayout(catalog){
    <div class="lab-viewer">${anatomyPanel()}</div>
    <nav class="lab-rail lab-rail-right" aria-label="More anatomy tools">${tools.slice(4).map(tool).join('')}
     <div class="lab-rail-presets anatomy-quick-presets" role="group" aria-label="Show"><span class="lab-rail-label">SHOW</span>${presets.map(([v,n])=>`<button data-anatomy-preset="${v}" aria-pressed="${v===5}">${n}</button>`).join('')}</div>
+    <div class="lab-rail-zoom" role="group" aria-label="Zoom and reset"><span class="lab-rail-label">ZOOM</span><button data-anatomy-zoom="in" aria-label="Zoom in" title="Zoom in">${icon('plus')}</button><button data-anatomy-zoom="out" aria-label="Zoom out" title="Zoom out">${icon('minus')}</button><button data-anatomy-view="reset" aria-label="Reset view" title="Reset view">${icon('refresh')}</button></div>
    </nav>
   </div>
   <div class="anatomy-workspace-heading"><div><span class="eyebrow">INTERACTIVE ATLAS</span><span class="anatomy-atlas-count">${catalog.parts.length.toLocaleString()} named source parts</span><span id="anatomy-context-status">Full body reference</span></div><span id="lab-loaded-stat" aria-live="polite">Preparing geometry…</span></div>
